@@ -1,6 +1,6 @@
 all::
 	go build -o bin/rstore src/main.go
-	go build -o bin/rstcli src/rstcli.go
+	go build -o bin/rstcli src/rstcli/rstcli.go
 
 
 prepare::
