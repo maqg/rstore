@@ -1,0 +1,5 @@
+version: 0.1
+debuglevel: 3
+loglevel: 3
+http:
+    addr: :5000
