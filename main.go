@@ -25,15 +25,12 @@ func initLogConfig() {
 }
 
 func init() {
-	flag.StringVar(&addr, "addr", "0.0.0.0", "listen addr")
-	flag.IntVar(&port, "port", 8000, "listen port")
-	flag.StringVar(&cert, "cert", "./cert/cert.crt", "cert file path")
 	flag.StringVar(&config, "config", "./config.json", "config file")
 }
 
 func usage() {
 	fmt.Println("  RVM Store of V" + utils.Version() + "\n")
-	fmt.Println("  ./rstore -port 8000 -config ./config.json\n")
+	fmt.Println("  ./rstore -config ./config.json\n")
 	flag.PrintDefaults()
 }
 
@@ -48,7 +45,7 @@ func main() {
 	initLogConfig()
 
 	api := &api.Api{
-		Name: "Mirage API Server",
+		Name: "RSTORE API Server",
 	}
 
 	server := &http.Server{
@@ -57,7 +54,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	octlog.Warn("Mirage Engine Started\n")
+	octlog.Warn("RSTORE Engine Started\n")
 
 	err := server.ListenAndServe()
 	if err != nil {
