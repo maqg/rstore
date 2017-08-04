@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"octlink/rstore/vender/github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 func YourHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,1 +1,1 @@
-For Vender List
+For Vendor List
