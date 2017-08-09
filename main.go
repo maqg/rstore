@@ -7,6 +7,7 @@ import (
 	"octlink/mirage/src/api"
 	"octlink/mirage/src/utils"
 	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/handlers"
 )
 
 var (
@@ -26,6 +27,9 @@ func initLogConfig() {
 
 func init() {
 	flag.StringVar(&config, "config", "./config.json", "config file")
+
+	initDebugConfig()
+	initLogConfig()
 }
 
 func usage() {
@@ -39,25 +43,9 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	fmt.Println(utils.Version())
+	app := handlers.NewApp()
 
-	initDebugConfig()
-	initLogConfig()
-
-	api := &api.Api{
-		Name: "RSTORE API Server",
-	}
-
-	server := &http.Server{
-		Addr:           fmt.Sprintf("%s:%d", addr, port),
-		Handler:        api.ApiRouter(),
-		MaxHeaderBytes: 1 << 20,
-	}
+	http.ListenAndServe(":8000", app.Router)
 
 	octlog.Warn("RSTORE Engine Started\n")
-
-	err := server.ListenAndServe()
-	if err != nil {
-		octlog.Error("error to listen\n")
-	}
 }

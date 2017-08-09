@@ -1,6 +1,6 @@
 package main
 
-import "octlink/rstore/src/cobracmd/cobracmd"
+import "octlink/rstore/playground/cobracmd/cobracmd"
 
 func main() {
 	cobracmd.RootCmd.Execute()
