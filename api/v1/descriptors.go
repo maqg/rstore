@@ -29,6 +29,14 @@ var routeDescriptors = []RouteDescriptor{
 		Name: "test",
 		Path: "/v1/test",
 	},
+	{
+		Name: "blob",
+		Path: "/v1/test",
+	},
+	{
+		Name: "blob-upload",
+		Path: "/v1/test",
+	},
 }
 
 func init() {

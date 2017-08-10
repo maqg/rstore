@@ -87,13 +87,13 @@ var GErrorsCN = map[int]string{
 	ERR_USERGROUP_USERS_NOT_EMPTY: "该用户组下的用户不为空",
 }
 
-type MirageError struct {
+type MError struct {
 	ErrorNo  int    `json:"no"`
 	ErrorMsg string `json:"msg"`
 }
 
-func NewError(code int, message string) *MirageError {
-	return &MirageError{
+func NewError(code int, message string) *MError {
+	return &MError{
 		ErrorNo:  code,
 		ErrorMsg: message,
 	}
