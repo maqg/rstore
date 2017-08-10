@@ -1,34 +1,20 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
+	"octlink/rstore/modules/blobs"
 
 	"github.com/gorilla/handlers"
 )
 
-func getBlob(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-func deleteBlob(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
 func blobManager(r *http.Request) http.Handler {
 
 	mhandler := handlers.MethodHandler{
-		"GET":  http.HandlerFunc(getBlob),
-		"HEAD": http.HandlerFunc(getBlob),
+		"GET":  http.HandlerFunc(blobs.GetBlob),
+		"HEAD": http.HandlerFunc(blobs.GetBlob),
 	}
 
-	mhandler["DELETE"] = http.HandlerFunc(deleteBlob)
+	mhandler["DELETE"] = http.HandlerFunc(blobs.DeleteBlob)
 
 	return mhandler
 }
