@@ -8,12 +8,14 @@ import (
 )
 
 func GetBlob(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+
+	name := mux.Vars(r)["name"]
+	digest := r.FormValue("digest")
+
+	emptyJSON := fmt.Sprintf("{\"msg\":\"this is blob message,name:%s,digest:%s\"}", name, digest)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Printf("got resposity name [%s]\n", vars["name"])
-	fmt.Print(vars)
 	fmt.Fprint(w, emptyJSON)
 }
 
