@@ -20,6 +20,9 @@ type RouteDescriptor struct {
 	// should match.
 	Path string
 
+	// Description for this router.
+	Description string
+
 	// Methods should describe the various HTTP methods that may be used on
 	// this route, including request and response formats.
 	Methods []MethodDescriptor
@@ -92,6 +95,9 @@ type ParameterDescriptor struct {
 
 	// Description provides a human-readable description of the parameter.
 	Description string
+
+	// Required or not
+	Required bool
 
 	// Examples provides multiple examples for the values that might be valid
 	// for this parameter.
@@ -215,20 +221,113 @@ var routeDescriptors = []RouteDescriptor{
 		},
 	},
 	{
-		Name: "help",
-		Path: "/v1/help",
+		Name:        RouteNameTags,
+		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/tags/list",
+		Description: "Retrieve information about tags.",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Fetch the tags under the repository identified by `name`.",
+				Requests: []RequestDescriptor{
+					{
+						Name:        "Tags",
+						Description: "Return all tags for the repository",
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+						},
+					},
+				},
+			},
+		},
 	},
 	{
-		Name: "test",
-		Path: "/v1/test",
+		Name:        RouteNameBlobUpload,
+		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/",
+		Description: "Initiate a blob upload.",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "POST",
+				Description: "Initiate a resumable blob upload. On success, upload location will be provided. Optionally, if the `digest` parameter is present, the request body will be used to complete the upload in a single request.",
+				Requests: []RequestDescriptor{
+					{
+						Name:        "Initiate Monolithic Blob Upload",
+						Description: "Upload a blob identified by the `digest` parameter in single request. This upload will not beresumable unless a recoverable error is returned.",
+						Headers: []ParameterDescriptor{
+							{
+								Name:   "Content-Length",
+								Type:   "integer",
+								Format: "<length of blob>",
+							},
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+						},
+						QueryParameters: []ParameterDescriptor{
+							{
+								Name:   "digest",
+								Type:   "query",
+								Format: "<digest>",
+								Description: `Digest of uploaded blob. If present, the upload will be completed, in a single reques
+								t, with contents of the request body as the resulting blob.`,
+							},
+						},
+						Body: BodyDescriptor{
+							ContentType: "application/octect-stream",
+							Format:      "<binary data>",
+						},
+					},
+					{
+						Name:        "Initiate Resumable Blob Upload",
+						Description: "Initiate a resumable blob upload with an empty request body.",
+						Headers: []ParameterDescriptor{
+							contentLengthZeroHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+						},
+					},
+					{
+						Name:        "Mount Blob",
+						Description: "Mount a blob identified by the `mount` parameter from another repository.",
+						Headers: []ParameterDescriptor{
+							contentLengthZeroHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+						},
+						QueryParameters: []ParameterDescriptor{
+							{
+								Name:        "mount",
+								Type:        "query",
+								Format:      "<digest>",
+								Description: `Digest of blob to mount from the source repository.`,
+							},
+							{
+								Name:        "from",
+								Type:        "query",
+								Format:      "<repository name>",
+								Description: `Name of the source repository.`,
+							},
+						},
+					},
+				},
+			},
+		},
 	},
 	{
-		Name: "blob",
-		Path: "/v1/test",
+		Name: RouteNameHelp,
+		Path: "/v1/help/",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Print API Help Message for V1.",
+			},
+		},
 	},
 	{
-		Name: "blob-upload",
-		Path: "/v1/test",
+		Name:    RouteNameBlob,
+		Path:    "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/",
+		Methods: []MethodDescriptor{},
 	},
 }
 
