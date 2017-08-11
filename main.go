@@ -8,6 +8,7 @@ import (
 	"octlink/mirage/src/utils"
 	"octlink/mirage/src/utils/octlog"
 	"octlink/rstore/handlers"
+	"octlink/rstore/modules/blobs"
 )
 
 var (
@@ -23,6 +24,7 @@ func initDebugConfig() {
 
 func initLogConfig() {
 	api.InitApiLog(octlog.DEBUG_LEVEL)
+	blobs.InitLog(octlog.DEBUG_LEVEL)
 }
 
 func init() {
