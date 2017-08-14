@@ -6,17 +6,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var showVersion bool
+var (
+	showVersion bool
+	imageuuid   string
+	filepath    string // image file path
+	callbackurl string
+	taskid      string
+	name        string // image name
+	account     string // account uuid
+	cachedir    string // temp dir for image files caching
+	installpath string // where to store image of local
+	storepath   string // store path like rstore://uuid:manifest
+)
 
 func init() {
-	RootCmd.AddCommand(HenryCmd)
+	RootCmd.AddCommand(PullCmd)
+	RootCmd.AddCommand(PushCmd)
+	RootCmd.AddCommand(SearchCmd)
+	RootCmd.AddCommand(ImportCmd)
+	RootCmd.AddCommand(ImagesCmd)
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")
 }
 
 var RootCmd = &cobra.Command{
+
 	Use:   "rstcli",
-	Short: "`rstcli`",
-	Long:  "`rstcli`",
+	Short: "RSTORE CLI TOOLS",
+
 	Run: func(cmd *cobra.Command, args []string) {
 		if showVersion {
 			fmt.Printf("V 0.0.1\n")

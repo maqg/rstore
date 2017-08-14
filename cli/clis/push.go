@@ -7,17 +7,15 @@ import (
 )
 
 func init() {
-	PullCmd.Flags().StringVarP(&imageuuid, "imageuuid", "u", "", "imageuuid")
+	PushCmd.Flags().StringVarP(&imageuuid, "imageuuid", "u", "", "imageuuid")
 }
 
-var PullCmd = &cobra.Command{
+var PushCmd = &cobra.Command{
 
-	Use:   "pull",
-	Short: "Pull image from rstore.",
+	Use:   "push",
+	Short: "Push image to remote storage.",
 
 	Run: func(cmd *cobra.Command, args []string) {
-
-		fmt.Printf("running in pull service\n")
 
 		if imageuuid != "" {
 			fmt.Printf("got uuid %s\n", imageuuid)
