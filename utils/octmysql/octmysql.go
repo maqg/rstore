@@ -3,7 +3,7 @@ package octmysql
 import (
 	"database/sql"
 	"fmt"
-	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/utils/octlog"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -19,7 +19,7 @@ func InitLog(level int) {
 }
 
 const (
-	DB_NAME     = "dbmirage"
+	DB_NAME     = "dbrstore"
 	DB_USER     = "root"
 	DB_PASSWORD = "123456"
 	DB_SERVER   = "127.0.0.1"

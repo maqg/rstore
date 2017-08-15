@@ -4,11 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"octlink/mirage/src/api"
-	"octlink/mirage/src/utils"
-	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/api"
+	"octlink/rstore/configuration"
 	"octlink/rstore/handlers"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/utils"
+	"octlink/rstore/utils/octlog"
+	"os"
 )
 
 var (
@@ -28,7 +30,7 @@ func initLogConfig() {
 }
 
 func init() {
-	flag.StringVar(&config, "config", "./config.json", "config file")
+	flag.StringVar(&config, "config", "var/config.yml", "Config file path")
 
 	initDebugConfig()
 	initLogConfig()
@@ -36,8 +38,37 @@ func init() {
 
 func usage() {
 	fmt.Println("  RVM Store of V" + utils.Version() + "\n")
-	fmt.Println("  ./rstore -config ./config.json\n")
+	fmt.Println("  ./rstore -config ./config.yml\n")
 	flag.PrintDefaults()
+}
+
+func resolveConfiguration(configfile string) (*configuration.Configuration, error) {
+
+	var configurationPath string
+
+	if configfile == "" {
+		configurationPath = os.Getenv("REGISTRY_CONFIGURATION_PATH")
+	} else {
+		configurationPath = configfile
+	}
+
+	if configurationPath == "" {
+		return nil, fmt.Errorf("configuration path unspecified")
+	}
+
+	fp, err := os.Open(configurationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fp.Close()
+
+	config, err := configuration.Parse(fp)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing %s: %v", configurationPath, err)
+	}
+
+	return config, nil
 }
 
 func main() {
@@ -45,9 +76,15 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
+	config, err := resolveConfiguration(config)
+	if err != nil {
+		fmt.Printf("Resolve Configuration Error[%s]\n", err)
+		return
+	}
+
 	app := handlers.NewApp()
 
-	http.ListenAndServe(":8000", app.Router)
+	http.ListenAndServe(config.HTTP.Addr, app.Router)
 
 	octlog.Warn("RSTORE Engine Started\n")
 }

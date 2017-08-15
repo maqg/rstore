@@ -2,8 +2,8 @@ package httpresponse
 
 import (
 	"net/http"
-	"octlink/mirage/src/utils/merrors"
-	"octlink/mirage/src/utils/uuid"
+	"octlink/rstore/utils/merrors"
+	"octlink/rstore/utils/uuid"
 
 	"github.com/gin-gonic/gin"
 )

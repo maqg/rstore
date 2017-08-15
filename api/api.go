@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/utils/octlog"
 	"os"
 	"strings"
 )
@@ -18,7 +18,7 @@ const (
 
 	PARAM_NOT_NULL = "NotNull"
 
-	API_PREFIX_CENTER = "octlink.mirage.center"
+	API_PREFIX_CENTER = "octlink.rstore.center"
 )
 
 var logger *octlog.LogConfig
@@ -58,7 +58,7 @@ type ApiModule struct {
 	Protos map[string]ApiProto `json:"protos"`
 }
 
-// octlink.mirage.center.host.APIAddHost
+// octlink.rstore.center.host.APIAddHost
 func FindApiProto(api string) *ApiProto {
 	segments := strings.Split(api, ".")
 

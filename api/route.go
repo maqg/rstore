@@ -1,7 +1,7 @@
 package api
 
 import (
-	"octlink/mirage/src/utils"
+	"octlink/rstore/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,7 +1,7 @@
 package octmysql
 
 import (
-	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/utils/octlog"
 	"testing"
 )
 

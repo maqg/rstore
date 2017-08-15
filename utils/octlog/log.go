@@ -3,7 +3,7 @@ package octlog
 import (
 	"fmt"
 	"log"
-	"octlink/mirage/src/utils"
+	"octlink/rstore/utils"
 	"os"
 )
 

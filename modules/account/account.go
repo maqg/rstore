@@ -4,11 +4,11 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"octlink/mirage/src/modules/session"
-	"octlink/mirage/src/utils/config"
-	"octlink/mirage/src/utils/merrors"
-	"octlink/mirage/src/utils/octlog"
-	"octlink/mirage/src/utils/octmysql"
+	"octlink/rstore/configuration"
+	"octlink/rstore/modules/session"
+	"octlink/rstore/utils/merrors"
+	"octlink/rstore/utils/octlog"
+	"octlink/rstore/utils/octmysql"
 	"time"
 )
 
@@ -60,7 +60,7 @@ type Account struct {
 }
 
 func GetAccountCount(db *octmysql.OctMysql) int {
-	count, _ := db.Count(config.TB_ACCOUNT, "")
+	count, _ := db.Count(configuration.TB_ACCOUNT, "")
 	return count
 }
 
@@ -75,7 +75,7 @@ func (account *Account) ResetPassword(db *octmysql.OctMysql, password string) in
 	encPass := GetEncPassword(password)
 
 	sql := fmt.Sprintf("UPDATE %s SET U_Password='%s',U_LastSync='%d' WHERE ID='%s';",
-		config.TB_ACCOUNT, encPass, int64(time.Now().Unix()), account.Id)
+		configuration.TB_ACCOUNT, encPass, int64(time.Now().Unix()), account.Id)
 
 	_, err := db.Exec(sql)
 	if err != nil {
@@ -88,7 +88,7 @@ func (account *Account) ResetPassword(db *octmysql.OctMysql, password string) in
 }
 
 func (account *Account) GroupCount(db *octmysql.OctMysql) int {
-	count, _ := db.Count(config.TB_USERGROUP, "WHERE UG_AccountId=?", account.Id)
+	count, _ := db.Count(configuration.TB_USERGROUP, "WHERE UG_AccountId=?", account.Id)
 	return count
 }
 
@@ -100,7 +100,7 @@ func (account *Account) UpdatePassword(db *octmysql.OctMysql, oldPassword string
 	var accountId string
 
 	sql := fmt.Sprintf("SELECT ID FROM %s WHERE U_Name='%s' AND U_Password='%s';",
-		config.TB_ACCOUNT, account.Name, encPass)
+		configuration.TB_ACCOUNT, account.Name, encPass)
 
 	row := db.QueryRow(sql)
 	err := row.Scan(&accountId)
@@ -117,7 +117,7 @@ func (account *Account) Update(db *octmysql.OctMysql) int {
 
 	sql := fmt.Sprintf("UPDATE %s SET U_Email='%s',U_PhoneNumber='%s', "+
 		"U_Description='%s',U_LastSync='%d' WHERE ID='%s';",
-		config.TB_ACCOUNT, account.Email,
+		configuration.TB_ACCOUNT, account.Email,
 		account.PhoneNumber, account.Desc,
 		int64(time.Now().Unix()),
 		account.Id)
@@ -135,7 +135,7 @@ func (account *Account) Update(db *octmysql.OctMysql) int {
 func (account *Account) UpdateLogin(db *octmysql.OctMysql) int {
 
 	sql := fmt.Sprintf("UPDATE %s SET U_LastLogin='%d' WHERE ID='%s';",
-		config.TB_ACCOUNT, int64(time.Now().Unix()), account.Id)
+		configuration.TB_ACCOUNT, int64(time.Now().Unix()), account.Id)
 
 	_, err := db.Exec(sql)
 	if err != nil {
@@ -150,7 +150,7 @@ func (account *Account) UpdateLogin(db *octmysql.OctMysql) int {
 func (account *Account) UpdateSyncTime(db *octmysql.OctMysql) int {
 
 	sql := fmt.Sprintf("UPDATE %s SET U_LastSync='%d' WHERE ID='%s';",
-		config.TB_ACCOUNT, int64(time.Now().Unix()), account.Id)
+		configuration.TB_ACCOUNT, int64(time.Now().Unix()), account.Id)
 
 	_, err := db.Exec(sql)
 	if err != nil {
@@ -170,7 +170,7 @@ func (account *Account) Login(db *octmysql.OctMysql,
 	encPass := GetEncPassword(password)
 
 	sql := fmt.Sprintf("SELECT ID FROM %s WHERE U_Name='%s' AND U_Password='%s';",
-		config.TB_ACCOUNT, account.Name, encPass)
+		configuration.TB_ACCOUNT, account.Name, encPass)
 
 	row := db.QueryRow(sql)
 	err := row.Scan(&accountId)
@@ -190,7 +190,7 @@ func (account *Account) Add(db *octmysql.OctMysql) int {
 		"U_Email, U_PhoneNumber, U_Password, U_CreateTime, "+
 		"U_Description) VALUES ('%s', '%s', '%d', '%s', '%s', "+
 		"'%s', '%d', '%s')",
-		config.TB_ACCOUNT,
+		configuration.TB_ACCOUNT,
 		account.Id, account.Name, account.Type,
 		account.Email, account.PhoneNumber, account.Password,
 		account.CreateTime, account.Desc)
@@ -217,7 +217,7 @@ func (account *Account) Delete(db *octmysql.OctMysql) int {
 	}
 
 	sql := fmt.Sprintf("DELETE FROM %s WHERE ID='%s'",
-		config.TB_ACCOUNT, account.Id)
+		configuration.TB_ACCOUNT, account.Id)
 
 	_, err := db.Exec(sql)
 	if err != nil {

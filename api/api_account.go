@@ -2,12 +2,12 @@ package api
 
 import (
 	"fmt"
-	"octlink/mirage/src/modules/account"
-	"octlink/mirage/src/modules/session"
-	"octlink/mirage/src/utils"
-	"octlink/mirage/src/utils/merrors"
-	"octlink/mirage/src/utils/octlog"
-	"octlink/mirage/src/utils/uuid"
+	"octlink/rstore/modules/account"
+	"octlink/rstore/modules/session"
+	"octlink/rstore/utils"
+	"octlink/rstore/utils/merrors"
+	"octlink/rstore/utils/octlog"
+	"octlink/rstore/utils/uuid"
 )
 
 func APIAddAccount(paras *ApiParas) *ApiResponse {

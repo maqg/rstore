@@ -1,11 +1,11 @@
 package api
 
 import (
-	"octlink/mirage/src/modules/session"
-	"octlink/mirage/src/utils/httpresponse"
-	"octlink/mirage/src/utils/merrors"
-	"octlink/mirage/src/utils/octlog"
-	"octlink/mirage/src/utils/octmysql"
+	"octlink/rstore/modules/session"
+	"octlink/rstore/utils/httpresponse"
+	"octlink/rstore/utils/merrors"
+	"octlink/rstore/utils/octlog"
+	"octlink/rstore/utils/octmysql"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +18,7 @@ type ApiResponse struct {
 
 /*
 {
-	"module": "octlink.mirage.center.host.APIAddHost",
+	"module": "octlink.rstore.center.host.APIAddHost",
 	"paras": {
 		"ip": "kk",
 		"account": "root",
@@ -68,8 +68,8 @@ func GetApiService(key string) *ApiService {
 }
 
 var SessionExceptions = []string{
-	"octlink.mirage.center.account.APILoginByAccount",
-	"octlink.mirage.center.user.APILoginByUser",
+	"octlink.rstore.center.account.APILoginByAccount",
+	"octlink.rstore.center.user.APILoginByUser",
 }
 
 func NeedSessionCheck(api string) bool {
