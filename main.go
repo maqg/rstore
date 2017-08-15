@@ -71,6 +71,31 @@ func resolveConfiguration(configfile string) (*configuration.Configuration, erro
 	return config, nil
 }
 
+const (
+	HTTP_SERVER = "0.0.0.0"
+	HTTP_PORT   = 8001
+)
+
+func runApiThread() {
+
+	api := &api.Api{
+		Name: "Mirage API Server",
+	}
+
+	server := &http.Server{
+		Addr:           fmt.Sprintf("%s:%d", HTTP_SERVER, HTTP_PORT),
+		Handler:        api.ApiRouter(),
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	octlog.Warn("Mirage Engine Started\n")
+
+	err := server.ListenAndServe()
+	if err != nil {
+		octlog.Error("error to listen\n")
+	}
+}
+
 func main() {
 
 	flag.Usage = usage
@@ -82,9 +107,11 @@ func main() {
 		return
 	}
 
+	go runApiThread()
+
 	app := handlers.NewApp()
 
-	http.ListenAndServe(config.HTTP.Addr, app.Router)
-
 	octlog.Warn("RSTORE Engine Started\n")
+
+	http.ListenAndServe(config.HTTP.Addr, app.Router)
 }

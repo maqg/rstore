@@ -13,7 +13,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIAccountLogOut"
 	service.Handler = APIAccountLogOut
-	GApiServices["octlink.rstore.center.account.APIAccountLogOut"] = service
+	GApiServices["octlink.mirage.center.account.APIAccountLogOut"] = service
 
 	// --------------------
 	// for APIAddAccount
@@ -21,7 +21,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIAddAccount"
 	service.Handler = APIAddAccount
-	GApiServices["octlink.rstore.center.account.APIAddAccount"] = service
+	GApiServices["octlink.mirage.center.account.APIAddAccount"] = service
 
 	// --------------------
 	// for APIDeleteAccount
@@ -29,7 +29,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIDeleteAccount"
 	service.Handler = APIDeleteAccount
-	GApiServices["octlink.rstore.center.account.APIDeleteAccount"] = service
+	GApiServices["octlink.mirage.center.account.APIDeleteAccount"] = service
 
 	// --------------------
 	// for APILoginByAccount
@@ -37,7 +37,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APILoginByAccount"
 	service.Handler = APILoginByAccount
-	GApiServices["octlink.rstore.center.account.APILoginByAccount"] = service
+	GApiServices["octlink.mirage.center.account.APILoginByAccount"] = service
 
 	// --------------------
 	// for APIResetAccountPassword
@@ -45,7 +45,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIResetAccountPassword"
 	service.Handler = APIResetAccountPassword
-	GApiServices["octlink.rstore.center.account.APIResetAccountPassword"] = service
+	GApiServices["octlink.mirage.center.account.APIResetAccountPassword"] = service
 
 	// --------------------
 	// for APIShowAccount
@@ -53,7 +53,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIShowAccount"
 	service.Handler = APIShowAccount
-	GApiServices["octlink.rstore.center.account.APIShowAccount"] = service
+	GApiServices["octlink.mirage.center.account.APIShowAccount"] = service
 
 	// --------------------
 	// for APIShowAccountList
@@ -61,7 +61,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIShowAccountList"
 	service.Handler = APIShowAccountList
-	GApiServices["octlink.rstore.center.account.APIShowAccountList"] = service
+	GApiServices["octlink.mirage.center.account.APIShowAccountList"] = service
 
 	// --------------------
 	// for APIShowAllAccount
@@ -69,7 +69,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIShowAllAccount"
 	service.Handler = APIShowAllAccount
-	GApiServices["octlink.rstore.center.account.APIShowAllAccount"] = service
+	GApiServices["octlink.mirage.center.account.APIShowAllAccount"] = service
 
 	// --------------------
 	// for APIUpdateAccount
@@ -77,7 +77,7 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIUpdateAccount"
 	service.Handler = APIUpdateAccount
-	GApiServices["octlink.rstore.center.account.APIUpdateAccount"] = service
+	GApiServices["octlink.mirage.center.account.APIUpdateAccount"] = service
 
 	// --------------------
 	// for APIUpdateAccountPassword
@@ -85,5 +85,5 @@ func InitApiService() {
 	service = new(ApiService)
 	service.Name = "APIUpdateAccountPassword"
 	service.Handler = APIUpdateAccountPassword
-	GApiServices["octlink.rstore.center.account.APIUpdateAccountPassword"] = service
+	GApiServices["octlink.mirage.center.account.APIUpdateAccountPassword"] = service
 }

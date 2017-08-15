@@ -31,10 +31,10 @@ type LogConfig struct {
 }
 
 func getLogDir() string {
-	if utils.IsFileExist("logs") {
-		return "./var/logs/"
+	if utils.IsFileExist("var/logs") {
+		return "var/logs/"
 	} else {
-		return "./"
+		return ""
 	}
 }
 

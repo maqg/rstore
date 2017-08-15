@@ -3,6 +3,7 @@ all::
 
 
 prepare::
+	go run tools/funcmap/create_funcmap.go > api/funcmap.go 
 
 clean::
 	rm -rf bin/*

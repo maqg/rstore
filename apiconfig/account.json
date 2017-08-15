@@ -1,0 +1,193 @@
+{
+   	"APIAddAccount": {
+		"name": "添加账号",
+		"paras": [
+			{
+				"name": "account",
+				"type": "string",
+				"desc": "账号名称",
+				"default": "NotNull"
+			},
+			{
+				"name": "password",
+				"type": "string",
+				"desc": "密码（明文）",
+				"default": "NotNull"
+			},
+			{
+				"name": "email",
+				"type": "string",
+				"desc": "账号名称",
+				"default": ""
+			},
+			{
+				"name": "phoneNumber",
+				"type": "string",
+				"desc": "电话号码",
+				"default": ""
+			},
+			{
+				"name": "type",
+				"type": "int",
+				"desc": "账号类型",
+				"default": 3
+			},
+			{
+				"name": "desc",
+				"type": "string",
+				"desc": "描述信息",
+				"default": ""
+			}
+		]
+	},
+
+	"APILoginByAccount": {
+		"name": "根据账号登录",
+		"paras": [
+			{
+				"name": "account",
+				"type": "string",
+				"desc": "账号名称",
+				"default": "NotNull"
+			},
+			{
+				"name": "password",
+				"type": "string",
+				"desc": "密码（明文）",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIShowAccount": {
+		"name": "获取单个账号信息",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIShowAllAccount": {
+		"name": "获取所有账号信息",
+		"paras": [
+			{
+				"name": "start",
+				"type": "int",
+				"desc": "开始位置",
+				"default": 0
+			},
+			{
+				"name": "limit",
+				"type": "int",
+				"desc": "获取条目",
+				"default": 15
+			}
+		]
+	},
+
+	"APIShowAccountList": {
+		"name": "获取账号列表",
+		"paras": []
+	},
+
+	"APIDeleteAccount": {
+		"name": "删除单个账号信息",
+		"handler": "AddAccount",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIResetAccountPassword": {
+		"name": "重置账号密码",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			},
+			{
+				"name": "password",
+				"type": "string",
+				"desc": "新密码",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIUpdateAccountPassword": {
+		"name": "更新账号密码",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			},
+			{
+				"name": "newPassword",
+				"type": "string",
+				"desc": "新密码",
+				"default": "NotNull"
+			},
+			{
+				"name": "oldPassword",
+				"type": "string",
+				"desc": "原始密码",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIUpdateAccount": {
+		"name": "编辑账号信息",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			},
+			{
+				"name": "email",
+				"type": "string",
+				"desc": "账号名称",
+				"default": ""
+			},
+			{
+				"name": "phoneNumber",
+				"type": "string",
+				"desc": "电话号码",
+				"default": ""
+			},
+			{
+				"name": "desc",
+				"type": "string",
+				"desc": "描述信息",
+				"default": ""
+			}
+		]
+	},
+
+	"APIAccountLogOut": {
+		"name": "退出登录",
+		"paras": [
+			{
+				"name": "sessionId",
+				"type": "string",
+				"desc": "会话Id",
+				"default": "NotNull"
+			}
+		]
+	}
+}
