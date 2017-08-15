@@ -3,4 +3,4 @@ debuglevel: 5
 loglevel: 5
 http:
     addr: :5000
-rootdirectory: /tmp/bs1
+rootdirectory: var/temp
