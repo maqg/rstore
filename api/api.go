@@ -89,7 +89,7 @@ func loadModule(name string, baseDir string) bool {
 
 	var apiModule ApiModule
 
-	filePath := baseDir + "apiconfig/" + name + ".json"
+	filePath := baseDir + "api/apiconfig/" + name + ".json"
 
 	file, err := os.Open(filePath)
 	if err != nil {

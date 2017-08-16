@@ -86,4 +86,44 @@ func InitApiService() {
 	service.Name = "APIUpdateAccountPassword"
 	service.Handler = APIUpdateAccountPassword
 	GApiServices["octlink.mirage.center.account.APIUpdateAccountPassword"] = service
+
+	// --------------------
+	// for APIAddImage
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIAddImage"
+	service.Handler = APIAddImage
+	GApiServices["octlink.mirage.center.images.APIAddImage"] = service
+
+	// --------------------
+	// for APIDeleteImage
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIDeleteImage"
+	service.Handler = APIDeleteImage
+	GApiServices["octlink.mirage.center.images.APIDeleteImage"] = service
+
+	// --------------------
+	// for APIShowAllImages
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIShowAllImages"
+	service.Handler = APIShowAllImages
+	GApiServices["octlink.mirage.center.images.APIShowAllImages"] = service
+
+	// --------------------
+	// for APIShowImage
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIShowImage"
+	service.Handler = APIShowImage
+	GApiServices["octlink.mirage.center.images.APIShowImage"] = service
+
+	// --------------------
+	// for APIUpdateImage
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIUpdateImage"
+	service.Handler = APIUpdateImage
+	GApiServices["octlink.mirage.center.images.APIUpdateImage"] = service
 }
