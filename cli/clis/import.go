@@ -10,6 +10,7 @@ func init() {
 	ImportCmd.Flags().StringVarP(&id, "id", "i", "", "id")
 	ImportCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
 	ImportCmd.Flags().StringVarP(&callbackurl, "callbackurl", "c", "", "callbackurl to async")
+	ImportCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
 }
 
 var ImportCmd = &cobra.Command{

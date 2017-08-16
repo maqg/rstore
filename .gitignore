@@ -2,6 +2,10 @@
 *.o
 *.a
 *.so
+*~
+
+rstore
+rstcli
 
 # Folders
 _obj

@@ -17,6 +17,7 @@ var (
 	cachedir    string // temp dir for image files caching
 	installpath string // where to store image of local
 	storepath   string // store path like rstore://uuid:manifest
+	address     string // address like 10.10.0.100:8000
 )
 
 func init() {

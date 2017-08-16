@@ -8,6 +8,7 @@ import (
 
 func init() {
 	PullCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	PullCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
 }
 
 var PullCmd = &cobra.Command{
