@@ -88,7 +88,7 @@ func runApiThread() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	octlog.Warn("Mirage Engine Started\n")
+	octlog.Warn("Mirage API Engine Started\n")
 
 	err := server.ListenAndServe()
 	if err != nil {
