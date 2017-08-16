@@ -1,0 +1,86 @@
+{
+   	"APIAddImage": {
+		"name": "添加镜像",
+		"paras": [
+			{
+				"name": "name",
+				"type": "string",
+				"desc": "镜像名称",
+				"default": "NotNull"
+			},
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "镜像ID",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIShowImage": {
+		"name": "获取单个镜像",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIShowAllImages": {
+		"name": "获取所有镜像",
+		"paras": [
+			{
+				"name": "start",
+				"type": "int",
+				"desc": "开始位置",
+				"default": 0
+			},
+			{
+				"name": "limit",
+				"type": "int",
+				"desc": "获取条目",
+				"default": 15
+			}
+		]
+	},
+
+	"APIDeleteImage": {
+		"name": "删除镜像",
+		"handler": "DeleteImage",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "账号的UUID",
+				"default": "NotNull"
+			}
+		]
+	},
+
+	"APIUpdateImage": {
+		"name": "更新镜像",
+		"paras": [
+			{
+				"name": "id",
+				"type": "string",
+				"desc": "镜像Id",
+				"default": "NotNull"
+			},
+			{
+				"name": "name",
+				"type": "string",
+				"desc": "镜像名称",
+				"default": ""
+			},
+			{
+				"name": "desc",
+				"type": "string",
+				"desc": "描述信息",
+				"default": ""
+			}
+		]
+	}
+}
