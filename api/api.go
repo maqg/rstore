@@ -125,7 +125,7 @@ func loadModule(name string, baseDir string) bool {
 
 func LoadApiConfig(baseDir string) bool {
 
-	modules := []string{"account"}
+	modules := []string{"images"}
 
 	for i := 0; i < len(modules); i++ {
 		state := loadModule(modules[i], baseDir)
