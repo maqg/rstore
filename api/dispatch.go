@@ -1,11 +1,9 @@
 package api
 
 import (
-	"octlink/rstore/modules/session"
 	"octlink/rstore/utils/httpresponse"
 	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
-	"octlink/rstore/utils/octmysql"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,25 +23,18 @@ type ApiResponse struct {
 		"password": ""
 	},
 	"async": false,
-	"session": {
-		"uuid": "00000000000000000000000000000000",
-		"skey": "00000000000000000000000000000000"
-	}
 }
 */
 type InputParas struct {
-	Module  string
-	Api     string
-	Paras   map[string]interface{}
-	Async   bool
-	Session map[string]interface{}
+	Module string
+	Api    string
+	Paras  map[string]interface{}
+	Async  bool
 }
 
 type ApiParas struct {
 	Proto   *ApiProto
-	Session *session.Session
 	InParas *InputParas
-	Db      *octmysql.OctMysql
 }
 
 func (api *Api) ApiTest(c *gin.Context) {
@@ -67,24 +58,8 @@ func GetApiService(key string) *ApiService {
 	return service
 }
 
-var SessionExceptions = []string{
-	"octlink.rstore.center.account.APILoginByAccount",
-	"octlink.rstore.center.user.APILoginByUser",
-}
-
-func NeedSessionCheck(api string) bool {
-	for _, tmp_api := range SessionExceptions {
-		if api == tmp_api {
-			return false
-		}
-	}
-
-	return true
-}
-
 func getApiParas(c *gin.Context) (*ApiParas, int) {
 
-	var sid string
 	var apiParas *ApiParas = new(ApiParas)
 
 	c.BindJSON(&apiParas.InParas)
@@ -104,22 +79,6 @@ func getApiParas(c *gin.Context) (*ApiParas, int) {
 	}
 
 	apiParas.Proto = proto
-	apiParas.Db = new(octmysql.OctMysql)
-
-	if NeedSessionCheck(apiParas.InParas.Api) {
-		sid = apiParas.InParas.Session["uuid"].(string)
-	} else {
-		sid = session.SESSION_DEFAULT_ID
-	}
-	octlog.Debug("found session id " + sid)
-
-	session := session.FindSession(apiParas.Db, sid)
-	if session == nil {
-		octlog.Error("not session found for this id" + sid)
-		return nil, merrors.ERR_USER_NOT_LOGIN
-	}
-
-	apiParas.Session = session
 
 	return apiParas, 0
 }
@@ -176,7 +135,6 @@ func (api *Api) ApiDispatch(c *gin.Context) {
 	}
 
 	resp := service.Handler(paras)
-	defer paras.Db.Close()
 
 	if resp.Error == 0 {
 		httpresponse.Ok(c, resp.Data)
