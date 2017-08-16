@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	PushCmd.Flags().StringVarP(&imageuuid, "imageuuid", "u", "", "imageuuid")
+	PushCmd.Flags().StringVarP(&id, "id", "u", "", "id")
 }
 
 var PushCmd = &cobra.Command{
@@ -17,8 +17,8 @@ var PushCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if imageuuid != "" {
-			fmt.Printf("got uuid %s\n", imageuuid)
+		if id != "" {
+			fmt.Printf("got uuid %s\n", id)
 			return
 		}
 

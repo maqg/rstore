@@ -8,7 +8,7 @@ import (
 
 var (
 	showVersion bool
-	imageuuid   string
+	id          string
 	filepath    string // image file path
 	callbackurl string
 	taskid      string
@@ -22,7 +22,6 @@ var (
 func init() {
 	RootCmd.AddCommand(PullCmd)
 	RootCmd.AddCommand(PushCmd)
-	RootCmd.AddCommand(SearchCmd)
 	RootCmd.AddCommand(ImportCmd)
 	RootCmd.AddCommand(ImagesCmd)
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")

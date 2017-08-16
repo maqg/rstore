@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	PullCmd.Flags().StringVarP(&imageuuid, "imageuuid", "u", "", "imageuuid")
+	PullCmd.Flags().StringVarP(&id, "id", "u", "", "id")
 }
 
 var PullCmd = &cobra.Command{
@@ -19,8 +19,8 @@ var PullCmd = &cobra.Command{
 
 		fmt.Printf("running in pull service\n")
 
-		if imageuuid != "" {
-			fmt.Printf("got uuid %s\n", imageuuid)
+		if id != "" {
+			fmt.Printf("got uuid %s\n", id)
 			return
 		}
 
