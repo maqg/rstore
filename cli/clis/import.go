@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	ImportCmd.Flags().StringVarP(&id, "id", "u", "", "id")
+	ImportCmd.Flags().StringVarP(&id, "id", "i", "", "id")
 	ImportCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
 	ImportCmd.Flags().StringVarP(&callbackurl, "callbackurl", "c", "", "callbackurl to async")
 }

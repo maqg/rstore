@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	ImagesCmd.Flags().StringVarP(&id, "id", "u", "", "id")
+	ImagesCmd.Flags().StringVarP(&id, "id", "i", "", "id")
 	ImagesCmd.Flags().StringVarP(&name, "name", "n", "", "Image Name")
 	ImagesCmd.Flags().StringVarP(&account, "account", "a", "", "Account Id")
 }

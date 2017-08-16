@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	PullCmd.Flags().StringVarP(&id, "id", "u", "", "id")
+	PullCmd.Flags().StringVarP(&id, "id", "i", "", "id")
 }
 
 var PullCmd = &cobra.Command{
