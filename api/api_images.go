@@ -71,6 +71,23 @@ func APIUpdateImage(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
+func APIDeleteImageByAccount(paras *ApiParas) *ApiResponse {
+
+	octlog.Debug("running in APIDeleteImage\n")
+
+	resp := new(ApiResponse)
+
+	image := image.FindImage(paras.InParas.Paras["id"].(string))
+	if image == nil {
+		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
+		return resp
+	}
+
+	resp.Error = image.Delete()
+
+	return resp
+}
+
 func APIDeleteImage(paras *ApiParas) *ApiResponse {
 
 	octlog.Debug("running in APIDeleteImage\n")
@@ -101,6 +118,16 @@ func APIShowAllImages(paras *ApiParas) *ApiResponse {
 	result["data"] = imageList
 
 	resp.Data = result
+
+	return resp
+}
+
+func APIShowAccountList(paras *ApiParas) *ApiResponse {
+	resp := new(ApiResponse)
+
+	octlog.Debug("running in APIShowAllImage\n")
+	accounts := make([]string, 0)
+	resp.Data = accounts
 
 	return resp
 }

@@ -19,7 +19,7 @@ func (api *Api) ApiRouter() *gin.Engine {
 		BaseDir = "../"
 	}
 
-	LoadApiConfig(BaseDir)
+	//LoadApiConfig(BaseDir)
 
 	router.LoadHTMLGlob(BaseDir + "frontend/apitest/templates/*.html")
 	router.Static("/static", BaseDir+"frontend/static")

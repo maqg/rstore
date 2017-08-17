@@ -24,6 +24,14 @@ func InitApiService() {
 	GApiServices["octlink.rstore.center.images.APIDeleteImage"] = service
 
 	// --------------------
+	// for APIShowAccountList
+	// --------------------
+	service = new(ApiService)
+	service.Name = "APIShowAccountList"
+	service.Handler = APIShowAccountList
+	GApiServices["octlink.rstore.center.images.APIShowAccountList"] = service
+
+	// --------------------
 	// for APIShowAllImages
 	// --------------------
 	service = new(ApiService)

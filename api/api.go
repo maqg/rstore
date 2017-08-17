@@ -42,11 +42,11 @@ type ProtoPara struct {
 }
 
 type ApiProto struct {
-	Timeout int         `json:"timeout"`
-	Name    string      `json:"name"`
-	Key     string      `json:"key"`
-	Handler string      `json:"handler"`
-	Paras   []ProtoPara `json:"paras"`
+	Timeout int                          `json:"timeout"`
+	Name    string                       `json:"name"`
+	Key     string                       `json:"key"`
+	Handler func(*ApiParas) *ApiResponse `json:"handler"`
+	Paras   []ProtoPara                  `json:"paras"`
 }
 
 func InitApiLog(level int) {
@@ -54,8 +54,8 @@ func InitApiLog(level int) {
 }
 
 type ApiModule struct {
-	Name   string              `json:"name"`
-	Protos map[string]ApiProto `json:"protos"`
+	Name   string     `json:"name"`
+	Protos []ApiProto `json:"protos"`
 }
 
 // octlink.rstore.center.host.APIAddHost
@@ -134,8 +134,6 @@ func LoadApiConfig(baseDir string) bool {
 			return false
 		}
 	}
-
-	InitApiService()
 
 	return true
 }
