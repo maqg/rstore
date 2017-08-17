@@ -71,24 +71,19 @@ func resolveConfiguration(configfile string) (*configuration.Configuration, erro
 	return config, nil
 }
 
-const (
-	HTTP_SERVER = "0.0.0.0"
-	HTTP_PORT   = 8001
-)
-
-func runApiThread() {
+func runApiThread(conf *configuration.Configuration) {
 
 	api := &api.Api{
-		Name: "Mirage API Server",
+		Name: "Rstore API Server",
 	}
 
 	server := &http.Server{
-		Addr:           fmt.Sprintf("%s:%d", HTTP_SERVER, HTTP_PORT),
+		Addr:           fmt.Sprintf("%s", conf.HTTP.ApiAddr),
 		Handler:        api.ApiRouter(),
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	octlog.Warn("Mirage API Engine Started\n")
+	octlog.Warn("RSTORE API Engine Started ON %s\n", conf.HTTP.ApiAddr)
 
 	err := server.ListenAndServe()
 	if err != nil {
@@ -101,17 +96,17 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	config, err := resolveConfiguration(config)
+	conf, err := resolveConfiguration(config)
 	if err != nil {
 		fmt.Printf("Resolve Configuration Error[%s]\n", err)
 		return
 	}
 
-	go runApiThread()
+	go runApiThread(conf)
 
 	app := handlers.NewApp()
 
-	octlog.Warn("RSTORE Engine Started\n")
+	octlog.Warn("RSTORE HTTP Engine Started ON %s\n", conf.HTTP.Addr)
 
-	http.ListenAndServe(config.HTTP.Addr, app.Router)
+	http.ListenAndServe(conf.HTTP.Addr, app.Router)
 }

@@ -3,11 +3,11 @@ package api
 var apiDescriptors = []ApiModule{
 	{
 		Name: "images",
-		Protos: []ApiProto{
-			{
+		Protos: map[string]ApiProto{
+			"APIAddImage": {
 				Key:     "APIAddImage",
 				Name:    "添加镜像",
-				Handler: APIAddImage,
+				handler: APIAddImage,
 				Paras: []ProtoPara{
 					{
 						Name:    "name",
@@ -96,10 +96,10 @@ var apiDescriptors = []ApiModule{
 				},
 			},
 
-			{
+			"APIDeleteImageByAccount": {
 				Key:     "APIDeleteImageByAccount",
 				Name:    "删除镜像",
-				Handler: APIDeleteImage,
+				handler: APIDeleteImage,
 				Paras: []ProtoPara{
 					{
 						Name:    "accountId",
@@ -110,10 +110,10 @@ var apiDescriptors = []ApiModule{
 				},
 			},
 
-			{
+			"APIDeleteImage": {
 				Key:     "APIDeleteImage",
 				Name:    "删除镜像",
-				Handler: APIDeleteImageByAccount,
+				handler: APIDeleteImageByAccount,
 				Paras: []ProtoPara{
 					{
 						Name:    "id",
@@ -140,7 +140,6 @@ func loadModules(module ApiModule) {
 	}
 
 	GApiConfig.Modules[module.Name] = module
-
 }
 
 func init() {
@@ -151,7 +150,7 @@ func init() {
 		for _, proto := range descriptor.Protos {
 			service := new(ApiService)
 			service.Name = proto.Name
-			service.Handler = proto.Handler
+			service.Handler = proto.handler
 			GApiServices["octlink.rstore.center."+descriptor.Name+"."+proto.Key] = service
 		}
 		loadModules(descriptor)

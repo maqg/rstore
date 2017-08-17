@@ -41,7 +41,8 @@ type Configuration struct {
 	Debuglevel string `yaml:"debuglevel,omitempty"`
 
 	HTTP struct {
-		Addr string `yaml:"addr,omitempty"`
+		Addr    string `yaml:"addr,omitempty"`
+		ApiAddr string `yaml:"apiAddr,omitempty"`
 	}
 }
 
