@@ -1,11 +1,8 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"octlink/rstore/utils/octlog"
-	"os"
 	"strings"
 )
 
@@ -59,8 +56,10 @@ type ApiModule struct {
 
 // octlink.rstore.center.host.APIAddHost
 func FindApiProto(api string) *ApiProto {
-	segments := strings.Split(api, ".")
 
+	octlog.Debug("incoming api %s\n", api)
+
+	segments := strings.Split(api, ".")
 	moduleName := segments[3]
 	apiKey := segments[4]
 
@@ -82,57 +81,4 @@ func FindApiProto(api string) *ApiProto {
 	}
 
 	return &proto
-}
-
-func loadModule(name string, baseDir string) bool {
-
-	var apiModule ApiModule
-
-	filePath := baseDir + "api/apiconfig/" + name + ".json"
-
-	file, err := os.Open(filePath)
-	if err != nil {
-		fmt.Println("open file " + filePath + "error")
-		return false
-	}
-
-	data, err := ioutil.ReadFile(filePath)
-
-	file.Close()
-
-	err = json.Unmarshal(data, &apiModule.Protos)
-	if err != nil {
-		fmt.Println("Transfer json bytes error")
-		fmt.Println(err)
-		return false
-	}
-	apiModule.Name = name
-
-	if GApiConfig.Modules == nil {
-		GApiConfig.Modules = make(map[string]ApiModule, 50)
-	}
-
-	for key, proto := range apiModule.Protos {
-		proto.Key = API_PREFIX_CENTER + "." + name + "." + key
-		apiModule.Protos[key] = proto
-	}
-
-	GApiConfig.Modules[name] = apiModule
-
-	return true
-}
-
-func LoadApiConfig(baseDir string) bool {
-
-	modules := []string{"images"}
-
-	for i := 0; i < len(modules); i++ {
-		state := loadModule(modules[i], baseDir)
-		if state != true {
-			fmt.Println("load module %s error", modules[i])
-			return false
-		}
-	}
-
-	return true
 }
