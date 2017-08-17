@@ -67,17 +67,6 @@ type RequestDescriptor struct {
 	// QueryParameters provides a list of query parameters for the given
 	// request.
 	QueryParameters []ParameterDescriptor
-
-	// Body describes the format of the request body.
-	Body BodyDescriptor
-}
-
-// BodyDescriptor describes a request body and its expected content type. For
-// the most  part, it should be example json or some placeholder for body
-// data in documentation.
-type BodyDescriptor struct {
-	ContentType string
-	Format      string
 }
 
 // ParameterDescriptor describes the format of a request parameter, which may
@@ -271,10 +260,6 @@ var routeDescriptors = []RouteDescriptor{
 								t, with contents of the request body as the resulting blob.`,
 							},
 						},
-						Body: BodyDescriptor{
-							ContentType: "application/octect-stream",
-							Format:      "<binary data>",
-						},
 					},
 					{
 						Name:        "Initiate Resumable Blob Upload",
@@ -308,6 +293,62 @@ var routeDescriptors = []RouteDescriptor{
 								Format:      "<repository name>",
 								Description: `Name of the source repository.`,
 							},
+						},
+					},
+				},
+			},
+		},
+	},
+
+	{
+		Name:        RouteNameManifest,
+		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{reference:" + digest.DigestRegexp.String() + "}",
+		Description: "Create, update, delete and retrieve manifests.",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Fetch the manifest identified by `name` and `reference`",
+				Requests: []RequestDescriptor{
+					{
+						Headers: []ParameterDescriptor{
+							hostHeader,
+							authHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							referenceParameterDescriptor,
+						},
+					},
+				},
+			},
+			{
+				Method:      "PUT",
+				Description: "Put the manifest identified by `name` and `reference`",
+				Requests: []RequestDescriptor{
+					{
+						Headers: []ParameterDescriptor{
+							hostHeader,
+							authHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							referenceParameterDescriptor,
+						},
+					},
+				},
+			},
+			{
+				Method:      "DELETE",
+				Description: "Delete the manifest identified by `name` and `reference`",
+				Requests: []RequestDescriptor{
+					{
+						Headers: []ParameterDescriptor{
+							hostHeader,
+							authHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							referenceParameterDescriptor,
 						},
 					},
 				},
