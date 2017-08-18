@@ -1,8 +1,13 @@
 package image
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"octlink/rstore/configuration"
 	"octlink/rstore/utils/octlog"
+	"os"
+	"strings"
 )
 
 var logger *octlog.LogConfig
@@ -16,13 +21,24 @@ const (
 )
 
 type Image struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Status     string `json:"status"`
-	MediaType  string `json:"mediaType"`
-	CreateTime int64  `json:"createTime"`
-	LastSync   int64  `json:"lastSync"`
-	Desc       string `json:"desc"`
+	Id          string `json:"uuid"`
+	Name        string `json:"name"`
+	State       string `json:"state"`
+	Status      string `json:"status"`
+	MediaType   string `json:"mediaType"`
+	CreateTime  string `json:"createTime"`
+	LastSync    string `json:"lastSync"`
+	Desc        string `json:"description"`
+	DiskSize    int64  `json:"diskSize"`
+	VirtualSize int64  `json:"virtualSize"`
+	Md5Sum      string `json:"md5sum"`
+	Url         string `json:"url"`
+	Type        string `json:"type"`
+	Platform    string `json:"platform"`
+	Format      string `json:"format"`
+	System      bool   `json:"system"`
+	Account     string `json:"account"`
+	InstallPath string `json:"installPath"`
 }
 
 func GetImageCount() int {
@@ -73,12 +89,49 @@ func FindImage(id string) *Image {
 	return image
 }
 
-func GetAllImages() []Image {
+func GetAllImages(account string, mediaType string, keyword string) []Image {
 
 	imagePath := configuration.GetConfig().RootDirectory + "/" + IMAGESTORE_FILE
+
 	octlog.Debug("find image path[%s]\n", imagePath)
 
 	imageList := make([]Image, 0)
+	images := make([]Image, 0)
 
-	return imageList
+	file, err := os.Open(imagePath)
+	if err != nil {
+		fmt.Println("open file " + imagePath + "error")
+		return nil
+	}
+
+	data, err := ioutil.ReadFile(imagePath)
+	defer file.Close()
+
+	err = json.Unmarshal(data, &imageList)
+	if err != nil {
+		octlog.Warn("Transfer json bytes error %s\n", err)
+		return nil
+	}
+
+	for _, image := range imageList {
+
+		// filter account
+		if account != "" && image.Account != account {
+			continue
+		}
+
+		// filter mediaType
+		if mediaType != "" && image.MediaType != mediaType {
+			continue
+		}
+
+		// filter keyword
+		if keyword != "" && !strings.Contains(image.Name, keyword) {
+			continue
+		}
+
+		images = append(images, image)
+	}
+
+	return images
 }
