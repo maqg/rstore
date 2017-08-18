@@ -1,5 +1,5 @@
 all::
-	go build -o apihelper apihelper.go
+	go build -o apihelper main.go
 
 
 clean::

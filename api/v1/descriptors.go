@@ -15,10 +15,11 @@ type RouteDescriptor struct {
 	// used.
 	Name string `json:"name"`
 
-	// Path is a gorilla/mux-compatible regexp that can be used to match the
+	// path is a gorilla/mux-compatible regexp that can be used to match the
 	// route. For any incoming method and path, only one route descriptor
 	// should match.
-	Path string `json:"path"`
+	path       string
+	PathSimple string `json:"pathSimple"`
 
 	// Description for this router.
 	Description string `json:"description"`
@@ -79,8 +80,8 @@ type ParameterDescriptor struct {
 	// Type specifies the type of the parameter, such as string, integer, etc.
 	Type string `json:"type"`
 
-	// Format is a specifying the string format accepted by this parameter.
-	Format string `json:"format"`
+	// format is a specifying the string format accepted by this parameter.
+	format string
 
 	// Description provides a human-readable description of the parameter.
 	Description string `json:"description"`
@@ -97,7 +98,7 @@ var (
 	nameParameterDescriptor = ParameterDescriptor{
 		Name:        "name",
 		Type:        "string",
-		Format:      reference.NameRegexp.String(),
+		format:      reference.NameRegexp.String(),
 		Required:    true,
 		Description: `Name of the target repository.`,
 	}
@@ -105,7 +106,7 @@ var (
 	referenceParameterDescriptor = ParameterDescriptor{
 		Name:        "reference",
 		Type:        "string",
-		Format:      reference.TagRegexp.String(),
+		format:      reference.TagRegexp.String(),
 		Required:    true,
 		Description: `Tag or digest of the target manifest.`,
 	}
@@ -121,7 +122,7 @@ var (
 		Name:        "digest",
 		Type:        "path",
 		Required:    true,
-		Format:      digest.DigestRegexp.String(),
+		format:      digest.DigestRegexp.String(),
 		Description: `Digest of desired blob.`,
 	}
 
@@ -129,7 +130,7 @@ var (
 		Name:        "Host",
 		Type:        "string",
 		Description: "Standard HTTP Host Header. Should be set to the registry host.",
-		Format:      "<registry host>",
+		format:      "<registry host>",
 		Examples:    []string{"registry-1.docker.io"},
 	}
 
@@ -137,7 +138,7 @@ var (
 		Name:        "Authorization",
 		Type:        "string",
 		Description: "An RFC7235 compliant authorization header.",
-		Format:      "<scheme> <token>",
+		format:      "<scheme> <token>",
 		Examples:    []string{"Bearer dGhpcyBpcyBhIGZha2UgYmVhcmVyIHRva2VuIQ=="},
 	}
 
@@ -145,7 +146,7 @@ var (
 		Name:        "WWW-Authenticate",
 		Type:        "string",
 		Description: "An RFC7235 compliant authentication challenge header.",
-		Format:      `<scheme> realm="<realm>", ..."`,
+		format:      `<scheme> realm="<realm>", ..."`,
 		Examples: []string{
 			`Bearer realm="https://auth.docker.com/", service="registry.docker.com", scopes="repository:library/ubuntu:pull"`,
 		},
@@ -155,28 +156,28 @@ var (
 		Name:        "Content-Length",
 		Description: "The `Content-Length` header must be zero and the body must be empty.",
 		Type:        "integer",
-		Format:      "0",
+		format:      "0",
 	}
 
 	dockerUploadUUIDHeader = ParameterDescriptor{
 		Name:        "Docker-Upload-UUID",
 		Description: "Identifies the docker upload uuid for the current request.",
 		Type:        "uuid",
-		Format:      "<uuid>",
+		format:      "<uuid>",
 	}
 
 	digestHeader = ParameterDescriptor{
 		Name:        "Docker-Content-Digest",
 		Description: "Digest of the targeted content for the request.",
 		Type:        "digest",
-		Format:      "<digest>",
+		format:      "<digest>",
 	}
 
 	linkHeader = ParameterDescriptor{
 		Name:        "Link",
 		Type:        "link",
 		Description: "RFC5988 compliant rel='next' with URL to next result set, if available",
-		Format:      `<<url>?n=<last n value>&last=<last entry from response>>; rel="next"`,
+		format:      `<<url>?n=<last n value>&last=<last entry from response>>; rel="next"`,
 	}
 
 	paginationParameters = []ParameterDescriptor{
@@ -184,14 +185,14 @@ var (
 			Name:        "n",
 			Type:        "integer",
 			Description: "Limit the number of entries in each response. It not present, all entries will be returned.",
-			Format:      "<integer>",
+			format:      "<integer>",
 			Required:    false,
 		},
 		{
 			Name:        "last",
 			Type:        "string",
 			Description: "Result set will include values lexically after last.",
-			Format:      "<integer>",
+			format:      "<integer>",
 			Required:    false,
 		},
 	}
@@ -200,7 +201,8 @@ var (
 var routeDescriptors = []RouteDescriptor{
 	{
 		Name:        RouteNameBase,
-		Path:        "/v1/",
+		path:        "/v1/",
+		PathSimple:  "/v1/",
 		Description: "Base V1 API route",
 		Methods: []MethodDescriptor{
 			{
@@ -211,7 +213,8 @@ var routeDescriptors = []RouteDescriptor{
 	},
 	{
 		Name:        RouteNameTags,
-		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/tags/list",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/tags/list",
+		PathSimple:  "/v1/{name}/tags/list",
 		Description: "Retrieve information about tags.",
 		Methods: []MethodDescriptor{
 			{
@@ -231,7 +234,8 @@ var routeDescriptors = []RouteDescriptor{
 	},
 	{
 		Name:        RouteNameBlobUpload,
-		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/",
+		PathSimple:  "/v1/{name}/blobs/uploads/",
 		Description: "Initiate a blob upload.",
 		Methods: []MethodDescriptor{
 			{
@@ -245,7 +249,7 @@ var routeDescriptors = []RouteDescriptor{
 							{
 								Name:   "Content-Length",
 								Type:   "integer",
-								Format: "<length of blob>",
+								format: "<length of blob>",
 							},
 						},
 						PathParameters: []ParameterDescriptor{
@@ -255,7 +259,7 @@ var routeDescriptors = []RouteDescriptor{
 							{
 								Name:   "digest",
 								Type:   "query",
-								Format: "<digest>",
+								format: "<digest>",
 								Description: `Digest of uploaded blob. If present, the upload will be completed, in a single reques
 								t, with contents of the request body as the resulting blob.`,
 							},
@@ -284,13 +288,13 @@ var routeDescriptors = []RouteDescriptor{
 							{
 								Name:        "mount",
 								Type:        "query",
-								Format:      "<digest>",
+								format:      "<digest>",
 								Description: `Digest of blob to mount from the source repository.`,
 							},
 							{
 								Name:        "from",
 								Type:        "query",
-								Format:      "<repository name>",
+								format:      "<repository name>",
 								Description: `Name of the source repository.`,
 							},
 						},
@@ -302,7 +306,8 @@ var routeDescriptors = []RouteDescriptor{
 
 	{
 		Name:        RouteNameManifest,
-		Path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{reference:" + digest.DigestRegexp.String() + "}",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{reference:" + digest.DigestRegexp.String() + "}",
+		PathSimple:  "/v1/{name}/manifest/{reference}/",
 		Description: "Create, update, delete and retrieve manifests.",
 		Methods: []MethodDescriptor{
 			{
@@ -356,8 +361,9 @@ var routeDescriptors = []RouteDescriptor{
 		},
 	},
 	{
-		Name: RouteNameHelp,
-		Path: "/v1/help/",
+		Name:       RouteNameHelp,
+		path:       "/v1/help/",
+		PathSimple: "/v1/help/",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "GET",
@@ -366,9 +372,10 @@ var routeDescriptors = []RouteDescriptor{
 		},
 	},
 	{
-		Name:    RouteNameBlob,
-		Path:    "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/",
-		Methods: []MethodDescriptor{},
+		Name:       RouteNameBlob,
+		path:       "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/",
+		PathSimple: "/v1/{name}/blobs/",
+		Methods:    []MethodDescriptor{},
 	},
 }
 

@@ -20,7 +20,7 @@ func NewRouters() *mux.Router {
 	router.StrictSlash(true)
 
 	for _, descriptor := range routeDescriptors {
-		router.Path(descriptor.Path).Name(descriptor.Name)
+		router.Path(descriptor.path).Name(descriptor.Name)
 	}
 
 	return router
