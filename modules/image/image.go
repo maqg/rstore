@@ -61,7 +61,7 @@ func (image *Image) Add() int {
 }
 
 func (image *Image) Delete() int {
-	octlog.Debug("image deleted\n")
+	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.Id)
 	return 0
 }
 
@@ -79,40 +79,40 @@ func FindImageByName(name string) *Image {
 
 func FindImage(id string) *Image {
 
-	image := new(Image)
+	images := GetAllImages("", "", "")
+	for _, image := range images {
+		if image.Id == id {
+			return &image
+		}
+	}
 
-	image.Name = "testimage"
-	image.Id = "fffffffffffffff"
+	octlog.Error("image of %S not exist", id)
 
-	octlog.Debug("id %s, name :%s", image.Id, image.Name)
-
-	return image
+	return nil
 }
 
 func GetAllImages(account string, mediaType string, keyword string) []Image {
 
 	imagePath := configuration.GetConfig().RootDirectory + "/" + IMAGESTORE_FILE
-
 	octlog.Debug("find image path[%s]\n", imagePath)
-
-	imageList := make([]Image, 0)
-	images := make([]Image, 0)
 
 	file, err := os.Open(imagePath)
 	if err != nil {
 		fmt.Println("open file " + imagePath + "error")
-		return nil
+		return make([]Image, 0)
 	}
 
 	data, err := ioutil.ReadFile(imagePath)
 	defer file.Close()
 
+	imageList := make([]Image, 0)
 	err = json.Unmarshal(data, &imageList)
 	if err != nil {
 		octlog.Warn("Transfer json bytes error %s\n", err)
-		return nil
+		return make([]Image, 0)
 	}
 
+	images := make([]Image, 0)
 	for _, image := range imageList {
 
 		// filter account
@@ -134,4 +134,26 @@ func GetAllImages(account string, mediaType string, keyword string) []Image {
 	}
 
 	return images
+}
+
+func ContainAccount(accounts []string, id string) bool {
+	for _, account := range accounts {
+		if account == id {
+			return true
+		}
+	}
+	return false
+}
+
+func GetAccountList() []string {
+
+	images := GetAllImages("", "", "")
+	accounts := make([]string, 0)
+	for _, image := range images {
+		if image.Account != "" && !ContainAccount(accounts, image.Account) {
+			accounts = append(accounts, image.Account)
+		}
+	}
+
+	return accounts
 }

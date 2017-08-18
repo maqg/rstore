@@ -96,7 +96,7 @@ var ImageDescriptors = ApiModule{
 
 		"APIDeleteImageByAccount": {
 			Name:    "删除镜像（根据账号）",
-			handler: APIDeleteImage,
+			handler: APIDeleteImageByAccount,
 			Paras: []ProtoPara{
 				{
 					Name:    "accountId",
@@ -165,7 +165,7 @@ var ImageDescriptors = ApiModule{
 
 		"APIDeleteImage": {
 			Name:    "删除镜像",
-			handler: APIDeleteImageByAccount,
+			handler: APIDeleteImage,
 			Paras: []ProtoPara{
 				{
 					Name:    "id",

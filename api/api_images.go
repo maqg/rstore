@@ -12,14 +12,7 @@ func APIAddImage(paras *ApiParas) *ApiResponse {
 
 	resp := new(ApiResponse)
 
-	newImage := image.FindImageByName(paras.InParas.Paras["image"].(string))
-	if newImage != nil {
-		logger.Errorf("image %s already exist\n", newImage.Name)
-		resp.Error = merrors.ERR_SEGMENT_ALREADY_EXIST
-		return resp
-	}
-
-	newImage = new(image.Image)
+	newImage := new(image.Image)
 	newImage.Id = uuid.Generate().Simple()
 	newImage.Name = paras.InParas.Paras["image"].(string)
 	newImage.Desc = paras.InParas.Paras["desc"].(string)
@@ -30,11 +23,11 @@ func APIAddImage(paras *ApiParas) *ApiResponse {
 }
 
 func APIShowImage(paras *ApiParas) *ApiResponse {
+
 	resp := new(ApiResponse)
-
 	imageId := paras.InParas.Paras["id"].(string)
-	temp := image.FindImage(imageId)
 
+	temp := image.FindImage(imageId)
 	if temp == nil {
 		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
 		resp.ErrorLog = fmt.Sprintf("user %s not found", imageId)
@@ -42,8 +35,6 @@ func APIShowImage(paras *ApiParas) *ApiResponse {
 	}
 
 	resp.Data = temp
-
-	octlog.Debug("found User %s", temp.Name)
 
 	return resp
 }
@@ -77,13 +68,15 @@ func APIDeleteImageByAccount(paras *ApiParas) *ApiResponse {
 
 	resp := new(ApiResponse)
 
-	image := image.FindImage(paras.InParas.Paras["id"].(string))
-	if image == nil {
-		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
-		return resp
+	images := image.GetAllImages(paras.InParas.Paras["accountId"].(string), "", "")
+	for _, image := range images {
+		err := image.Delete()
+		if err != 0 {
+			resp.Error = err
+			octlog.Error("Errored when deleting image of %s\n", image.Name)
+			return resp
+		}
 	}
-
-	resp.Error = image.Delete()
 
 	return resp
 }
@@ -124,11 +117,12 @@ func APIShowAllImages(paras *ApiParas) *ApiResponse {
 }
 
 func APIShowAccountList(paras *ApiParas) *ApiResponse {
-	resp := new(ApiResponse)
 
 	octlog.Debug("running in APIShowAllImage\n")
-	accounts := make([]string, 0)
-	resp.Data = accounts
+
+	resp := new(ApiResponse)
+
+	resp.Data = image.GetAccountList()
 
 	return resp
 }
