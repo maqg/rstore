@@ -13,19 +13,19 @@ type RouteDescriptor struct {
 	// These names a should be considered a unique reference for a route. If
 	// the route is registered with gorilla, this is the name that will be
 	// used.
-	Name string
+	Name string `json:"name"`
 
 	// Path is a gorilla/mux-compatible regexp that can be used to match the
 	// route. For any incoming method and path, only one route descriptor
 	// should match.
-	Path string
+	Path string `json:"path"`
 
 	// Description for this router.
-	Description string
+	Description string `json:"description"`
 
 	// Methods should describe the various HTTP methods that may be used on
 	// this route, including request and response formats.
-	Methods []MethodDescriptor
+	Methods []MethodDescriptor `json:"methods"`
 }
 
 // MethodDescriptor provides a description of the requests that may be
@@ -33,16 +33,16 @@ type RouteDescriptor struct {
 type MethodDescriptor struct {
 
 	// Method is an HTTP method, such as GET, PUT or POST.
-	Method string
+	Method string `json:"method"`
 
 	// Description should provide an overview of the functionality provided by
 	// the covered method, suitable for use in documentation. Use of markdown
 	// here is encouraged.
-	Description string
+	Description string `json:"description"`
 
 	// Requests is a slice of request descriptors enumerating how this
 	// endpoint may be used.
-	Requests []RequestDescriptor
+	Requests []RequestDescriptor `json:"request"`
 }
 
 // RequestDescriptor covers a particular set of headers and parameters that
@@ -51,22 +51,22 @@ type MethodDescriptor struct {
 type RequestDescriptor struct {
 	// Name provides a short identifier for the request, usable as a title or
 	// to provide quick context for the particular request.
-	Name string
+	Name string `json:"name"`
 
 	// Description should cover the requests purpose, covering any details for
 	// this particular use case.
-	Description string
+	Description string `json:"description"`
 
 	// Headers describes headers that must be used with the HTTP request.
-	Headers []ParameterDescriptor
+	Headers []ParameterDescriptor `json:"headers"`
 
 	// PathParameters enumerate the parameterized path components for the
 	// given request, as defined in the route's regular expression.
-	PathParameters []ParameterDescriptor
+	PathParameters []ParameterDescriptor `json:"pathParameterDescriptor"`
 
 	// QueryParameters provides a list of query parameters for the given
 	// request.
-	QueryParameters []ParameterDescriptor
+	QueryParameters []ParameterDescriptor `json:"parameterDescriptor"`
 }
 
 // ParameterDescriptor describes the format of a request parameter, which may
@@ -74,23 +74,23 @@ type RequestDescriptor struct {
 type ParameterDescriptor struct {
 	// Name is the name of the parameter, either of the path component or
 	// query parameter.
-	Name string
+	Name string `json:"name"`
 
 	// Type specifies the type of the parameter, such as string, integer, etc.
-	Type string
+	Type string `json:"type"`
 
 	// Format is a specifying the string format accepted by this parameter.
-	Format string
+	Format string `json:"format"`
 
 	// Description provides a human-readable description of the parameter.
-	Description string
+	Description string `json:"description"`
 
 	// Required or not
-	Required bool
+	Required bool `json:"required"`
 
 	// Examples provides multiple examples for the values that might be valid
 	// for this parameter.
-	Examples []string
+	Examples []string `json:"examples"`
 }
 
 var (
