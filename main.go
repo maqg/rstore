@@ -30,7 +30,7 @@ func initLogConfig() {
 }
 
 func init() {
-	flag.StringVar(&config, "config", "var/config.yml", "Config file path")
+	flag.StringVar(&config, "config", "./config.yml", "Config file path")
 
 	initDebugConfig()
 	initLogConfig()
