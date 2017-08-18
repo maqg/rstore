@@ -68,6 +68,8 @@ func resolveConfiguration(configfile string) (*configuration.Configuration, erro
 		return nil, fmt.Errorf("error parsing %s: %v", configurationPath, err)
 	}
 
+	configuration.Conf = config
+
 	return config, nil
 }
 

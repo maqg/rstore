@@ -44,6 +44,14 @@ type Configuration struct {
 		Addr    string `yaml:"addr,omitempty"`
 		ApiAddr string `yaml:"apiAddr,omitempty"`
 	}
+
+	RootDirectory string `yaml:"rootdirectory,omitempty"`
+}
+
+var Conf *Configuration
+
+func GetConfig() *Configuration {
+	return Conf
 }
 
 func ParseConfig(in []byte) (*Configuration, error) {

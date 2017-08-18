@@ -1,12 +1,19 @@
 package image
 
-import "octlink/rstore/utils/octlog"
+import (
+	"octlink/rstore/configuration"
+	"octlink/rstore/utils/octlog"
+)
 
 var logger *octlog.LogConfig
 
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("image.log", level)
 }
+
+const (
+	IMAGESTORE_FILE = "imagestore_info.json"
+)
 
 type Image struct {
 	Id         string `json:"id"`
@@ -64,4 +71,14 @@ func FindImage(id string) *Image {
 	octlog.Debug("id %s, name :%s", image.Id, image.Name)
 
 	return image
+}
+
+func GetAllImages() []Image {
+
+	imagePath := configuration.GetConfig().RootDirectory + "/" + IMAGESTORE_FILE
+	octlog.Debug("find image path[%s]\n", imagePath)
+
+	imageList := make([]Image, 0)
+
+	return imageList
 }
