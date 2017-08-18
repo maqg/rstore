@@ -57,8 +57,6 @@ type ApiModule struct {
 // octlink.rstore.center.host.APIAddHost
 func FindApiProto(api string) *ApiProto {
 
-	octlog.Debug("incoming api %s\n", api)
-
 	segments := strings.Split(api, ".")
 	moduleName := segments[3]
 	apiKey := segments[4]
