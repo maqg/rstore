@@ -1,6 +1,7 @@
 package digest
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -79,4 +80,13 @@ func TestParseDigest(t *testing.T) {
 			t.Fatalf("expected equal: %q != %q", newParsed, digest)
 		}
 	}
+}
+
+func TestParseDigestEX(t *testing.T) {
+	digest, err := ParseDigest("sha256:e58fcf7418d4390dec8e8fb69d88c06ec07039d651fedd3aa72af9972e7d046b")
+	if err != nil {
+		fmt.Printf("error got\n")
+	}
+
+	fmt.Printf("ddd[%s]\n", digest.String())
 }
