@@ -1,11 +1,31 @@
 package manifest
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"octlink/rstore/configuration"
+	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
+	"os"
 
 	"github.com/gorilla/mux"
+)
+
+type Manifest struct {
+	Id          string `json:"uuid"`
+	Name        string `json:"name"`    // Image UUID
+	BlobSum     string `json:"blobsum"` // Sum of Blob Digests
+	Arch        string `json:"arch"`
+	DiskSize    int64  `json:"diskSize"`
+	VirtualSize int64  `json:"virtualSize"`
+	CreateTime  string `json:"createTime"`
+}
+
+const (
+	REPOS_DIR     = "/registry/repos"
+	REVISIONS_DIR = "/manifests/revisions"
 )
 
 var logger *octlog.LogConfig
@@ -14,18 +34,59 @@ func InitLog(level int) {
 	logger = octlog.InitLogConfig("manifest.log", level)
 }
 
+func FileToManifest(filePath string) (*Manifest, error) {
+
+	fp, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fp.Close()
+
+	in, err := ioutil.ReadAll(fp)
+	if err != nil {
+		return nil, err
+	}
+
+	manifest := new(Manifest)
+	if err := json.Unmarshal(in, manifest); err != nil {
+		return nil, err
+	}
+
+	return manifest, nil
+}
+
 func GetManifest(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
-	digest := r.FormValue("digest")
+	digest := mux.Vars(r)["digest"]
 
-	emptyJSON := fmt.Sprintf("{\"msg\":\"this is blob message,name:%s,digest:%s\"}", name, digest)
+	octlog.Debug("got name[%s],digest[%s]\n", name, digest)
 
-	logger.Debugf("got name:%s,digest:%s\n", name, digest)
+	conf := configuration.GetConfig()
+	maniPath := conf.RootDirectory + REPOS_DIR + "/" + name + REVISIONS_DIR + "/" + digest + "/json"
+	if !utils.IsFileExist(maniPath) {
+		w.WriteHeader(http.StatusNotFound)
+		octlog.Error("manifest not exist %s\n", maniPath)
+		logger.Errorf("manifest not exist %s\n", maniPath)
+		return
+	}
 
+	manifest, err := FileToManifest(maniPath)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		octlog.Error("manifest parse error %s\n", maniPath)
+		logger.Errorf("manifest parse error %s\n", maniPath)
+		return
+	}
+
+	data, _ := json.Marshal(manifest)
+	dataStr := utils.BytesToString(data)
+
+	octlog.Debug("Got manifest %s\n", dataStr)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
+	w.Header().Set("Content-Length", fmt.Sprint(len(dataStr)))
+	fmt.Fprint(w, dataStr)
 }
 
 func DeleteManifest(w http.ResponseWriter, r *http.Request) {
@@ -40,4 +101,8 @@ func PutManifest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
 	fmt.Fprint(w, emptyJSON)
+}
+
+func init() {
+	InitLog(octlog.DEBUG_LEVEL)
 }

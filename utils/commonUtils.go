@@ -2,7 +2,9 @@ package utils
 
 import (
 	"os"
+	"reflect"
 	"time"
+	"unsafe"
 )
 
 const (
@@ -27,4 +29,26 @@ func IsFileExist(filename string) bool {
 
 func ParasInt(val interface{}) int {
 	return int(val.(float64))
+}
+
+//return GoString's buffer slice(enable modify string)
+func StringToBytes(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(&s))
+}
+
+// convert b to string without copy
+func BytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
+}
+
+// returns &s[0], which is not allowed in go
+func StringToPointer(s string) unsafe.Pointer {
+	p := (*reflect.StringHeader)(unsafe.Pointer(&s))
+	return unsafe.Pointer(p.Data)
+}
+
+// returns &b[0], which is not allowed in go
+func BytesToPointer(b []byte) unsafe.Pointer {
+	p := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	return unsafe.Pointer(p.Data)
 }

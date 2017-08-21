@@ -102,8 +102,9 @@ func GetAllImages(account string, mediaType string, keyword string) []Image {
 		return make([]Image, 0)
 	}
 
-	data, err := ioutil.ReadFile(imagePath)
 	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
 
 	imageList := make([]Image, 0)
 	err = json.Unmarshal(data, &imageList)

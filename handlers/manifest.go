@@ -11,6 +11,7 @@ func manifestManager(r *http.Request) http.Handler {
 
 	mhandler := handlers.MethodHandler{
 		"GET":    http.HandlerFunc(manifest.GetManifest),
+		"HEAD":   http.HandlerFunc(manifest.GetManifest),
 		"PUT":    http.HandlerFunc(manifest.PutManifest),
 		"DELETE": http.HandlerFunc(manifest.DeleteManifest),
 	}

@@ -305,9 +305,11 @@ var routeDescriptors = []RouteDescriptor{
 	},
 
 	{
-		Name:        RouteNameManifest,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{reference:" + digest.DigestRegexp.String() + "}",
-		PathSimple:  "/v1/{name}/manifest/{reference}/",
+		Name: RouteNameManifest,
+		//path: "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.NameRegexp.String() + "}",
+		//path: "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.NameRegexp.String() + "}",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + digest.DigestRegexp.String() + "}",
+		PathSimple:  "/v1/{name}/manifests/{digest}/",
 		Description: "Create, update, delete and retrieve manifests.",
 		Methods: []MethodDescriptor{
 			{
