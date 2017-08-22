@@ -5,5 +5,6 @@
     "go.vetOnSave": "package",
     "go.formatOnSave": true,
     "files.autoSaveDelay": 1000,
-    "files.autoSave": "off"
+    "files.autoSave": "off",
+    "go.autocompleteUnimportedPackages": true
 }
