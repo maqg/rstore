@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"octlink/rstore/digest"
 	"octlink/rstore/reference"
 )
 
@@ -122,7 +121,7 @@ var (
 		Name:        "digest",
 		Type:        "path",
 		Required:    true,
-		format:      digest.DigestRegexp.String(),
+		format:      reference.DigestRegexp.String(),
 		Description: `Digest of desired blob.`,
 	}
 
