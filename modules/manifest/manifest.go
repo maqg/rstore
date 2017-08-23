@@ -24,8 +24,11 @@ type Manifest struct {
 }
 
 const (
-	REPOS_DIR     = "/registry/repos"
-	REVISIONS_DIR = "/manifests/revisions"
+	REPOS_DIR                = "/registry/repos"
+	MANIFEST_DIR_PROTO       = "/registry/repos/%s"
+	REVISIONS_DIR            = "/manifests/revisions"
+	REVISIONS_DIR_PROTO      = "/registry/repos/%s/manifests/revisions/%s"
+	REVISIONS_FILE_DIR_PROTO = "/registry/repos/%s/manifests/revisions/%s/json"
 )
 
 var logger *octlog.LogConfig

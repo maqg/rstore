@@ -7,18 +7,19 @@ import (
 )
 
 var (
-	showVersion bool
-	arch        string // architecture, defautl amd64
-	id          string // image uuid
-	filepath    string // image file path
-	callbackurl string
-	taskid      string
-	name        string // image name
-	account     string // account uuid
-	cachedir    string // temp dir for image files caching
-	installpath string // where to store image of local
-	storepath   string // store path like rstore://uuid:manifest
-	address     string // address like 10.10.0.100:8000
+	showVersion   bool
+	rootdirectory string
+	arch          string // architecture, defautl amd64
+	id            string // image uuid
+	filepath      string // image file path
+	callbackurl   string
+	taskid        string
+	name          string // image name
+	account       string // account uuid
+	cachedir      string // temp dir for image files caching
+	installpath   string // where to store image of local
+	storepath     string // store path like rstore://uuid:manifest
+	address       string // address like 10.10.0.100:8000
 )
 
 func init() {
