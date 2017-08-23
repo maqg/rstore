@@ -41,7 +41,12 @@ var (
 	anchoredTagRegexp = anchored(TagRegexp)
 
 	// DigestRegexp matches valid digests.
-	DigestRegexp = match(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
+	//DigestRegexp = match(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
+	//DigestRegexp = match(`-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
+
+	// DigestRegexp matches valid digest types.
+	DigestRegexp = regexp.MustCompile(`[a-fA-F0-9]+`)
+	//var DigestRegexp = regexp.MustCompile(`[a-zA-Z0-9-_+.]+:[a-fA-F0-9]+`)
 
 	// anchoredDigestRegexp matches valid digests, anchored at the start and
 	// end of the matched string.
