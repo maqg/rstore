@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"os"
 	"reflect"
 	"time"
@@ -51,4 +53,11 @@ func StringToPointer(s string) unsafe.Pointer {
 func BytesToPointer(b []byte) unsafe.Pointer {
 	p := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 	return unsafe.Pointer(p.Data)
+}
+
+// GetDigest return digest hash value of sha256
+func GetDigest(buffer []byte) string {
+	hash := sha256.New()
+	hash.Write(buffer)
+	return hex.EncodeToString(hash.Sum(nil))
 }

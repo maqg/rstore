@@ -8,7 +8,8 @@ import (
 
 var (
 	showVersion bool
-	id          string
+	arch        string // architecture, defautl amd64
+	id          string // image uuid
 	filepath    string // image file path
 	callbackurl string
 	taskid      string

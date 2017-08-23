@@ -29,6 +29,10 @@ const (
 	USER_TYPE_USER = 0
 )
 
+const (
+	BLOB_SIZE = 4 * 1024 * 1024 // bytes
+)
+
 type Configuration struct {
 
 	// Version is the version which defines the format of the rest of the configuration
