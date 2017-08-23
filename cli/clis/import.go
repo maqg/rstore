@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/uuid"
+
 	"os"
 
 	"github.com/spf13/cobra"
@@ -73,26 +75,32 @@ func checkParas() bool {
 	return true
 }
 
-func importImage() {
+func importImage() int {
 
 	fmt.Printf("got image id[%s],filepath[%s],callbackurl[%s]\n",
 		id, filepath, callbackurl)
 
 	if !checkParas() {
 		fmt.Printf("check input paras failed\n")
-		return
+		return merrors.ERR_UNACCP_PARAS
 	}
 
-	mid := uuid.Generate().Simple()
-
-	revision := rootdirectory + fmt.Sprintf(manifest.REVISIONS_DIR_PROTO, id, mid)
-	fmt.Printf("got new manifest dir %s\n", revision)
+	reposDir := rootdirectory + "/" + manifest.REPOS_DIR
+	if !utils.IsFileExist(reposDir) {
+		fmt.Printf("Directory of %s not exist\n", reposDir)
+		return merrors.ERR_UNACCP_PARAS
+	}
 
 	hashes, err := splitFile(filepath)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
-		return
+		return merrors.ERR_COMMON_ERR
 	}
+
+	mid := uuid.Generate().Simple()
+	revisionDir := rootdirectory + fmt.Sprintf(manifest.REVISIONS_DIR_PROTO, id, mid)
+	fmt.Printf("got new manifest dir %s\n", revisionDir)
+	utils.CreateDir(revisionDir)
 
 	if callbackurl != "" {
 		callbacking()
@@ -102,6 +110,8 @@ func importImage() {
 	fmt.Printf("%s\n", string(d))
 
 	fmt.Printf("Import image OK")
+
+	return 0
 }
 
 var ImportCmd = &cobra.Command{

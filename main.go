@@ -1,6 +1,7 @@
 package main
 
 import (
+	"octlink/rstore/modules/manifest"
 	"flag"
 	"fmt"
 	"net/http"
@@ -103,6 +104,7 @@ func main() {
 		fmt.Printf("Resolve Configuration Error[%s]\n", err)
 		return
 	}
+	utils.CreateDir(conf.RootDirectory + manifest.REPOS_DIR)
 
 	go runApiThread(conf)
 

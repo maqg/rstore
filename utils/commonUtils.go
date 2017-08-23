@@ -33,7 +33,7 @@ func ParasInt(val interface{}) int {
 	return int(val.(float64))
 }
 
-//return GoString's buffer slice(enable modify string)
+// StringToBytes return GoString's buffer slice(enable modify string)
 func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&s))
 }
@@ -60,4 +60,18 @@ func GetDigest(buffer []byte) string {
 	hash := sha256.New()
 	hash.Write(buffer)
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+// CreateDir create dir if not exist
+func CreateDir(filepath string) {
+	if !IsFileExist(filepath) {
+		os.MkdirAll(filepath, os.ModePerm)
+	}
+}
+
+// RemoveDir if file or directory exists, just remove it
+func RemoveDir(filepath string) {
+	if IsFileExist(filepath) {
+		os.RemoveAll(filepath)
+	}
 }
