@@ -21,6 +21,7 @@ type Manifest struct {
 	DiskSize    int64  `json:"diskSize"`
 	VirtualSize int64  `json:"virtualSize"`
 	CreateTime  string `json:"createTime"`
+	Path        string
 }
 
 const (
@@ -30,7 +31,7 @@ const (
 	// BlobManifestDir for manifest-blobs relationship
 	BlobManifestDir = "/registry/blob-manifests"
 
-	// BlobsDir for blobs tree directory
+	// BlobDir for blobs tree directory
 	BlobDir = "/registry/blobs"
 
 	// ImageDirProto Image Dir Proto Type
@@ -125,4 +126,32 @@ func PutManifest(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 	InitLog(octlog.DEBUG_LEVEL)
+}
+
+// Delete for manifest self delete
+func (manifest *Manifest) Delete() error {
+	return nil
+}
+
+// Write for manifest self delete
+func (manifest *Manifest) Write() error {
+
+	// create manifest base diretory
+	utils.CreateDir(manifest.Path)
+
+	filePath := manifest.Path + fmt.Sprintf("/%s.json", manifest.ID)
+	utils.Remove(filePath)
+
+	fd, err := os.Create(filePath)
+	if err != nil {
+		fmt.Printf("create file %s error\n", filePath)
+		return err
+	}
+
+	defer fd.Close()
+
+	data, _ := json.MarshalIndent(manifest, "", "  ")
+	fd.Write(data)
+
+	return nil
 }

@@ -10,17 +10,30 @@ import (
 )
 
 const (
-	TIME_STR_FORMAT = "2006-01-02 15:04:05"
+	timeStrFormat = "2006-01-02 15:04:05"
 )
 
+// Time2Str convert int64 time to string
 func Time2Str(timeVal int64) string {
-	return time.Unix(timeVal, 0).Format(TIME_STR_FORMAT)
+	return time.Unix(timeVal, 0).Format(timeStrFormat)
 }
 
+// CurrentTime get current time in int64 format
+func CurrentTime() int64 {
+	return int64(time.Now().Unix())
+}
+
+// CurrentTimeStr get current time in string format
+func CurrentTimeStr() string {
+	return Time2Str(CurrentTime())
+}
+
+// Version of this program
 func Version() string {
 	return "0.0.1"
 }
 
+// IsFileExist check file's existence
 func IsFileExist(filename string) bool {
 	var exist = true
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
@@ -29,7 +42,8 @@ func IsFileExist(filename string) bool {
 	return exist
 }
 
-func ParasInt(val interface{}) int {
+// ParseInt to parse int
+func ParseInt(val interface{}) int {
 	return int(val.(float64))
 }
 
@@ -38,18 +52,18 @@ func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(&s))
 }
 
-// convert b to string without copy
+// BytesToString convert b to string without copy
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-// returns &s[0], which is not allowed in go
+// StringToPointer returns &s[0], which is not allowed in go
 func StringToPointer(s string) unsafe.Pointer {
 	p := (*reflect.StringHeader)(unsafe.Pointer(&s))
 	return unsafe.Pointer(p.Data)
 }
 
-// returns &b[0], which is not allowed in go
+// BytesToPointer returns &b[0], which is not allowed in go
 func BytesToPointer(b []byte) unsafe.Pointer {
 	p := (*reflect.SliceHeader)(unsafe.Pointer(&b))
 	return unsafe.Pointer(p.Data)
@@ -73,5 +87,12 @@ func CreateDir(filepath string) {
 func RemoveDir(filepath string) {
 	if IsFileExist(filepath) {
 		os.RemoveAll(filepath)
+	}
+}
+
+// Remove if file or directory exists, just remove it
+func Remove(filepath string) {
+	if IsFileExist(filepath) {
+		os.Remove(filepath)
 	}
 }
