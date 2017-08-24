@@ -7,7 +7,6 @@ import (
 	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/manifest"
-	"octlink/rstore/modules/revision"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/uuid"
 
@@ -17,10 +16,10 @@ import (
 )
 
 func init() {
-	ImportCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	ImportCmd.Flags().StringVarP(&rootdirectory, "rootdirectory", "r", "", "RootDirectory of RSTORE")
-	ImportCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
-	ImportCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
+	importCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	importCmd.Flags().StringVarP(&rootdirectory, "rootdirectory", "r", "", "RootDirectory of RSTORE")
+	importCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
+	importCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
 }
 
 func callbacking() {
@@ -86,20 +85,20 @@ func importImage() int {
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	reposDir := rootdirectory + "/" + manifest.REPOS_DIR
+	reposDir := rootdirectory + "/" + manifest.ReposDir
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
 		return merrors.ERR_UNACCP_PARAS
 	}
 
 	mid := uuid.Generate().Simple()
-	revisionDir := rootdirectory + fmt.Sprintf(manifest.REVISIONS_DIR_PROTO, id, mid)
-	fmt.Printf("got new manifest dir %s\n", revisionDir)
-	utils.CreateDir(revisionDir)
+	manifestDir := rootdirectory + fmt.Sprintf(manifest.ManifestDirProto, id)
+	fmt.Printf("got new manifest dir %s\n", manifestDir)
+	utils.CreateDir(manifestDir)
 
-	revision := new(revision.Revision)
+	revision := new(manifest.Manifest)
 	revision.Name = id
-	revision.Id = mid
+	revision.ID = mid
 
 	hashes, err := splitFile(filepath)
 	if err != nil {
@@ -119,7 +118,7 @@ func importImage() int {
 	return 0
 }
 
-var ImportCmd = &cobra.Command{
+var importCmd = &cobra.Command{
 
 	Use:   "import -filepath xxx -id xxx -callbackurl xxx",
 	Short: "Import image from local to bs.",

@@ -13,30 +13,38 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Manifest base Manifest structure
 type Manifest struct {
-	Id          string `json:"uuid"`
+	ID          string `json:"uuid"`
 	Name        string `json:"name"`    // Image UUID
 	BlobSum     string `json:"blobsum"` // Sum of Blob Digests
-	Arch        string `json:"arch"`
 	DiskSize    int64  `json:"diskSize"`
 	VirtualSize int64  `json:"virtualSize"`
 	CreateTime  string `json:"createTime"`
 }
 
 const (
-	REPOS_DIR                = "/registry/repos"
-	MANIFEST_DIR_PROTO       = "/registry/repos/%s"
-	REVISIONS_DIR            = "/manifests/revisions"
-	REVISIONS_DIR_PROTO      = "/registry/repos/%s/manifests/revisions/%s"
-	REVISIONS_FILE_DIR_PROTO = "/registry/repos/%s/manifests/revisions/%s/json"
+	// ReposDir Base Repos Directory
+	ReposDir = "/registry/repos"
+
+	// ImageDirProto Image Dir Proto Type
+	ImageDirProto = "/registry/repos/%s"
+
+	// ManifestDirProto manifest directory proto type
+	ManifestDirProto = "/registry/repos/%s/manifests"
+
+	// ManifestFileProto manifest file of json proto type
+	ManifestFileProto = "/registry/repos/%s/manifests/%s.json"
 )
 
 var logger *octlog.LogConfig
 
+// InitLog for manifest module
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("manifest.log", level)
 }
 
+// FileToManifest load file to Manifest struct from json
 func FileToManifest(filePath string) (*Manifest, error) {
 
 	fp, err := os.Open(filePath)
@@ -59,6 +67,7 @@ func FileToManifest(filePath string) (*Manifest, error) {
 	return manifest, nil
 }
 
+// GetManifest for api call
 func GetManifest(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
@@ -67,7 +76,7 @@ func GetManifest(w http.ResponseWriter, r *http.Request) {
 	octlog.Debug("got name[%s],digest[%s]\n", name, digest)
 
 	conf := configuration.GetConfig()
-	maniPath := conf.RootDirectory + REPOS_DIR + "/" + name + REVISIONS_DIR + "/" + digest + "/json"
+	maniPath := conf.RootDirectory + fmt.Sprintf(ManifestFileProto, name, digest)
 	if !utils.IsFileExist(maniPath) {
 		w.WriteHeader(http.StatusNotFound)
 		octlog.Error("manifest not exist %s\n", maniPath)
@@ -92,6 +101,7 @@ func GetManifest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, dataStr)
 }
 
+// DeleteManifest for api call
 func DeleteManifest(w http.ResponseWriter, r *http.Request) {
 	const emptyJSON = "{\"msg\":\"this is blob message\"}"
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -99,6 +109,7 @@ func DeleteManifest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, emptyJSON)
 }
 
+// PutManifest for api call
 func PutManifest(w http.ResponseWriter, r *http.Request) {
 	const emptyJSON = "{\"msg\":\"this is blob message\"}"
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")

@@ -7,20 +7,20 @@ import (
 )
 
 func init() {
-	ImagesCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	ImagesCmd.Flags().StringVarP(&name, "name", "n", "", "Image Name")
-	ImagesCmd.Flags().StringVarP(&account, "user", "u", "", "Account Id")
-	ImagesCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	imagesCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	imagesCmd.Flags().StringVarP(&name, "name", "n", "", "Image Name")
+	imagesCmd.Flags().StringVarP(&account, "user", "u", "", "Account Id")
+	imagesCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
 }
 
-var IMAGES_DISP_HEADER = "%-33s%-33s%-16s%-6s%-7s%-7s%-16s\n"
+var imagesDispHeader = "%-33s%-33s%-16s%-6s%-7s%-7s%-16s\n"
 
 func listImages() {
-	fmt.Printf(IMAGES_DISP_HEADER, "Name", "Uuid",
+	fmt.Printf(imagesDispHeader, "Name", "Uuid",
 		"Account", "Arch",
 		"R-Size", "V-SIZE",
 		"CreateTime")
-	fmt.Printf(IMAGES_DISP_HEADER, "c4fffb59fc8e40899abd824d654ce416",
+	fmt.Printf(imagesDispHeader, "c4fffb59fc8e40899abd824d654ce416",
 		"2264713e80d311e79b5f525400659eb7",
 		"admin", "amd64", "500M", "100G", "2017-08-10 22:33:33")
 }
@@ -36,7 +36,7 @@ func imageDetail() {
 	fmt.Printf("createTime: %s\n", "2017-08-10 22:33:33")
 }
 
-var ImagesCmd = &cobra.Command{
+var imagesCmd = &cobra.Command{
 
 	Use:   "images",
 	Short: "List images of rstore.",
