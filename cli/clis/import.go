@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/uuid"
@@ -53,25 +54,38 @@ func importImage() int {
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	_, blobSum, err := blobs.WriteBlobs(filepath, rootdirectory)
+	hashes, size, err := blobs.WriteBlobs(filepath, rootdirectory)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ERR_COMMON_ERR
 	}
 
+	// write blobs-manifest config
+	bm := new(blobsmanifest.BlobsManifest)
+	bm.Size = size
+	bm.Chunks = hashes
+	bm.Path = rootdirectory + manifest.BlobManifestDir
+	bm.BlobSum = bm.GetBlobSum()
+	err = bm.Write()
+	if err != nil {
+		fmt.Printf("write blobs-manifest error\n")
+		return merrors.ERR_SYSTEM_ERR
+	}
+
+	// write manifest config
 	mid := uuid.Generate().Simple()
 	manifestDir := rootdirectory + fmt.Sprintf(manifest.ManifestDirProto, id)
-
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
 	manifest.ID = mid
 	manifest.Path = manifestDir
 	manifest.CreateTime = utils.CurrentTimeStr()
-	manifest.BlobSum = blobSum
+	manifest.BlobSum = bm.BlobSum
 
 	err = manifest.Write()
 	if err != nil {
 		fmt.Printf("Create manifest error[%s]\n", err)
+		// TDB,rollback
 		return merrors.ERR_SYSTEM_ERR
 	}
 

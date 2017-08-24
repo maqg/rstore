@@ -76,6 +76,11 @@ func GetDigest(buffer []byte) string {
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
+// GetDigestStr get digest value by string
+func GetDigestStr(data string) string {
+	return GetDigest(StringToBytes(data))
+}
+
 // CreateDir create dir if not exist
 func CreateDir(filepath string) {
 	if !IsFileExist(filepath) {

@@ -30,6 +30,7 @@ func init() {
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")
 }
 
+// RootCmd Root Cmd
 var RootCmd = &cobra.Command{
 
 	Use:   "rstcli",
