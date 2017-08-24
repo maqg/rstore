@@ -1,38 +1,20 @@
 package configuration
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 const (
-	TB_USER         = "tb_user"
-	TB_RELUSERGROUP = "tb_relusergroup"
-	TB_USERGROUP    = "tb_usergroup"
-	TB_ACCOUNT      = "tb_account"
-	TB_MISC         = "tb_misc"
-	TB_SESSION      = "tb_session"
+	// BlobSize for blob manage in bytes
+	BlobSize = 4 * 1024 * 1024
 )
 
-const (
-	ACCOUNT_STATE_DISABLE = 0
-	ACCOUNT_STATE_ENABLE  = 1
-)
-
-const (
-	ACCOUNT_TYPE_SUPERADMIN = 7
-	ACCOUNT_TYPE_ADMIN      = 3
-	ACCOUNT_TYPE_AUDIT      = 1
-
-	USER_TYPE_USER = 0
-)
-
-const (
-	BLOB_SIZE = 4 * 1024 * 1024 // bytes
-)
-
+// Configuration for global config
 type Configuration struct {
 
 	// Version is the version which defines the format of the rest of the configuration
@@ -46,18 +28,21 @@ type Configuration struct {
 
 	HTTP struct {
 		Addr    string `yaml:"addr,omitempty"`
-		ApiAddr string `yaml:"apiAddr,omitempty"`
+		APIAddr string `yaml:"apiAddr,omitempty"`
 	}
 
 	RootDirectory string `yaml:"rootdirectory,omitempty"`
 }
 
+// Conf global configuration
 var Conf *Configuration
 
+// GetConfig for global
 func GetConfig() *Configuration {
 	return Conf
 }
 
+// ParseConfig from yml
 func ParseConfig(in []byte) (*Configuration, error) {
 
 	config := new(Configuration)
@@ -69,6 +54,7 @@ func ParseConfig(in []byte) (*Configuration, error) {
 	return config, nil
 }
 
+// Parse from io.Reader
 func Parse(rd io.Reader) (*Configuration, error) {
 
 	in, err := ioutil.ReadAll(rd)
@@ -77,4 +63,36 @@ func Parse(rd io.Reader) (*Configuration, error) {
 	}
 
 	return ParseConfig(in)
+}
+
+// ResolveConfig for config convert from yml
+func ResolveConfig(configfile string) (*Configuration, error) {
+
+	var configurationPath string
+
+	if configfile == "" {
+		configurationPath = os.Getenv("REGISTRY_CONFIGURATION_PATH")
+	} else {
+		configurationPath = configfile
+	}
+
+	if configurationPath == "" {
+		return nil, fmt.Errorf("configuration path unspecified")
+	}
+
+	fp, err := os.Open(configurationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fp.Close()
+
+	config, err := Parse(fp)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing %s: %v", configurationPath, err)
+	}
+
+	Conf = config
+
+	return config, nil
 }

@@ -108,7 +108,7 @@ func WriteBlob(rootdirectory string, dgst string, data []byte) error {
 }
 
 // WriteBlobs to write blobs from file and return its hash values
-func WriteBlobs(filepath string, rootdirectory string) ([]string, int64, error) {
+func WriteBlobs(filepath string) ([]string, int64, error) {
 
 	f, err := os.Open(filepath)
 	if err != nil {
@@ -120,7 +120,7 @@ func WriteBlobs(filepath string, rootdirectory string) ([]string, int64, error) 
 	var fileLength int64
 	hashList := make([]string, 0)
 	for {
-		buffer := make([]byte, configuration.BLOB_SIZE)
+		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
 			fmt.Printf("reached end of file[%d]\n", n)
@@ -134,7 +134,7 @@ func WriteBlobs(filepath string, rootdirectory string) ([]string, int64, error) 
 
 		dgst := utils.GetDigest(buffer)
 		fmt.Printf("got size of %d,with hash:%s\n", n, dgst)
-		WriteBlob(rootdirectory, dgst, buffer)
+		WriteBlob(configuration.GetConfig().RootDirectory, dgst, buffer)
 
 		hashList = append(hashList, dgst)
 	}

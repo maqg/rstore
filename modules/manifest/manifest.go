@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"octlink/rstore/configuration"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
 	"os"
-
-	"github.com/gorilla/mux"
 )
 
 // Manifest base Manifest structure
@@ -75,53 +72,26 @@ func FileToManifest(filePath string) (*Manifest, error) {
 }
 
 // GetManifest for api call
-func GetManifest(w http.ResponseWriter, r *http.Request) {
+func GetManifest(name string, dgst string) *Manifest {
 
-	name := mux.Vars(r)["name"]
-	digest := mux.Vars(r)["digest"]
-
-	octlog.Debug("got name[%s],digest[%s]\n", name, digest)
+	octlog.Debug("got name[%s],digest[%s]\n", name, dgst)
 
 	conf := configuration.GetConfig()
-	maniPath := conf.RootDirectory + fmt.Sprintf(ManifestFileProto, name, digest)
+	maniPath := conf.RootDirectory + fmt.Sprintf(ManifestFileProto, name, dgst)
 	if !utils.IsFileExist(maniPath) {
-		w.WriteHeader(http.StatusNotFound)
 		octlog.Error("manifest not exist %s\n", maniPath)
 		logger.Errorf("manifest not exist %s\n", maniPath)
-		return
+		return nil
 	}
 
 	manifest, err := FileToManifest(maniPath)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
 		octlog.Error("manifest parse error %s\n", maniPath)
 		logger.Errorf("manifest parse error %s\n", maniPath)
-		return
+		return nil
 	}
 
-	data, _ := json.Marshal(manifest)
-	dataStr := utils.BytesToString(data)
-
-	octlog.Debug("Got manifest %s\n", dataStr)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(dataStr)))
-	fmt.Fprint(w, dataStr)
-}
-
-// DeleteManifest for api call
-func DeleteManifest(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-// PutManifest for api call
-func PutManifest(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
+	return manifest
 }
 
 func init() {

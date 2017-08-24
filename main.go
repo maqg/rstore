@@ -11,7 +11,6 @@ import (
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
-	"os"
 )
 
 var (
@@ -38,55 +37,24 @@ func init() {
 }
 
 func usage() {
-	fmt.Println("  RVM Store of V" + utils.Version() + "\n")
-	fmt.Println("  ./rstore -config ./config.yml\n")
+	fmt.Printf("  RVM Store of V" + utils.Version() + "\n")
+	fmt.Printf("  ./rstore -config ./config.yml\n")
 	flag.PrintDefaults()
 }
 
-func resolveConfiguration(configfile string) (*configuration.Configuration, error) {
-
-	var configurationPath string
-
-	if configfile == "" {
-		configurationPath = os.Getenv("REGISTRY_CONFIGURATION_PATH")
-	} else {
-		configurationPath = configfile
-	}
-
-	if configurationPath == "" {
-		return nil, fmt.Errorf("configuration path unspecified")
-	}
-
-	fp, err := os.Open(configurationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer fp.Close()
-
-	config, err := configuration.Parse(fp)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing %s: %v", configurationPath, err)
-	}
-
-	configuration.Conf = config
-
-	return config, nil
-}
-
-func runApiThread(conf *configuration.Configuration) {
+func runAPIThread(conf *configuration.Configuration) {
 
 	api := &api.Api{
 		Name: "Rstore API Server",
 	}
 
 	server := &http.Server{
-		Addr:           fmt.Sprintf("%s", conf.HTTP.ApiAddr),
+		Addr:           fmt.Sprintf("%s", conf.HTTP.APIAddr),
 		Handler:        api.ApiRouter(),
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	octlog.Warn("RSTORE API Engine Started ON %s\n", conf.HTTP.ApiAddr)
+	octlog.Warn("RSTORE API Engine Started ON %s\n", conf.HTTP.APIAddr)
 
 	err := server.ListenAndServe()
 	if err != nil {
@@ -105,7 +73,7 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	conf, err := resolveConfiguration(config)
+	conf, err := configuration.ResolveConfig(config)
 	if err != nil {
 		fmt.Printf("Resolve Configuration Error[%s]\n", err)
 		return
@@ -113,7 +81,7 @@ func main() {
 
 	initRootDirectory(conf)
 
-	go runApiThread(conf)
+	go runAPIThread(conf)
 
 	app := handlers.NewApp()
 

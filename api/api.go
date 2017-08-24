@@ -28,7 +28,7 @@ type Api struct {
 }
 
 type ApiConfig struct {
-	Modules map[string]ApiModule `json:"modules`
+	Modules map[string]ApiModule `json:"modules"`
 }
 
 type ProtoPara struct {

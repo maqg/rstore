@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"os"
 	"reflect"
 	"time"
@@ -100,4 +101,10 @@ func Remove(filepath string) {
 	if IsFileExist(filepath) {
 		os.Remove(filepath)
 	}
+}
+
+// JSON2String convert json to string
+func JSON2String(v interface{}) string {
+	data, _ := json.MarshalIndent(v, "", "  ")
+	return string(data)
 }

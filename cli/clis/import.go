@@ -3,6 +3,7 @@ package clis
 import (
 	"fmt"
 	"octlink/mirage/src/utils/merrors"
+	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
@@ -14,7 +15,7 @@ import (
 
 func init() {
 	importCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	importCmd.Flags().StringVarP(&rootdirectory, "rootdirectory", "r", "", "RootDirectory of RSTORE")
+	importCmd.Flags().StringVarP(&config, "config", "c", "./config.yml", "Config of RSTORE")
 	importCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
 	importCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
 }
@@ -24,9 +25,9 @@ func callbacking() {
 }
 
 func checkParas() bool {
-	if id == "" || filepath == "" || rootdirectory == "" {
+	if id == "" || filepath == "" || config == "" {
 		fmt.Printf("id or filepath must specified,id:%s,filepath:%s,rootdir:%s\n",
-			id, filepath, rootdirectory)
+			id, filepath, config)
 		return false
 	}
 
@@ -40,21 +41,27 @@ func checkParas() bool {
 
 func importImage() int {
 
-	fmt.Printf("got image id[%s],filepath[%s],root[%s],callbackurl[%s]\n",
-		id, filepath, rootdirectory, callbackurl)
+	fmt.Printf("got image id[%s],filepath[%s],config[%s],callbackurl[%s]\n",
+		id, filepath, config, callbackurl)
 
 	if !checkParas() {
 		fmt.Printf("check input paras failed\n")
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	reposDir := rootdirectory + "/" + manifest.ReposDir
+	conf, err := configuration.ResolveConfig(config)
+	if err != nil {
+		fmt.Printf("parse config %s error\n", config)
+		return merrors.ERR_CMD_ERR
+	}
+
+	reposDir := conf.RootDirectory + "/" + manifest.ReposDir
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	hashes, size, err := blobs.WriteBlobs(filepath, rootdirectory)
+	hashes, size, err := blobs.WriteBlobs(filepath)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ERR_COMMON_ERR
@@ -64,7 +71,7 @@ func importImage() int {
 	bm := new(blobsmanifest.BlobsManifest)
 	bm.Size = size
 	bm.Chunks = hashes
-	bm.Path = rootdirectory + manifest.BlobManifestDir
+	bm.Path = conf.RootDirectory + manifest.BlobManifestDir
 	bm.BlobSum = bm.GetBlobSum()
 	err = bm.Write()
 	if err != nil {
@@ -74,7 +81,7 @@ func importImage() int {
 
 	// write manifest config
 	mid := uuid.Generate().Simple()
-	manifestDir := rootdirectory + fmt.Sprintf(manifest.ManifestDirProto, id)
+	manifestDir := conf.RootDirectory + fmt.Sprintf(manifest.ManifestDirProto, id)
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
 	manifest.ID = mid

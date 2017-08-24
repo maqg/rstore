@@ -61,12 +61,13 @@ func httpDo() {
 
 	resp, err := client.Do(req)
 
-	defer resp.Body.Close()
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		// handle error
 	}
+
+	defer resp.Body.Close()
+
 
 	fmt.Println(string(body))
 }

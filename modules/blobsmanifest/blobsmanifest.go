@@ -50,3 +50,8 @@ func (bm *BlobsManifest) Write() error {
 
 	return nil
 }
+
+// GetBlobsManifest to get blobs manifest config
+func GetBlobsManifest(blobsum string) *BlobsManifest {
+	return nil
+}
