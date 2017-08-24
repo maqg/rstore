@@ -1,7 +1,6 @@
 package main
 
 import (
-	"octlink/rstore/modules/manifest"
 	"flag"
 	"fmt"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"octlink/rstore/configuration"
 	"octlink/rstore/handlers"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
 	"os"
@@ -94,6 +94,12 @@ func runApiThread(conf *configuration.Configuration) {
 	}
 }
 
+func initRootDirectory(conf *configuration.Configuration) {
+	utils.CreateDir(conf.RootDirectory + manifest.ReposDir)
+	utils.CreateDir(conf.RootDirectory + manifest.BlobDir)
+	utils.CreateDir(conf.RootDirectory + manifest.BlobManifestDir)
+}
+
 func main() {
 
 	flag.Usage = usage
@@ -104,7 +110,8 @@ func main() {
 		fmt.Printf("Resolve Configuration Error[%s]\n", err)
 		return
 	}
-	utils.CreateDir(conf.RootDirectory + manifest.REPOS_DIR)
+
+	initRootDirectory(conf)
 
 	go runApiThread(conf)
 

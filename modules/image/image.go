@@ -34,6 +34,7 @@ type Image struct {
 	Md5Sum      string `json:"md5sum"`
 	Url         string `json:"url"`
 	Type        string `json:"type"`
+	Arch        string `json:"arch"`
 	Platform    string `json:"platform"`
 	Format      string `json:"format"`
 	System      bool   `json:"system"`

@@ -27,6 +27,12 @@ const (
 	// ReposDir Base Repos Directory
 	ReposDir = "/registry/repos"
 
+	// BlobManifestDir for manifest-blobs relationship
+	BlobManifestDir = "/registry/blob-manifests"
+
+	// BlobsDir for blobs tree directory
+	BlobDir = "/registry/blobs"
+
 	// ImageDirProto Image Dir Proto Type
 	ImageDirProto = "/registry/repos/%s"
 

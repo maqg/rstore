@@ -7,11 +7,11 @@ import (
 )
 
 func init() {
-	PullCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	PullCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	pullCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	pullCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
 }
 
-var PullCmd = &cobra.Command{
+var pullCmd = &cobra.Command{
 
 	Use:   "pull",
 	Short: "Pull image from rstore.",

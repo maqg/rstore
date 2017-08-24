@@ -7,13 +7,13 @@ import (
 )
 
 func init() {
-	PushCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	PushCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	pushCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	pushCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
 }
 
-var PushCmd = &cobra.Command{
+var pushCmd = &cobra.Command{
 
-	Use:   "push",
+	Use:   "Push",
 	Short: "Push image to remote storage.",
 
 	Run: func(cmd *cobra.Command, args []string) {

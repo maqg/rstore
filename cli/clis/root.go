@@ -23,9 +23,9 @@ var (
 )
 
 func init() {
-	RootCmd.AddCommand(PullCmd)
-	RootCmd.AddCommand(PushCmd)
-	RootCmd.AddCommand(ImportCmd)
+	RootCmd.AddCommand(pullCmd)
+	RootCmd.AddCommand(pushCmd)
+	RootCmd.AddCommand(importCmd)
 	RootCmd.AddCommand(imagesCmd)
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")
 }
