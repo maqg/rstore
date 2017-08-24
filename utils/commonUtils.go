@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -107,4 +108,9 @@ func Remove(filepath string) {
 func JSON2String(v interface{}) string {
 	data, _ := json.MarshalIndent(v, "", "  ")
 	return string(data)
+}
+
+// TrimDir trim directory name by replace "//"
+func TrimDir(path string) string {
+	return strings.Replace(path, "//", "/", -1)
 }

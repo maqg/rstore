@@ -55,7 +55,7 @@ func importImage() int {
 		return merrors.ERR_CMD_ERR
 	}
 
-	reposDir := conf.RootDirectory + "/" + manifest.ReposDir
+	reposDir := utils.TrimDir(conf.RootDirectory + "/" + manifest.ReposDir)
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
 		return merrors.ERR_UNACCP_PARAS
@@ -71,7 +71,7 @@ func importImage() int {
 	bm := new(blobsmanifest.BlobsManifest)
 	bm.Size = size
 	bm.Chunks = hashes
-	bm.Path = conf.RootDirectory + manifest.BlobManifestDir
+	bm.Path = utils.TrimDir(conf.RootDirectory + manifest.BlobManifestDir)
 	bm.BlobSum = bm.GetBlobSum()
 	err = bm.Write()
 	if err != nil {
@@ -81,7 +81,7 @@ func importImage() int {
 
 	// write manifest config
 	mid := uuid.Generate().Simple()
-	manifestDir := conf.RootDirectory + fmt.Sprintf(manifest.ManifestDirProto, id)
+	manifestDir := utils.TrimDir(conf.RootDirectory + fmt.Sprintf(manifest.ManifestDirProto, id))
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
 	manifest.ID = mid
