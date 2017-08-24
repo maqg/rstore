@@ -17,3 +17,10 @@ go get -u -v github.com/tpng/gopkgs
 go get -u -v github.com/newhook/go-symbols
 go get -u -v golang.org/x/tools/cmd/guru
 go get -v -u github.com/peterh/liner github.com/derekparker/delve/cmd/dlv
+
+Installing github.com/tpng/gopkgs SUCCEEDED
+Installing github.com/acroca/go-symbols SUCCEEDED
+Installing golang.org/x/tools/cmd/guru SUCCEEDED
+Installing github.com/fatih/gomodifytags SUCCEEDED
+Installing github.com/josharian/impl SUCCEEDED
+Installing github.com/cweill/gotests/... SUCCEEDED

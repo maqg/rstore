@@ -7,6 +7,7 @@ import (
 	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/manifest"
+	"octlink/rstore/modules/revision"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/uuid"
 
@@ -91,16 +92,20 @@ func importImage() int {
 		return merrors.ERR_UNACCP_PARAS
 	}
 
+	mid := uuid.Generate().Simple()
+	revisionDir := rootdirectory + fmt.Sprintf(manifest.REVISIONS_DIR_PROTO, id, mid)
+	fmt.Printf("got new manifest dir %s\n", revisionDir)
+	utils.CreateDir(revisionDir)
+
+	revision := new(revision.Revision)
+	revision.Name = id
+	revision.Id = mid
+
 	hashes, err := splitFile(filepath)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ERR_COMMON_ERR
 	}
-
-	mid := uuid.Generate().Simple()
-	revisionDir := rootdirectory + fmt.Sprintf(manifest.REVISIONS_DIR_PROTO, id, mid)
-	fmt.Printf("got new manifest dir %s\n", revisionDir)
-	utils.CreateDir(revisionDir)
 
 	if callbackurl != "" {
 		callbacking()
