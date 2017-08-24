@@ -15,6 +15,7 @@ var (
 	outpath     string // output file path
 	callbackurl string
 	taskid      string
+	blobsum     string // blobsum
 	name        string // image name
 	account     string // account uuid
 	cachedir    string // temp dir for image files caching

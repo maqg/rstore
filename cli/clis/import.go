@@ -71,7 +71,6 @@ func importImage() int {
 	bm := new(blobsmanifest.BlobsManifest)
 	bm.Size = size
 	bm.Chunks = hashes
-	bm.Path = utils.TrimDir(conf.RootDirectory + manifest.BlobManifestDir)
 	bm.BlobSum = bm.GetBlobSum()
 	err = bm.Write()
 	if err != nil {
@@ -81,11 +80,9 @@ func importImage() int {
 
 	// write manifest config
 	mid := uuid.Generate().Simple()
-	manifestDir := utils.TrimDir(conf.RootDirectory + fmt.Sprintf(manifest.ManifestDirProto, id))
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
 	manifest.ID = mid
-	manifest.Path = manifestDir
 	manifest.CreateTime = utils.CurrentTimeStr()
 	manifest.BlobSum = bm.BlobSum
 

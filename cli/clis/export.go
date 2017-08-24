@@ -12,20 +12,16 @@ import (
 )
 
 func init() {
-	exportCmd.Flags().StringVarP(&id, "id", "i", "", "manifest uuid")
-	exportCmd.Flags().StringVarP(&name, "name", "n", "", "image uuid")
+	exportCmd.Flags().StringVarP(&blobsum, "blobsum", "s", "", "manifest blob sum")
 	exportCmd.Flags().StringVarP(&config, "config", "c", "./config.yml", "Config file for rstore")
-	exportCmd.Flags().StringVarP(&outpath, "outpath", "o", "", "output file path of local image")
+	exportCmd.Flags().StringVarP(&outpath, "outpath", "o", "./out.qcow2", "output file path of local image")
 }
 
 func exportImage() int {
 
-	fmt.Printf("got image id[%s],out[%s],root[%s]\n",
-		id, outpath, config)
-
-	if id == "" || outpath == "" || config == "" || name == "" {
-		fmt.Printf("id or filepath must specified,id:%s,filepath:%s,rootdir:%s,name:%s\n",
-			id, outpath, config, name)
+	if blobsum == "" || outpath == "" || config == "" {
+		fmt.Printf("id or filepath must specified,blobsum:%s,out:%s,config:%s\n",
+			blobsum, outpath, config)
 		return merrors.ERR_UNACCP_PARAS
 	}
 
@@ -35,25 +31,26 @@ func exportImage() int {
 		return merrors.ERR_CMD_ERR
 	}
 
-	reposDir := conf.RootDirectory + "/" + manifest.ReposDir
+	reposDir := utils.TrimDir(conf.RootDirectory + "/" + manifest.ReposDir)
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	manifest := manifest.GetManifest(name, id)
-	if manifest == nil {
-		fmt.Printf("manifest of %s:%s not exist\n", name, id)
-		return merrors.ERR_SEGMENT_NOT_EXIST
-	}
-
-	bm := blobsmanifest.GetBlobsManifest(manifest.BlobSum)
+	bm := blobsmanifest.GetBlobsManifest(blobsum)
 	if bm == nil {
-		fmt.Printf("blobs manifest of %s not exist\n", manifest.BlobSum)
+		fmt.Printf("blobs manifest of %s not exist\n", blobsum)
 		return merrors.ERR_SEGMENT_NOT_EXIST
 	}
 
-	fmt.Printf(utils.JSON2String(bm))
+	fmt.Println(utils.JSON2String(bm))
+
+	err = bm.Export(outpath)
+	if err != nil {
+		fmt.Printf("export image to %s error\n", outpath)
+	}
+
+	fmt.Printf("Export image of %s to %s OK\n", blobsum, outpath)
 
 	return 0
 }
@@ -65,7 +62,7 @@ var exportCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if id != "" {
+		if blobsum != "" {
 			exportImage()
 			return
 		}
