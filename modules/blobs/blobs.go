@@ -43,7 +43,7 @@ func GetBlob(name string, digest string) ([]byte, int, error) {
 		return nil, 0, err
 	}
 
-	return data, int(utils.FileLength(blobpath)), nil
+	return data, int(utils.GetFileSize(blobpath)), nil
 }
 
 // DeleteBlob to delete blob from api
@@ -91,15 +91,10 @@ func CancelBlobUpload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, emptyJSON)
 }
 
-// GetBlobDir to get blob dir from root and digest
-func GetBlobDir(rootdirectory string, digest string) string {
-	return rootdirectory + manifest.BlobDir + "/" + digest[0:2] + "/" + digest[2:4]
-}
-
 // WriteBlob To write blob from file
-func WriteBlob(rootdirectory string, dgst string, data []byte) error {
+func WriteBlob(dgst string, data []byte) error {
 
-	blobDir := GetBlobDir(rootdirectory, dgst)
+	blobDir := DirPath(dgst)
 	utils.CreateDir(blobDir)
 
 	fd, err := os.Create(blobDir + "/" + dgst)
@@ -109,7 +104,6 @@ func WriteBlob(rootdirectory string, dgst string, data []byte) error {
 	}
 
 	defer fd.Close()
-
 	fd.Write(data)
 
 	return nil
@@ -142,7 +136,7 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 
 		dgst := utils.GetDigest(buffer[:n])
 		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
-		WriteBlob(configuration.GetConfig().RootDirectory, dgst, buffer[:n])
+		WriteBlob(dgst, buffer[:n])
 
 		hashList = append(hashList, dgst)
 	}

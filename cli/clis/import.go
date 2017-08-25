@@ -8,7 +8,6 @@ import (
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
-	"octlink/rstore/utils/uuid"
 
 	"github.com/spf13/cobra"
 )
@@ -79,10 +78,12 @@ func importImage() int {
 	}
 
 	// write manifest config
-	mid := uuid.Generate().Simple()
+	mid := utils.GetDigestStr(id)
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
 	manifest.ID = mid
+	manifest.DiskSize = size
+	manifest.VirtualSize = utils.GetVirtualSize(filepath)
 	manifest.CreateTime = utils.CurrentTimeStr()
 	manifest.BlobSum = bm.BlobSum
 

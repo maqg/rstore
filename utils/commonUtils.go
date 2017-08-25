@@ -4,7 +4,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
+	"os/exec"
 	"reflect"
 	"strings"
 	"time"
@@ -47,6 +49,11 @@ func IsFileExist(filename string) bool {
 // ParseInt to parse int
 func ParseInt(val interface{}) int {
 	return int(val.(float64))
+}
+
+// ParseInt64 to parse int
+func ParseInt64(val interface{}) int64 {
+	return int64(val.(float64))
 }
 
 // StringToBytes return GoString's buffer slice(enable modify string)
@@ -115,12 +122,39 @@ func TrimDir(path string) string {
 	return strings.Replace(path, "//", "/", -1)
 }
 
-// FileLength to get file length
-func FileLength(path string) int64 {
+// GetFileSize to get file length
+func GetFileSize(path string) int64 {
 	stat, err := os.Stat(path)
 	if err != nil {
 		return 0
 	}
 
 	return stat.Size()
+}
+
+const (
+	//QemuImgTool for virtual size fetching
+	QemuImgTool = "/usr/bin/qemu-img"
+)
+
+// GetVirtualSize to get file's virtual size
+func GetVirtualSize(filepath string) int64 {
+
+	if IsFileExist(QemuImgTool) {
+		cmdStr := fmt.Sprintf("%s info %s | grep \"virtual size\" | awk -F' ' '{print $4}' | cut -b2-", QemuImgTool, filepath)
+		cmd := exec.Command(cmdStr)
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("exec cmd %s error\n", cmdStr)
+			return 0
+		}
+
+		data, err := cmd.Output()
+		if err != nil {
+			fmt.Printf("get output error\n")
+			return 0
+		}
+
+		return ParseInt64(string(data))
+	}
+	return 0
 }

@@ -20,7 +20,7 @@ func main() {
 	defer f.Close()
 
 	for {
-		buffer := make([]byte, configuration.BLOB_SIZE)
+		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
 			fmt.Printf("reached end of file[%d]\n", n)
