@@ -6,9 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (api *Api) ApiRouter() *gin.Engine {
+// Router for api management
+func (api *API) Router() *gin.Engine {
 
-	var BaseDir string = ""
+	var baseDir = ""
 
 	router := gin.New()
 
@@ -16,18 +17,16 @@ func (api *Api) ApiRouter() *gin.Engine {
 
 	exist := utils.IsFileExist("frontend")
 	if !exist {
-		BaseDir = "../"
+		baseDir = "../"
 	}
 
-	//LoadApiConfig(BaseDir)
+	router.LoadHTMLGlob(baseDir + "frontend/apitest/templates/*.html")
+	router.Static("/static", baseDir+"frontend/static")
 
-	router.LoadHTMLGlob(BaseDir + "frontend/apitest/templates/*.html")
-	router.Static("/static", BaseDir+"frontend/static")
+	router.GET("/api/test/", api.LoadTestPage)
 
-	router.GET("/api/test/", api.LoadApiTestPage)
-
-	router.GET("/api/", api.ApiTest)
-	router.POST("/api/", api.ApiDispatch)
+	router.GET("/api/", api.Test)
+	router.POST("/api/", api.Dispatch)
 
 	return router
 }

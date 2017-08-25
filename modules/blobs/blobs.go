@@ -132,12 +132,17 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 			fmt.Printf("read file error %s", err)
 		}
 
-		dgst := utils.GetDigest(buffer)
+		dgst := utils.GetDigest(buffer[:n])
 		fmt.Printf("got size of %d,with hash:%s\n", n, dgst)
-		WriteBlob(configuration.GetConfig().RootDirectory, dgst, buffer)
+		WriteBlob(configuration.GetConfig().RootDirectory, dgst, buffer[:n])
 
 		hashList = append(hashList, dgst)
 	}
 
 	return hashList, fileLength, nil
+}
+
+// DirPath to make blob path
+func DirPath(blobsum string) string {
+	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
 }

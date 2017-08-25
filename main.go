@@ -25,7 +25,7 @@ func initDebugConfig() {
 }
 
 func initLogConfig() {
-	api.InitApiLog(octlog.DEBUG_LEVEL)
+	api.InitAPILog(octlog.DEBUG_LEVEL)
 	blobs.InitLog(octlog.DEBUG_LEVEL)
 }
 
@@ -44,13 +44,13 @@ func usage() {
 
 func runAPIThread(conf *configuration.Configuration) {
 
-	api := &api.Api{
+	api := &api.API{
 		Name: "Rstore API Server",
 	}
 
 	server := &http.Server{
 		Addr:           fmt.Sprintf("%s", conf.HTTP.APIAddr),
-		Handler:        api.ApiRouter(),
+		Handler:        api.Router(),
 		MaxHeaderBytes: 1 << 20,
 	}
 

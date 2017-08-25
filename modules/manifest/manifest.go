@@ -18,7 +18,6 @@ type Manifest struct {
 	DiskSize    int64  `json:"diskSize"`
 	VirtualSize int64  `json:"virtualSize"`
 	CreateTime  string `json:"createTime"`
-	Path        string
 }
 
 const (
@@ -103,15 +102,19 @@ func (manifest *Manifest) Delete() error {
 	return nil
 }
 
+func dirpath(imageID string) string {
+	return utils.TrimDir(configuration.GetConfig().RootDirectory + fmt.Sprintf(ManifestDirProto, imageID))
+}
+
 // Write for manifest self delete
 func (manifest *Manifest) Write() error {
 
 	// create manifest base diretory
-	utils.CreateDir(manifest.Path)
+	manifestPath := dirpath(manifest.Name)
+	utils.CreateDir(manifestPath)
 
-	filePath := manifest.Path + fmt.Sprintf("/%s.json", manifest.ID)
+	filePath := manifestPath + "/" + manifest.ID + ".json"
 	utils.Remove(filePath)
-
 	fd, err := os.Create(filePath)
 	if err != nil {
 		fmt.Printf("create file %s error\n", filePath)

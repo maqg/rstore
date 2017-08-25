@@ -1,30 +1,30 @@
 package api
 
-var apiDescriptors = []ApiModule{
+var apiDescriptors = []Module{
 	ImageDescriptors,
 }
 
-func loadModules(module ApiModule) {
+func loadModules(module Module) {
 
-	if GApiConfig.Modules == nil {
-		GApiConfig.Modules = make(map[string]ApiModule, 50)
+	if GAPIConfig.Modules == nil {
+		GAPIConfig.Modules = make(map[string]Module, 50)
 	}
 
-	GApiConfig.Modules[module.Name] = module
+	GAPIConfig.Modules[module.Name] = module
 }
 
 func init() {
 
-	GApiServices = make(map[string]*ApiService, 10000)
+	GServices = make(map[string]*Service, 10000)
 
 	for _, descriptor := range apiDescriptors {
 		for key, proto := range descriptor.Protos {
-			service := new(ApiService)
+			service := new(Service)
 			service.Name = proto.Name
 			service.Handler = proto.handler
-			proto.Key = API_PREFIX_CENTER + "." + descriptor.Name + "." + key
+			proto.Key = APIPrefixCenter + "." + descriptor.Name + "." + key
 			descriptor.Protos[key] = proto
-			GApiServices[API_PREFIX_CENTER+"."+descriptor.Name+"."+key] = service
+			GServices[APIPrefixCenter+"."+descriptor.Name+"."+key] = service
 		}
 
 		loadModules(descriptor)

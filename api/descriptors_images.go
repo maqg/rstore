@@ -1,93 +1,94 @@
 package api
 
-var ImageDescriptors = ApiModule{
+// ImageDescriptors for image management by API
+var ImageDescriptors = Module{
 	Name: "images",
-	Protos: map[string]ApiProto{
+	Protos: map[string]Proto{
 		"APIAddImage": {
 			Name:    "添加镜像",
-			handler: APIAddImage,
+			handler: AddImage,
 			Paras: []ProtoPara{
 				{
 					Name:    "name",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Image Name",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 				{
 					Name:    "id",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "UUID of Image",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 				{
 					Name:    "accountId",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Account Id",
 					Default: "",
 				},
 				{
 					Name:    "url1",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Url1 of Source Image",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 				{
 					Name:    "url2",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Url2 of Source Image",
 					Default: "",
 				},
 				{
 					Name:    "url3",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Url3 of Source Image",
 					Default: "",
 				},
 				{
 					Name:    "format",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Image Format, qcow2,raw,iso",
 					Default: "qcow2",
 				},
 				{
 					Name:    "arch",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Arch of Image, amd64 or x86",
 					Default: "amd64",
 				},
 				{
 					Name:    "mediaType",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "镜像的媒体类型，RootVolumeTemplate，DataValumeTemplate, ISO",
 					Default: "RootVolumeTemplate",
 				},
 				{
 					Name:    "platform",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "平台类型，如Linux，Windows， Other",
 					Default: "Linux",
 				},
 				{
 					Name:    "guestOsType",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "客户操作系统类型，如CentOS，Debian",
 					Default: "Debian7",
 				},
 				{
 					Name:    "isSystem",
-					Type:    PARAM_TYPE_BOOLEAN,
+					Type:    ParamTypeBoolean,
 					Desc:    "是否为系统镜像",
 					Default: false,
 				},
 				{
 					Name:    "username",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "FTP or HTTP username",
 					Default: "",
 				},
 				{
 					Name:    "password",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "FTP or HTTP password",
 					Default: "",
 				},
@@ -96,37 +97,37 @@ var ImageDescriptors = ApiModule{
 
 		"APIDeleteImageByAccount": {
 			Name:    "删除镜像（根据账号）",
-			handler: APIDeleteImageByAccount,
+			handler: DeleteImageByAccount,
 			Paras: []ProtoPara{
 				{
 					Name:    "accountId",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Account Id",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 			},
 		},
 
 		"APIShowImage": {
 			Name:    "查看单个镜像",
-			handler: APIShowImage,
+			handler: ShowImage,
 			Paras: []ProtoPara{
 				{
 					Name:    "id",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "Image Id",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 			},
 		},
 
 		"APIShowAllImages": {
 			Name:    "获取所有镜像",
-			handler: APIShowAllImages,
+			handler: ShowAllImages,
 			Paras: []ProtoPara{
 				{
 					Name:    "start",
-					Type:    PARAM_TYPE_INT,
+					Type:    ParamTypeInt,
 					Desc:    "开始位置",
 					Default: 0,
 				},
@@ -159,23 +160,23 @@ var ImageDescriptors = ApiModule{
 
 		"APIShowAccountList": {
 			Name:    "查看账号列表",
-			handler: APIShowAccountList,
+			handler: ShowAccountList,
 			Paras:   []ProtoPara{},
 		},
 
 		"APIDeleteImage": {
 			Name:    "删除镜像",
-			handler: APIDeleteImage,
+			handler: DeleteImage,
 			Paras: []ProtoPara{
 				{
 					Name:    "id",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "UUID of Image",
-					Default: PARAM_NOT_NULL,
+					Default: ParamNotNull,
 				},
 				{
 					Name:    "mediaType",
-					Type:    PARAM_TYPE_STRING,
+					Type:    ParamTypeString,
 					Desc:    "镜像的媒体类型，RootVolumeTemplate，DataValumeTemplate, ISO",
 					Default: "RootVolumeTemplate",
 				},

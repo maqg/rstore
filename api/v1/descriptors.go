@@ -4,6 +4,7 @@ import (
 	"octlink/rstore/reference"
 )
 
+// RouteDescriptorsMap for router map
 var RouteDescriptorsMap map[string]RouteDescriptor
 
 // RouteDescriptor describes a route specified by name.
@@ -125,44 +126,11 @@ var (
 		Description: `Digest of desired blob.`,
 	}
 
-	hostHeader = ParameterDescriptor{
-		Name:        "Host",
-		Type:        "string",
-		Description: "Standard HTTP Host Header. Should be set to the registry host.",
-		format:      "<registry host>",
-		Examples:    []string{"registry-1.docker.io"},
-	}
-
-	authHeader = ParameterDescriptor{
-		Name:        "Authorization",
-		Type:        "string",
-		Description: "An RFC7235 compliant authorization header.",
-		format:      "<scheme> <token>",
-		Examples:    []string{"Bearer dGhpcyBpcyBhIGZha2UgYmVhcmVyIHRva2VuIQ=="},
-	}
-
-	authChallengeHeader = ParameterDescriptor{
-		Name:        "WWW-Authenticate",
-		Type:        "string",
-		Description: "An RFC7235 compliant authentication challenge header.",
-		format:      `<scheme> realm="<realm>", ..."`,
-		Examples: []string{
-			`Bearer realm="https://auth.docker.com/", service="registry.docker.com", scopes="repository:library/ubuntu:pull"`,
-		},
-	}
-
 	contentLengthZeroHeader = ParameterDescriptor{
 		Name:        "Content-Length",
 		Description: "The `Content-Length` header must be zero and the body must be empty.",
 		Type:        "integer",
 		format:      "0",
-	}
-
-	dockerUploadUUIDHeader = ParameterDescriptor{
-		Name:        "Docker-Upload-UUID",
-		Description: "Identifies the docker upload uuid for the current request.",
-		Type:        "uuid",
-		format:      "<uuid>",
 	}
 
 	digestHeader = ParameterDescriptor{
@@ -171,33 +139,10 @@ var (
 		Type:        "digest",
 		format:      "<digest>",
 	}
-
-	linkHeader = ParameterDescriptor{
-		Name:        "Link",
-		Type:        "link",
-		Description: "RFC5988 compliant rel='next' with URL to next result set, if available",
-		format:      `<<url>?n=<last n value>&last=<last entry from response>>; rel="next"`,
-	}
-
-	paginationParameters = []ParameterDescriptor{
-		{
-			Name:        "n",
-			Type:        "integer",
-			Description: "Limit the number of entries in each response. It not present, all entries will be returned.",
-			format:      "<integer>",
-			Required:    false,
-		},
-		{
-			Name:        "last",
-			Type:        "string",
-			Description: "Result set will include values lexically after last.",
-			format:      "<integer>",
-			Required:    false,
-		},
-	}
 )
 
-var routeDescriptors = []RouteDescriptor{
+// RouteDescriptors for route descriptor list
+var RouteDescriptors = []RouteDescriptor{
 	{
 		Name:        RouteNameBase,
 		path:        "/v1/",
@@ -207,27 +152,6 @@ var routeDescriptors = []RouteDescriptor{
 			{
 				Method:      "GET",
 				Description: "Check implements API V1.",
-			},
-		},
-	},
-	{
-		Name:        RouteNameTags,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/tags/list",
-		PathSimple:  "/v1/{name}/tags/list",
-		Description: "Retrieve information about tags.",
-		Methods: []MethodDescriptor{
-			{
-				Method:      "GET",
-				Description: "Fetch the tags under the repository identified by `name`.",
-				Requests: []RequestDescriptor{
-					{
-						Name:        "Tags",
-						Description: "Return all tags for the repository",
-						PathParameters: []ParameterDescriptor{
-							nameParameterDescriptor,
-						},
-					},
-				},
 			},
 		},
 	},
@@ -274,52 +198,22 @@ var routeDescriptors = []RouteDescriptor{
 							nameParameterDescriptor,
 						},
 					},
-					{
-						Name:        "Mount Blob",
-						Description: "Mount a blob identified by the `mount` parameter from another repository.",
-						Headers: []ParameterDescriptor{
-							contentLengthZeroHeader,
-						},
-						PathParameters: []ParameterDescriptor{
-							nameParameterDescriptor,
-						},
-						QueryParameters: []ParameterDescriptor{
-							{
-								Name:        "mount",
-								Type:        "query",
-								format:      "<digest>",
-								Description: `Digest of blob to mount from the source repository.`,
-							},
-							{
-								Name:        "from",
-								Type:        "query",
-								format:      "<repository name>",
-								Description: `Name of the source repository.`,
-							},
-						},
-					},
 				},
 			},
 		},
 	},
 
 	{
-		Name: RouteNameManifest,
-		//path: "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.NameRegexp.String() + "}",
-		//path: "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.NameRegexp.String() + "}",
+		Name:        RouteNameManifest,
 		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.DigestRegexp.String() + "}",
 		PathSimple:  "/v1/{name}/manifests/{digest}/",
 		Description: "Create, update, delete and retrieve manifests.",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "GET",
-				Description: "Fetch the manifest identified by `name` and `reference`",
+				Description: "Fetch the manifest identified by `name` and `digest`",
 				Requests: []RequestDescriptor{
 					{
-						Headers: []ParameterDescriptor{
-							hostHeader,
-							authHeader,
-						},
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
 							referenceParameterDescriptor,
@@ -332,10 +226,6 @@ var routeDescriptors = []RouteDescriptor{
 				Description: "Put the manifest identified by `name` and `reference`",
 				Requests: []RequestDescriptor{
 					{
-						Headers: []ParameterDescriptor{
-							hostHeader,
-							authHeader,
-						},
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
 							referenceParameterDescriptor,
@@ -348,10 +238,6 @@ var routeDescriptors = []RouteDescriptor{
 				Description: "Delete the manifest identified by `name` and `reference`",
 				Requests: []RequestDescriptor{
 					{
-						Headers: []ParameterDescriptor{
-							hostHeader,
-							authHeader,
-						},
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
 							referenceParameterDescriptor,
@@ -381,8 +267,8 @@ var routeDescriptors = []RouteDescriptor{
 }
 
 func init() {
-	RouteDescriptorsMap = make(map[string]RouteDescriptor, len(routeDescriptors))
-	for _, descriptor := range routeDescriptors {
+	RouteDescriptorsMap = make(map[string]RouteDescriptor, len(RouteDescriptors))
+	for _, descriptor := range RouteDescriptors {
 		RouteDescriptorsMap[descriptor.Name] = descriptor
 	}
 }

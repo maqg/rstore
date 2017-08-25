@@ -54,6 +54,7 @@ func (app *App) register(routeName string, dispatch dispatchFunc) {
 	app.Router.GetRoute(routeName).Handler(app.dispatcher(dispatch))
 }
 
+// NewApp to new an application
 func NewApp() *App {
 
 	app := &App{
