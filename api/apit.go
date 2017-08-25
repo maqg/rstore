@@ -7,16 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (api *Api) LoadApiTestPage(c *gin.Context) {
-	apiModules, _ := json.Marshal(GApiConfig.Modules)
+// LoadTestPage to load api test page
+func (api *API) LoadTestPage(c *gin.Context) {
+	apiModules, _ := json.Marshal(GAPIConfig.Modules)
 	c.HTML(http.StatusOK, "apitest.html",
 		gin.H{
 			"TESTTITLE": "Mirage",
 			"APICONFIG": string(apiModules),
 		})
-}
-
-func (api *Api) LoadNgPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html",
-		gin.H{"TESTTITLE": "Mirage"})
 }

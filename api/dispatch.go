@@ -8,7 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ApiResponse struct {
+// Response structure
+type Response struct {
 	Error    int         `json:"error"`
 	ErrorLog string      `json:"errorLog"`
 	Data     interface{} `json:"data"`
@@ -25,31 +26,36 @@ type ApiResponse struct {
 	"async": false,
 }
 */
-type InputParas struct {
+type inputParas struct {
 	Module string
-	Api    string
+	API    string
 	Paras  map[string]interface{}
 	Async  bool
 }
 
-type ApiParas struct {
-	Proto   *ApiProto
-	InParas *InputParas
+// Paras of API
+type Paras struct {
+	Proto   *Proto
+	InParas *inputParas
 }
 
-func (api *Api) ApiTest(c *gin.Context) {
+// Test for api test page
+func (api *API) Test(c *gin.Context) {
 	httpresponse.Ok(c, "Api Server is Running")
 }
 
-var GApiServices map[string]*ApiService
+// GServices for api service management
+var GServices map[string]*Service
 
-type ApiService struct {
-	Name    string                       `json:"name"`
-	Handler func(*ApiParas) *ApiResponse `json:"handler"`
+// Service of API
+type Service struct {
+	Name    string                 `json:"name"`
+	Handler func(*Paras) *Response `json:"handler"`
 }
 
-func GetApiService(key string) *ApiService {
-	service, ok := GApiServices[key]
+// GetService for api
+func GetService(key string) *Service {
+	service, ok := GServices[key]
 	if !ok {
 		octlog.Error("no service for %s found\n", key)
 		return nil
@@ -58,23 +64,23 @@ func GetApiService(key string) *ApiService {
 	return service
 }
 
-func getApiParas(c *gin.Context) (*ApiParas, int) {
+func getParas(c *gin.Context) (*Paras, int) {
 
-	var apiParas *ApiParas = new(ApiParas)
+	var apiParas = new(Paras)
 
 	c.BindJSON(&apiParas.InParas)
 
-	octlog.Debug("got api %s\n", apiParas.InParas.Api)
+	octlog.Debug("got api %s\n", apiParas.InParas.API)
 
-	if apiParas.InParas.Api == "" {
+	if apiParas.InParas.API == "" {
 		octlog.Error("got null api\n")
 		return nil, merrors.ERR_NO_SUCH_API
 	}
 
-	proto := FindApiProto(apiParas.InParas.Api)
+	proto := FindProto(apiParas.InParas.API)
 	if proto == nil {
 		octlog.Error("no api proto found for %s\n",
-			apiParas.InParas.Api)
+			apiParas.InParas.API)
 		return nil, merrors.ERR_NO_SUCH_API
 	}
 
@@ -83,7 +89,7 @@ func getApiParas(c *gin.Context) (*ApiParas, int) {
 	return apiParas, 0
 }
 
-func checkParas(apiParas *ApiParas) (int, string) {
+func checkParas(apiParas *Paras) (int, string) {
 
 	protoParas := apiParas.Proto.Paras
 
@@ -93,14 +99,14 @@ func checkParas(apiParas *ApiParas) (int, string) {
 		inParam := apiParas.InParas.Paras[protoParam.Name]
 
 		// if paras have default value and no input sepecified, set a default value
-		if protoParam.Default != PARAM_NOT_NULL && inParam == nil {
+		if protoParam.Default != ParamNotNull && inParam == nil {
 			apiParas.InParas.Paras[protoParam.Name] = protoParam.Default
 		}
 
 		octlog.Debug("param:%s, default:%s, value:%s\n", protoParam.Name,
 			protoParam.Default, inParam)
 
-		if protoParam.Default == PARAM_NOT_NULL && inParam.(string) == "" {
+		if protoParam.Default == ParamNotNull && inParam.(string) == "" {
 			errorMsg := "paras \"" + protoParam.Name + "\" must be specified"
 			return merrors.ERR_NOT_ENOUGH_PARAS, errorMsg
 		}
@@ -109,21 +115,22 @@ func checkParas(apiParas *ApiParas) (int, string) {
 	return merrors.ERR_OCT_SUCCESS, ""
 }
 
-func (api *Api) ApiDispatch(c *gin.Context) {
+// Dispatch api request
+func (api *API) Dispatch(c *gin.Context) {
 
 	octlog.Debug("got api request\n")
 
-	paras, err := getApiParas(c)
+	paras, err := getParas(c)
 	if paras == nil {
 		octlog.Error("No match proto found\n")
 		httpresponse.Error(c, err, nil)
 		return
 	}
 
-	service := GetApiService(paras.InParas.Api)
+	service := GetService(paras.InParas.API)
 	if service == nil {
 		octlog.Error("No match service found\n")
-		httpresponse.Error(c, merrors.ERR_NO_SUCH_API, paras.InParas.Api)
+		httpresponse.Error(c, merrors.ERR_NO_SUCH_API, paras.InParas.API)
 		return
 	}
 

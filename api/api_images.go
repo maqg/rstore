@@ -8,9 +8,10 @@ import (
 	"octlink/rstore/utils/uuid"
 )
 
-func APIAddImage(paras *ApiParas) *ApiResponse {
+// AddImage to add image by API
+func AddImage(paras *Paras) *Response {
 
-	resp := new(ApiResponse)
+	resp := new(Response)
 
 	newImage := new(image.Image)
 	newImage.Id = uuid.Generate().Simple()
@@ -22,15 +23,16 @@ func APIAddImage(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIShowImage(paras *ApiParas) *ApiResponse {
+// ShowImage by api
+func ShowImage(paras *Paras) *Response {
 
-	resp := new(ApiResponse)
-	imageId := paras.InParas.Paras["id"].(string)
+	resp := new(Response)
+	imageID := paras.InParas.Paras["id"].(string)
 
-	temp := image.FindImage(imageId)
+	temp := image.FindImage(imageID)
 	if temp == nil {
 		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
-		resp.ErrorLog = fmt.Sprintf("user %s not found", imageId)
+		resp.ErrorLog = fmt.Sprintf("user %s not found", imageID)
 		return resp
 	}
 
@@ -39,8 +41,9 @@ func APIShowImage(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIUpdateImage(paras *ApiParas) *ApiResponse {
-	resp := new(ApiResponse)
+// UpdateImage to update image by api
+func UpdateImage(paras *Paras) *Response {
+	resp := new(Response)
 
 	id := paras.InParas.Paras["id"].(string)
 
@@ -62,11 +65,12 @@ func APIUpdateImage(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIDeleteImageByAccount(paras *ApiParas) *ApiResponse {
+// DeleteImageByAccount to delete image by account
+func DeleteImageByAccount(paras *Paras) *Response {
 
 	octlog.Debug("running in APIDeleteImage\n")
 
-	resp := new(ApiResponse)
+	resp := new(Response)
 
 	images := image.GetAllImages(paras.InParas.Paras["accountId"].(string), "", "")
 	for _, image := range images {
@@ -81,11 +85,12 @@ func APIDeleteImageByAccount(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIDeleteImage(paras *ApiParas) *ApiResponse {
+// DeleteImage to delete image
+func DeleteImage(paras *Paras) *Response {
 
 	octlog.Debug("running in APIDeleteImage\n")
 
-	resp := new(ApiResponse)
+	resp := new(Response)
 
 	image := image.FindImage(paras.InParas.Paras["id"].(string))
 	if image == nil {
@@ -98,8 +103,9 @@ func APIDeleteImage(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIShowAllImages(paras *ApiParas) *ApiResponse {
-	resp := new(ApiResponse)
+// ShowAllImages to display all images by condition
+func ShowAllImages(paras *Paras) *Response {
+	resp := new(Response)
 
 	octlog.Debug("running in APIShowAllImage\n")
 
@@ -116,11 +122,12 @@ func APIShowAllImages(paras *ApiParas) *ApiResponse {
 	return resp
 }
 
-func APIShowAccountList(paras *ApiParas) *ApiResponse {
+// ShowAccountList of this rstore server
+func ShowAccountList(paras *Paras) *Response {
 
 	octlog.Debug("running in APIShowAllImage\n")
 
-	resp := new(ApiResponse)
+	resp := new(Response)
 
 	resp.Data = image.GetAccountList()
 

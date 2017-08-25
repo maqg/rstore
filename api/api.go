@@ -7,30 +7,45 @@ import (
 )
 
 const (
-	PARAM_TYPE_STRING     = "string"
-	PARAM_TYPE_INT        = "int"
-	PARAM_TYPE_LISTINT    = "listint"
-	PARAM_TYPE_LISTSTRING = "liststring"
-	PARAM_TYPE_BOOLEAN    = "boolean"
+	// ParamTypeString string type param
+	ParamTypeString = "string"
 
-	PARAM_NOT_NULL = "NotNull"
+	// ParamTypeInt int type param
+	ParamTypeInt = "int"
 
-	API_PREFIX_CENTER = "octlink.rstore.center"
+	// ParamTypeListInt param type of list int
+	ParamTypeListInt = "listint"
+
+	// ParamTypeListString param type of list string
+	ParamTypeListString = "liststring"
+
+	// ParamTypeBoolean boolean type param
+	ParamTypeBoolean = "boolean"
+
+	// ParamNotNull not null param
+	ParamNotNull = "NotNull"
+
+	// APIPrefixCenter API Prefix of Center API
+	APIPrefixCenter = "octlink.rstore.center"
 )
 
 var logger *octlog.LogConfig
 
-var GApiConfig ApiConfig
+// GAPIConfig for api config
+var GAPIConfig Config
 
-type Api struct {
+// API structure
+type API struct {
 	Name   string
-	Config *ApiConfig
+	Config *Config
 }
 
-type ApiConfig struct {
-	Modules map[string]ApiModule `json:"modules"`
+// Config structure
+type Config struct {
+	Modules map[string]Module `json:"modules"`
 }
 
+// ProtoPara of API
 type ProtoPara struct {
 	Name    string      `json:"name"`
 	Default interface{} `json:"default"`
@@ -38,24 +53,27 @@ type ProtoPara struct {
 	Desc    string      `json:"desc"`
 }
 
-type ApiProto struct {
+// Proto API proto structure
+type Proto struct {
 	Name    string      `json:"name"`
 	Key     string      `json:"key"`
 	Paras   []ProtoPara `json:"paras"`
-	handler func(*ApiParas) *ApiResponse
+	handler func(*Paras) *Response
 }
 
-func InitApiLog(level int) {
+// InitAPILog to init api log config
+func InitAPILog(level int) {
 	logger = octlog.InitLogConfig("api.log", level)
 }
 
-type ApiModule struct {
-	Name   string              `json:"name"`
-	Protos map[string]ApiProto `json:"protos"`
+// Module of API
+type Module struct {
+	Name   string           `json:"name"`
+	Protos map[string]Proto `json:"protos"`
 }
 
-// octlink.rstore.center.host.APIAddHost
-func FindApiProto(api string) *ApiProto {
+// FindProto octlink.rstore.center.host.APIAddHost
+func FindProto(api string) *Proto {
 
 	segments := strings.Split(api, ".")
 	moduleName := segments[3]
@@ -66,7 +84,7 @@ func FindApiProto(api string) *ApiProto {
 		return nil
 	}
 
-	module, ok := GApiConfig.Modules[moduleName]
+	module, ok := GAPIConfig.Modules[moduleName]
 	if !ok {
 		fmt.Printf("no module exist for %s\n", moduleName)
 		return nil

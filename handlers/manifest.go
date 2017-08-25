@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"octlink/rstore/modules/manifest"
@@ -23,12 +22,11 @@ func getManifest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, _ := json.Marshal(manifest)
-	dataStr := utils.BytesToString(data)
+	data := utils.JSON2String(manifest)
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(dataStr)))
-	fmt.Fprint(w, dataStr)
+	w.Header().Set("Content-Length", fmt.Sprint(len(data)))
+	fmt.Fprint(w, data)
 }
 
 // DeleteManifest for api call
