@@ -8,7 +8,7 @@ import (
 
 func init() {
 	pushCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	pushCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	pushCmd.Flags().StringVarP(&address, "address", "a", "localhost:5000", "Rstore Server Address")
 }
 
 var pushCmd = &cobra.Command{

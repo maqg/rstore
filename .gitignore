@@ -33,6 +33,8 @@ bin
 
 logs
 
+registry
+
 npm-debug.log*
 
 # Runtime data

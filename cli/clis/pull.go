@@ -2,13 +2,33 @@ package clis
 
 import (
 	"fmt"
+	"octlink/rstore/modules/manifest"
+	"octlink/rstore/utils"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	pullCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	pullCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	pullCmd.Flags().StringVarP(&installpath, "installpath", "i", "", "Install path like 'rstore://xxxxxx/xxxxxxxx'")
+	pullCmd.Flags().StringVarP(&outpath, "outpath", "o", "./out.qcow2", "Output file path")
+	pullCmd.Flags().StringVarP(&address, "address", "a", "localhost:5000", "Rstore Server Address")
+}
+
+func pullImage() {
+	segs := strings.Split(installpath, "/")
+	len := len(segs)
+	name := segs[len-2]
+	digest := segs[len-1]
+
+	url := fmt.Sprintf("http://%s/v1/%s/manifests/%s", address, name, digest)
+	manifest, err := manifest.HTTPGetManifest(url)
+	if err != nil {
+		fmt.Printf("get manifest from url %s error \n", url)
+		return
+	}
+
+	fmt.Printf("got manifest %s\n", utils.JSON2String(manifest))
 }
 
 var pullCmd = &cobra.Command{
@@ -20,8 +40,8 @@ var pullCmd = &cobra.Command{
 
 		fmt.Printf("running in pull service\n")
 
-		if id != "" {
-			fmt.Printf("got uuid %s\n", id)
+		if installpath != "" {
+			pullImage()
 			return
 		}
 

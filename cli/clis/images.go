@@ -10,7 +10,7 @@ func init() {
 	imagesCmd.Flags().StringVarP(&id, "id", "i", "", "id")
 	imagesCmd.Flags().StringVarP(&name, "name", "n", "", "Image Name")
 	imagesCmd.Flags().StringVarP(&account, "user", "u", "", "Account Id")
-	imagesCmd.Flags().StringVarP(&address, "address", "a", "localhost:8000", "Rstore Server Address")
+	imagesCmd.Flags().StringVarP(&address, "address", "a", "localhost:5000", "Rstore Server Address")
 }
 
 var imagesDispHeader = "%-33s%-33s%-16s%-6s%-7s%-7s%-16s\n"
