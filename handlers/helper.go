@@ -7,10 +7,19 @@ import (
 	"octlink/rstore/utils"
 
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
 func apiHelp(w http.ResponseWriter, r *http.Request) {
-	data := utils.JSON2String(v1.RouteDescriptors)
+
+	var data string
+	module := mux.Vars(r)["module"]
+	if module == "" {
+		data = utils.JSON2String(v1.EndPoints)
+	} else {
+		data = utils.JSON2String(v1.RouteDescriptorsMap[module])
+	}
+
 	fmt.Fprint(w, data)
 }
 

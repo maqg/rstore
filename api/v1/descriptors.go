@@ -2,6 +2,8 @@ package v1
 
 import (
 	"octlink/rstore/reference"
+
+	digest "github.com/opencontainers/go-digest"
 )
 
 // RouteDescriptorsMap for router map
@@ -258,11 +260,66 @@ var RouteDescriptors = []RouteDescriptor{
 			},
 		},
 	},
+
 	{
-		Name:       RouteNameBlob,
-		path:       "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/",
-		PathSimple: "/v1/{name}/blobs/",
-		Methods:    []MethodDescriptor{},
+		Name:       RouteNameHelpModule,
+		path:       "/v1/help/{module:" + reference.NameRegexp.String() + "}",
+		PathSimple: "/v1/help/{module}",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Print API Help Message for V1.",
+			},
+		},
+	},
+
+	{
+		Name:        RouteNameBlob,
+		path:        "/v2/{name:" + reference.NameRegexp.String() + "}/blobs/{digest:" + digest.DigestRegexp.String() + "}",
+		PathSimple:  "/v1/{name}/blobs/",
+		Description: "Operations on blobs identified by `name` and `digest`. Used to fetch or delete layers by digest.",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Retrieve the blob from the registry identified by `digest`. A `HEAD` request can also be issued to this endpoint to obtain resource information without receiving all data.",
+				Requests: []RequestDescriptor{
+					{
+						Name: "Fetch Blob",
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							digestPathParameter,
+						},
+					},
+					{
+						Name:        "Fetch Blob Part",
+						Description: "This endpoint may also support RFC7233 compliant range requests. Support can be detected by issuing a HEAD request. If the header `Accept-Range: bytes` is returned, range requests can be used to fetch partial content.",
+						Headers: []ParameterDescriptor{
+							{
+								Name:        "Range",
+								Type:        "string",
+								Description: "HTTP Range header specifying blob chunk.",
+							},
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							digestPathParameter,
+						},
+					},
+				},
+			},
+			{
+				Method:      "DELETE",
+				Description: "Delete the blob identified by `name` and `digest`",
+				Requests: []RequestDescriptor{
+					{
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							digestPathParameter,
+						},
+					},
+				},
+			},
+		},
 	},
 }
 

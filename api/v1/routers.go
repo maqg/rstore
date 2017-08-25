@@ -9,6 +9,9 @@ const (
 	// RouteNameHelp helper router
 	RouteNameHelp = "help"
 
+	// RouteNameHelpModule helper router
+	RouteNameHelpModule = "help-module"
+
 	// RouteNameManifest manifest routers
 	RouteNameManifest = "manifest"
 
@@ -21,6 +24,17 @@ const (
 	// RouteNameBlobUploadChunk for blob upload by chunk
 	RouteNameBlobUploadChunk = "blob-upload-chunk"
 )
+
+// EndPoints for all endpoints
+var EndPoints = []string{
+	RouteNameBase,
+	RouteNameHelp,
+	RouteNameHelpModule,
+	RouteNameManifest,
+	RouteNameBlob,
+	RouteNameBlobUpload,
+	RouteNameBlobUploadChunk,
+}
 
 // NewRouters to new routes manager for http
 func NewRouters() *mux.Router {
