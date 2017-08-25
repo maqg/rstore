@@ -23,6 +23,9 @@ const (
 
 	// RouteNameBlobUploadChunk for blob upload by chunk
 	RouteNameBlobUploadChunk = "blob-upload-chunk"
+
+	// RouteNameBlobsManifest for blobs and manifest relationship
+	RouteNameBlobsManifest = "blobs-manifest"
 )
 
 // EndPoints for all endpoints
@@ -31,6 +34,7 @@ var EndPoints = []string{
 	RouteNameHelp,
 	RouteNameHelpModule,
 	RouteNameManifest,
+	RouteNameBlobsManifest,
 	RouteNameBlob,
 	RouteNameBlobUpload,
 	RouteNameBlobUploadChunk,

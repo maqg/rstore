@@ -1,23 +1,59 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
-	"octlink/rstore/modules/blobs"
 
 	"github.com/gorilla/handlers"
 )
 
+func startBlobUpload(w http.ResponseWriter, r *http.Request) {
+	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
+	fmt.Fprint(w, emptyJSON)
+}
+
+func patchBlobData(w http.ResponseWriter, r *http.Request) {
+	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
+	fmt.Fprint(w, emptyJSON)
+}
+
+func putBlobUploadComplete(w http.ResponseWriter, r *http.Request) {
+	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
+	fmt.Fprint(w, emptyJSON)
+}
+
+func cancelBlobUpload(w http.ResponseWriter, r *http.Request) {
+	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
+	fmt.Fprint(w, emptyJSON)
+}
+
+// GetUploadStatus to get upload status of blob
+func getUploadStatus(w http.ResponseWriter, r *http.Request) {
+	const emptyJSON = "{\"msg\":\"this is blob message\"}"
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
+	fmt.Fprint(w, emptyJSON)
+}
+
 func blobUploadManager(r *http.Request) http.Handler {
 
 	mhandler := handlers.MethodHandler{
-		"GET":  http.HandlerFunc(blobs.GetUploadStatus),
-		"HEAD": http.HandlerFunc(blobs.GetUploadStatus),
+		"GET":  http.HandlerFunc(getUploadStatus),
+		"HEAD": http.HandlerFunc(getUploadStatus),
 	}
 
-	mhandler["POST"] = http.HandlerFunc(blobs.StartBlobUpload)
-	mhandler["PATCH"] = http.HandlerFunc(blobs.PatchBlobData)
-	mhandler["PUT"] = http.HandlerFunc(blobs.PutBlobUploadComplete)
-	mhandler["DELETE"] = http.HandlerFunc(blobs.CancelBlobUpload)
+	mhandler["POST"] = http.HandlerFunc(startBlobUpload)
+	mhandler["PATCH"] = http.HandlerFunc(patchBlobData)
+	mhandler["PUT"] = http.HandlerFunc(putBlobUploadComplete)
+	mhandler["DELETE"] = http.HandlerFunc(cancelBlobUpload)
 
 	return mhandler
 }

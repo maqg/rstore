@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/manifest"
@@ -116,4 +117,31 @@ func (bm *BlobsManifest) Export(outpath string) error {
 	}
 
 	return nil
+}
+
+// HTTPGetBlobsManifest will get blobs manifest by name and digest
+func HTTPGetBlobsManifest(url string) (*BlobsManifest, error) {
+
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("get url %s error\n", url)
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Read body from url %s error\n", url)
+		return nil, err
+	}
+
+	bm := new(BlobsManifest)
+	err = json.Unmarshal(body, bm)
+	if err != nil {
+		fmt.Printf("parse body to blobsmanifest error[%s]\n", string(body))
+		return nil, err
+	}
+
+	return bm, nil
 }

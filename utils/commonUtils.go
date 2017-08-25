@@ -114,3 +114,13 @@ func JSON2String(v interface{}) string {
 func TrimDir(path string) string {
 	return strings.Replace(path, "//", "/", -1)
 }
+
+// FileLength to get file length
+func FileLength(path string) int64 {
+	stat, err := os.Stat(path)
+	if err != nil {
+		return 0
+	}
+
+	return stat.Size()
+}

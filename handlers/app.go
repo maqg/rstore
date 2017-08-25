@@ -71,6 +71,7 @@ func NewApp() *App {
 	app.register(v1.RouteNameManifest, manifestManager)
 	app.register(v1.RouteNameBlob, blobManager)
 	app.register(v1.RouteNameBlobUpload, blobUploadManager)
+	app.register(v1.RouteNameBlobsManifest, blobsmanifestManager)
 
 	return app
 }

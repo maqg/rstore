@@ -2,8 +2,6 @@ package v1
 
 import (
 	"octlink/rstore/reference"
-
-	digest "github.com/opencontainers/go-digest"
 )
 
 // RouteDescriptorsMap for router map
@@ -274,9 +272,21 @@ var RouteDescriptors = []RouteDescriptor{
 	},
 
 	{
+		Name:       RouteNameBlobsManifest,
+		path:       "/v1/{name:" + reference.NameRegexp.String() + "}/blobsmanifest/{blobsum:" + reference.DigestRegexp.String() + "}",
+		PathSimple: "/v1/{name}/blobsmanifest/{blobsum}",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Get blobsmanifest config for blobs pulling.",
+			},
+		},
+	},
+
+	{
 		Name:        RouteNameBlob,
-		path:        "/v2/{name:" + reference.NameRegexp.String() + "}/blobs/{digest:" + digest.DigestRegexp.String() + "}",
-		PathSimple:  "/v1/{name}/blobs/",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/{digest:" + reference.NameRegexp.String() + "}",
+		PathSimple:  "/v1/{name}/blobs/{digest}",
 		Description: "Operations on blobs identified by `name` and `digest`. Used to fetch or delete layers by digest.",
 		Methods: []MethodDescriptor{
 			{

@@ -9,6 +9,7 @@ import (
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
 	"os"
+	"strings"
 )
 
 // Manifest base Manifest structure
@@ -155,4 +156,14 @@ func HTTPGetManifest(url string) (*Manifest, error) {
 	}
 
 	return manifest, nil
+}
+
+// ParseInstallPath parse installpath like rstore://name/manifestid to name and manifestid
+func ParseInstallPath(installpath string) (string, string) {
+	segs := strings.Split(installpath, "/")
+	len := len(segs)
+	if len < 2 {
+		return "", ""
+	}
+	return segs[len-2], segs[len-1]
 }

@@ -1,16 +1,16 @@
 package blobs
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
 	"os"
-
-	"github.com/gorilla/mux"
 )
 
 var logger *octlog.LogConfig
@@ -21,26 +21,34 @@ func InitLog(level int) {
 }
 
 // GetBlob to get blob from web api
-func GetBlob(w http.ResponseWriter, r *http.Request) {
+func GetBlob(name string, digest string) ([]byte, int, error) {
 
-	name := mux.Vars(r)["name"]
-	digest := r.FormValue("digest")
+	blobpath := DirPath(digest) + "/" + digest
+	if !utils.IsFileExist(blobpath) {
+		octlog.Error("blob of %s not exist\n", blobpath)
+		return nil, 0, errors.New("blob file of " + blobpath + " not exist")
+	}
 
-	emptyJSON := fmt.Sprintf("{\"msg\":\"this is blob message,name:%s,digest:%s\"}", name, digest)
+	fd, err := os.Open(blobpath)
+	if err != nil {
+		octlog.Error("open file of %s error\n", blobpath)
+		return nil, 0, err
+	}
 
-	logger.Debugf("got name:%s,digest:%s\n", name, digest)
+	defer fd.Close()
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
+	data, err := ioutil.ReadAll(fd)
+	if err != nil {
+		octlog.Error("read file from %s error\n", blobpath)
+		return nil, 0, err
+	}
+
+	return data, int(utils.FileLength(blobpath)), nil
 }
 
 // DeleteBlob to delete blob from api
-func DeleteBlob(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
+func DeleteBlob(name string, digest string) error {
+	return nil
 }
 
 // GetUploadStatus to get upload status of blob
@@ -96,7 +104,7 @@ func WriteBlob(rootdirectory string, dgst string, data []byte) error {
 
 	fd, err := os.Create(blobDir + "/" + dgst)
 	if err != nil {
-		fmt.Printf("create blob of %s error\n", blobDir+"/"+dgst)
+		octlog.Error("create blob of %s error\n", blobDir+"/"+dgst)
 		return err
 	}
 
@@ -112,7 +120,7 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 
 	f, err := os.Open(filepath)
 	if err != nil {
-		fmt.Printf("file of %s not exist\n", filepath)
+		octlog.Error("file of %s not exist\n", filepath)
 		return nil, 0, err
 	}
 	defer f.Close()
@@ -123,17 +131,17 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
-			fmt.Printf("reached end of file[%d]\n", n)
+			octlog.Error("reached end of file[%d]\n", n)
 			break
 		}
 		fileLength += int64(n)
 
 		if err != nil {
-			fmt.Printf("read file error %s", err)
+			octlog.Error("read file error %s", err)
 		}
 
 		dgst := utils.GetDigest(buffer[:n])
-		fmt.Printf("got size of %d,with hash:%s\n", n, dgst)
+		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
 		WriteBlob(configuration.GetConfig().RootDirectory, dgst, buffer[:n])
 
 		hashList = append(hashList, dgst)
@@ -145,4 +153,24 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 // DirPath to make blob path
 func DirPath(blobsum string) string {
 	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
+}
+
+// HTTPGetBlob will get blob by name and digest
+func HTTPGetBlob(url string) ([]byte, int, error) {
+
+	resp, err := http.Get(url)
+	if err != nil {
+		octlog.Error("get url %s error\n", url)
+		return nil, 0, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		octlog.Error("Read body from url %s error\n", url)
+		return nil, 0, err
+	}
+
+	return body, int(resp.ContentLength), nil
 }
