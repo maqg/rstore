@@ -157,9 +157,9 @@ var RouteDescriptors = []RouteDescriptor{
 	},
 	{
 		Name:        RouteNameBlobUpload,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/",
-		PathSimple:  "/v1/{name}/blobs/uploads/",
-		Description: "Initiate a blob upload.",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/{digest:" + reference.DigestRegexp.String() + "}",
+		PathSimple:  "/v1/{name}/blobs/uploads/{digest}",
+		Description: "Upload blob by name and digest.",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "POST",
@@ -177,25 +177,7 @@ var RouteDescriptors = []RouteDescriptor{
 						},
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
-						},
-						QueryParameters: []ParameterDescriptor{
-							{
-								Name:   "digest",
-								Type:   "query",
-								format: "<digest>",
-								Description: `Digest of uploaded blob. If present, the upload will be completed, in a single reques
-								t, with contents of the request body as the resulting blob.`,
-							},
-						},
-					},
-					{
-						Name:        "Initiate Resumable Blob Upload",
-						Description: "Initiate a resumable blob upload with an empty request body.",
-						Headers: []ParameterDescriptor{
-							contentLengthZeroHeader,
-						},
-						PathParameters: []ParameterDescriptor{
-							nameParameterDescriptor,
+							digestPathParameter,
 						},
 					},
 				},

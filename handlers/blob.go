@@ -4,16 +4,27 @@ import (
 	"fmt"
 	"net/http"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/utils"
+	"octlink/rstore/utils/serviceresp"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-func writeBackError(w http.ResponseWriter, r *http.Request) {
-	errorMsg := "{\"status\":\"Error\"}"
+// RenderErrorMsg to render error msg
+func RenderErrorMsg(w http.ResponseWriter, r *http.Request, errMsg string) {
+	msg := utils.JSON2String(serviceresp.SuccessResp(errMsg))
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(errorMsg)))
-	fmt.Fprint(w, errorMsg)
+	w.Header().Set("Content-Length", fmt.Sprint(len(msg)))
+	fmt.Fprint(w, msg)
+}
+
+// RenderMsg for render msg for success
+func RenderMsg(w http.ResponseWriter, r *http.Request, data interface{}) {
+	msg := utils.JSON2String(serviceresp.SuccessResp(data))
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Length", fmt.Sprint(len(msg)))
+	fmt.Fprint(w, msg)
 }
 
 // GetBlob to get blob from web api
@@ -26,7 +37,7 @@ func getBlob(w http.ResponseWriter, r *http.Request) {
 	data, len, err := blobs.GetBlob(name, digest)
 	if err != nil {
 		fmt.Printf("get blob by %s:%s error\n", name, digest)
-		writeBackError(w, r)
+		RenderErrorMsg(w, r, "blob of "+digest+" not exist")
 		return
 	}
 
