@@ -1,6 +1,7 @@
 package blobs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -167,4 +168,78 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 	}
 
 	return body, int(resp.ContentLength), nil
+}
+
+// HTTPWriteBlob To write blob from file by HTTP
+func HTTPWriteBlob(urlPattern string, dgst string, data []byte) ([]byte, error) {
+
+	url := urlPattern + dgst
+	reader := bytes.NewReader(data)
+	reqeust, err := http.NewRequest("POST", url, reader)
+	if err != nil {
+		octlog.Error("New Http Request error on url %s\n", url)
+		return nil, err
+	}
+
+	resp, err := http.DefaultClient.Do(reqeust)
+	if err != nil {
+		octlog.Error("do http post error to url %s\n", url)
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		octlog.Error("got bad status when post blob data %s\n", resp.Status)
+		return nil, errors.New("got bad status " + resp.Status)
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		octlog.Error("http.Do failed,[err=%s][url=%s]", err, url)
+		return nil, err
+	}
+
+	return b, nil
+}
+
+// HTTPWriteBlobs to write blobs from file by HTTP
+func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error) {
+
+	f, err := os.Open(filepath)
+	if err != nil {
+		octlog.Error("file of %s not exist\n", filepath)
+		return nil, 0, err
+	}
+	defer f.Close()
+
+	var fileLength int64
+	hashList := make([]string, 0)
+	for {
+		buffer := make([]byte, configuration.BlobSize)
+		n, err := f.Read(buffer)
+		if err == io.EOF {
+			octlog.Error("reached end of file[%d]\n", n)
+			break
+		}
+		fileLength += int64(n)
+
+		if err != nil {
+			octlog.Error("read file error %s", err)
+			return hashList, fileLength, err
+		}
+
+		dgst := utils.GetDigest(buffer[:n])
+		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
+
+		_, err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
+		if err != nil {
+			octlog.Error("http post blob error url:%s,blob:%s\n")
+			return hashList, fileLength, err
+		}
+
+		hashList = append(hashList, dgst)
+	}
+
+	return hashList, fileLength, nil
 }

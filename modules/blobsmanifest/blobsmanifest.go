@@ -145,3 +145,8 @@ func HTTPGetBlobsManifest(url string) (*BlobsManifest, error) {
 
 	return bm, nil
 }
+
+// HTTPWrite for manifest to write by http
+func (bm *BlobsManifest) HTTPWrite() error {
+	return nil
+}

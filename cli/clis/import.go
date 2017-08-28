@@ -2,18 +2,18 @@ package clis
 
 import (
 	"fmt"
-	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/merrors"
 
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	importCmd.Flags().StringVarP(&id, "id", "i", "", "id")
+	importCmd.Flags().StringVarP(&id, "id", "i", "", "Image UUID")
 	importCmd.Flags().StringVarP(&config, "config", "c", "./config.yml", "Config of RSTORE")
 	importCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
 	importCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
@@ -25,7 +25,7 @@ func callbacking() {
 
 func checkParas() bool {
 	if id == "" || filepath == "" || config == "" {
-		fmt.Printf("id or filepath must specified,id:%s,filepath:%s,rootdir:%s\n",
+		fmt.Printf("id or filepath must specified,id:%s,filepath:%s,config:%s\n",
 			id, filepath, config)
 		return false
 	}
@@ -45,25 +45,25 @@ func importImage() int {
 
 	if !checkParas() {
 		fmt.Printf("check input paras failed\n")
-		return merrors.ERR_UNACCP_PARAS
+		return merrors.ErrBadParas
 	}
 
 	conf, err := configuration.ResolveConfig(config)
 	if err != nil {
 		fmt.Printf("parse config %s error\n", config)
-		return merrors.ERR_CMD_ERR
+		return merrors.ErrCmdErr
 	}
 
 	reposDir := utils.TrimDir(conf.RootDirectory + "/" + manifest.ReposDir)
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
-		return merrors.ERR_UNACCP_PARAS
+		return merrors.ErrBadParas
 	}
 
 	hashes, size, err := blobs.WriteBlobs(filepath)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
-		return merrors.ERR_COMMON_ERR
+		return merrors.ErrCommonErr
 	}
 
 	// write blobs-manifest config
@@ -74,7 +74,7 @@ func importImage() int {
 	err = bm.Write()
 	if err != nil {
 		fmt.Printf("write blobs-manifest error\n")
-		return merrors.ERR_SYSTEM_ERR
+		return merrors.ErrSystemErr
 	}
 
 	// write manifest config
@@ -91,7 +91,7 @@ func importImage() int {
 	if err != nil {
 		fmt.Printf("Create manifest error[%s]\n", err)
 		// TDB,rollback
-		return merrors.ERR_SYSTEM_ERR
+		return merrors.ErrSystemErr
 	}
 
 	if callbackurl != "" {
