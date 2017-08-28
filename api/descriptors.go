@@ -2,6 +2,7 @@ package api
 
 var apiDescriptors = []Module{
 	ImageDescriptors,
+	ConfigDescriptors,
 }
 
 func loadModules(module Module) {
