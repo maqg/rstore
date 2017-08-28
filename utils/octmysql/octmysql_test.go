@@ -10,6 +10,6 @@ func TestTest(t *testing.T) {
 }
 
 func init() {
-	InitLog(octlog.DEBUG_LEVEL)
-	octlog.InitDebugConfig(octlog.DEBUG_LEVEL)
+	InitLog(octlog.DebugLevel)
+	octlog.InitDebugConfig(octlog.DebugLevel)
 }

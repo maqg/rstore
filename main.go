@@ -21,12 +21,12 @@ var (
 )
 
 func initDebugConfig() {
-	octlog.InitDebugConfig(octlog.DEBUG_LEVEL)
+	octlog.InitDebugConfig(octlog.DebugLevel)
 }
 
 func initLogConfig() {
-	api.InitAPILog(octlog.DEBUG_LEVEL)
-	blobs.InitLog(octlog.DEBUG_LEVEL)
+	api.InitAPILog(octlog.DebugLevel)
+	blobs.InitLog(octlog.DebugLevel)
 }
 
 func init() {

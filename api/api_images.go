@@ -31,7 +31,7 @@ func ShowImage(paras *Paras) *Response {
 
 	temp := image.FindImage(imageID)
 	if temp == nil {
-		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
+		resp.Error = merrors.ErrSegmentNotExist
 		resp.ErrorLog = fmt.Sprintf("user %s not found", imageID)
 		return resp
 	}
@@ -49,7 +49,7 @@ func UpdateImage(paras *Paras) *Response {
 
 	ac := image.FindImage(id)
 	if ac == nil {
-		resp.Error = merrors.ERR_USER_NOT_EXIST
+		resp.Error = merrors.ErrUserNotExist
 		resp.ErrorLog = "User " + id + "Not Exist"
 		return resp
 	}
@@ -94,7 +94,7 @@ func DeleteImage(paras *Paras) *Response {
 
 	image := image.FindImage(paras.InParas.Paras["id"].(string))
 	if image == nil {
-		resp.Error = merrors.ERR_SEGMENT_NOT_EXIST
+		resp.Error = merrors.ErrSegmentNotExist
 		return resp
 	}
 

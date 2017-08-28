@@ -96,7 +96,7 @@ func GetManifest(name string, dgst string) *Manifest {
 }
 
 func init() {
-	InitLog(octlog.DEBUG_LEVEL)
+	InitLog(octlog.DebugLevel)
 }
 
 // Delete for manifest self delete

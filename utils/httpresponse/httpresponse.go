@@ -24,7 +24,7 @@ func BuildErrorObj(ctx *gin.Context, code int, errlog interface{},
 
 // RHttprespnse retrun none error code 200
 func Ok(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, BuildErrorObj(ctx, merrors.ERR_OCT_SUCCESS, nil, data))
+	ctx.JSON(http.StatusOK, BuildErrorObj(ctx, merrors.ErrSuccess, nil, data))
 	return
 }
 
@@ -36,18 +36,18 @@ func Error(ctx *gin.Context, err int, errlog interface{}) {
 
 // RHttprespnse retrun none error code 201
 func Create(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusCreated, gin.H{"code": merrors.ERR_OCT_SUCCESS, "data": nil})
+	ctx.JSON(http.StatusCreated, gin.H{"code": merrors.ErrSuccess, "data": nil})
 	return
 }
 
 // RHttprespnse retrun none error code 204
 func Delete(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusNoContent, gin.H{"code": merrors.ERR_OCT_SUCCESS, "data": data})
+	ctx.JSON(http.StatusNoContent, gin.H{"code": merrors.ErrSuccess, "data": data})
 	return
 }
 
 // RHttprespnse retrun none error code 202
 func Update(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusAccepted, gin.H{"code": merrors.ERR_OCT_SUCCESS, "data": data})
+	ctx.JSON(http.StatusAccepted, gin.H{"code": merrors.ErrSuccess, "data": data})
 	return
 }

@@ -1,97 +1,118 @@
 package merrors
 
 const (
-	ERR_OCT_SUCCESS = iota
-	ERR_DB_ERR
-	ERR_NOT_ENOUGH_PARAS
-	ERR_TOO_MANY_PARAS
-	ERR_UNACCP_PARAS
-	ERR_CMD_ERR
-	ERR_COMMON_ERR
-	ERR_SEGMENT_NOT_EXIST
-	ERR_SEGMENT_ALREADY_EXIST
-	ERR_TIMEOUT
-	ERR_SYSCALL_ERR
-	ERR_SYSTEM_ERR
-	ERR_NO_SUCH_API
-	ERR_NOT_IMPLEMENTED
+	// ErrSuccess cmd successfully
+	ErrSuccess = iota
+
+	// ErrDbErr error for database
+	ErrDbErr
+
+	//ErrNotEnoughParas error for not enough paras
+	ErrNotEnoughParas
+
+	// ErrTooManyParas error for too many paras
+	ErrTooManyParas
+
+	// ErrBadParas error for bad paras
+	ErrBadParas
+
+	// ErrCmdErr error for cmd error
+	ErrCmdErr
+
+	// ErrCommonErr error for common error
+	ErrCommonErr
+
+	// ErrSegmentNotExist error for segment not exist
+	ErrSegmentNotExist
+
+	// ErrSegmentAlreadyExist error for segment not exist
+	ErrSegmentAlreadyExist
+
+	// ErrTimeout error for timeout error
+	ErrTimeout
+
+	// ErrSyscallErr error for system calling error
+	ErrSyscallErr
+
+	// ErrSystemErr error for system error
+	ErrSystemErr
+
+	// ErrNoSuchAPI error for no such api
+	ErrNoSuchAPI
+
+	// ErrNotImplemented error for not implemented error
+	ErrNotImplemented
 
 	// User
-	ERR_USER_NOT_EXIST
-	ERR_USER_ALREADY_EXIST
-	ERR_PASSWORD_DONT_MATCH
-	ERR_USER_NOT_LOGIN
-	ERR_USER_GROUPS_NOT_EMPTY
 
-	// User Group
-	ERR_USERGROUP_NOT_EXIST
-	ERR_USERGROUP_ALREADY_EXIST
-	ERR_USERGROUP_USERS_NOT_EMPTY
+	// ErrUserNotExist error for user not exist
+	ErrUserNotExist
+
+	// ErrUserAlreadyExist error for user already exist
+	ErrUserAlreadyExist
+
+	// ErrPasswordDontMatch error for password not match
+	ErrPasswordDontMatch
+
+	// ErrUserNotLogin error for user not login
+	ErrUserNotLogin
 )
 
+// GErrors for global errors mapping
 var GErrors = map[int]string{
-	ERR_OCT_SUCCESS:           "Command Success",
-	ERR_DB_ERR:                "Database Error",
-	ERR_NOT_ENOUGH_PARAS:      "No Enough Paras",
-	ERR_TOO_MANY_PARAS:        "Too Many Paras",
-	ERR_UNACCP_PARAS:          "Unaccept Paras",
-	ERR_CMD_ERR:               "Command Error",
-	ERR_COMMON_ERR:            "Common Error",
-	ERR_SEGMENT_NOT_EXIST:     "Segment Not Exist",
-	ERR_SEGMENT_ALREADY_EXIST: "Segment Already Exist",
-	ERR_TIMEOUT:               "Timeout Error",
-	ERR_SYSCALL_ERR:           "System Call Error",
-	ERR_SYSTEM_ERR:            "System Error",
-	ERR_NO_SUCH_API:           "No Such API",
-	ERR_NOT_IMPLEMENTED:       "Function not Implemented",
+	ErrSuccess:             "Command Success",
+	ErrDbErr:               "Database Error",
+	ErrNotEnoughParas:      "No Enough Paras",
+	ErrTooManyParas:        "Too Many Paras",
+	ErrBadParas:            "Unaccept Paras",
+	ErrCmdErr:              "Command Error",
+	ErrCommonErr:           "Common Error",
+	ErrSegmentNotExist:     "Segment Not Exist",
+	ErrSegmentAlreadyExist: "Segment Already Exist",
+	ErrTimeout:             "Timeout Error",
+	ErrSyscallErr:          "System Call Error",
+	ErrSystemErr:           "System Error",
+	ErrNoSuchAPI:           "No Such API",
+	ErrNotImplemented:      "Function not Implemented",
 
 	// User
-	ERR_USER_NOT_EXIST:        "User Not Exist",
-	ERR_USER_ALREADY_EXIST:    "User Already Exist",
-	ERR_PASSWORD_DONT_MATCH:   "User And Password Not Match",
-	ERR_USER_NOT_LOGIN:        "User Not Login",
-	ERR_USER_GROUPS_NOT_EMPTY: "Groups under Account must be empty",
-
-	// User group
-	ERR_USERGROUP_NOT_EXIST:       "User Group Not Exist",
-	ERR_USERGROUP_ALREADY_EXIST:   "User Group Already Exist",
-	ERR_USERGROUP_USERS_NOT_EMPTY: "Users under Group must be empty",
+	ErrUserNotExist:      "User Not Exist",
+	ErrUserAlreadyExist:  "User Already Exist",
+	ErrPasswordDontMatch: "User And Password Not Match",
+	ErrUserNotLogin:      "User Not Login",
 }
 
+// GErrorsCN Global error for Chinese
 var GErrorsCN = map[int]string{
-	ERR_OCT_SUCCESS:           "操作成功",
-	ERR_DB_ERR:                "数据库错误",
-	ERR_NOT_ENOUGH_PARAS:      "参数不足",
-	ERR_TOO_MANY_PARAS:        "太多参数",
-	ERR_UNACCP_PARAS:          "参数不合法",
-	ERR_CMD_ERR:               "命令执行错误",
-	ERR_COMMON_ERR:            "通用错误",
-	ERR_SEGMENT_NOT_EXIST:     "对象不存在",
-	ERR_SEGMENT_ALREADY_EXIST: "对象已存在",
-	ERR_TIMEOUT:               "超时错误",
-	ERR_SYSCALL_ERR:           "系统调用错误",
-	ERR_SYSTEM_ERR:            "系统错误",
-	ERR_NO_SUCH_API:           "无此API",
-	ERR_NOT_IMPLEMENTED:       "功能未实现",
+	ErrSuccess:             "操作成功",
+	ErrDbErr:               "数据库错误",
+	ErrNotEnoughParas:      "参数不足",
+	ErrTooManyParas:        "太多参数",
+	ErrBadParas:            "参数不合法",
+	ErrCmdErr:              "命令执行错误",
+	ErrCommonErr:           "通用错误",
+	ErrSegmentNotExist:     "对象不存在",
+	ErrSegmentAlreadyExist: "对象已存在",
+	ErrTimeout:             "超时错误",
+	ErrSyscallErr:          "系统调用错误",
+	ErrSystemErr:           "系统错误",
+	ErrNoSuchAPI:           "无此API",
+	ErrNotImplemented:      "功能未实现",
 
 	// User
-	ERR_USER_NOT_EXIST:        "用户不存在",
-	ERR_USER_ALREADY_EXIST:    "用户已经存在",
-	ERR_PASSWORD_DONT_MATCH:   "用户和密码不匹配",
-	ERR_USER_NOT_LOGIN:        "用户未登录",
-	ERR_USER_GROUPS_NOT_EMPTY: "该账号下的用户组不为空",
-
-	// User group
-	ERR_USERGROUP_NOT_EXIST:       "用户组不存在",
-	ERR_USERGROUP_ALREADY_EXIST:   "用户组已经存在",
-	ERR_USERGROUP_USERS_NOT_EMPTY: "该用户组下的用户不为空",
+	ErrUserNotExist:      "用户不存在",
+	ErrUserAlreadyExist:  "用户已经存在",
+	ErrPasswordDontMatch: "用户和密码不匹配",
+	ErrUserNotLogin:      "用户未登录",
 }
 
+// MError base error structure
 type MError struct {
 	ErrorNo  int    `json:"no"`
 	ErrorMsg string `json:"msg"`
 }
 
+// NewError to new an error
 func NewError(code int, message string) *MError {
 	return &MError{
 		ErrorNo:  code,
@@ -99,10 +120,12 @@ func NewError(code int, message string) *MError {
 	}
 }
 
+// GetMsg from errorNo
 func GetMsg(errorNo int) string {
 	return GErrors[errorNo]
 }
 
+// GetMsgCN from errorNo
 func GetMsgCN(errorNo int) string {
 	return GErrorsCN[errorNo]
 }

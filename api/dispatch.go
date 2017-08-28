@@ -74,14 +74,14 @@ func getParas(c *gin.Context) (*Paras, int) {
 
 	if apiParas.InParas.API == "" {
 		octlog.Error("got null api\n")
-		return nil, merrors.ERR_NO_SUCH_API
+		return nil, merrors.ErrNoSuchAPI
 	}
 
 	proto := FindProto(apiParas.InParas.API)
 	if proto == nil {
 		octlog.Error("no api proto found for %s\n",
 			apiParas.InParas.API)
-		return nil, merrors.ERR_NO_SUCH_API
+		return nil, merrors.ErrNoSuchAPI
 	}
 
 	apiParas.Proto = proto
@@ -108,11 +108,11 @@ func checkParas(apiParas *Paras) (int, string) {
 
 		if protoParam.Default == ParamNotNull && inParam.(string) == "" {
 			errorMsg := "paras \"" + protoParam.Name + "\" must be specified"
-			return merrors.ERR_NOT_ENOUGH_PARAS, errorMsg
+			return merrors.ErrNotEnoughParas, errorMsg
 		}
 	}
 
-	return merrors.ERR_OCT_SUCCESS, ""
+	return merrors.ErrSuccess, ""
 }
 
 // Dispatch api request
@@ -130,14 +130,14 @@ func (api *API) Dispatch(c *gin.Context) {
 	service := GetService(paras.InParas.API)
 	if service == nil {
 		octlog.Error("No match service found\n")
-		httpresponse.Error(c, merrors.ERR_NO_SUCH_API, paras.InParas.API)
+		httpresponse.Error(c, merrors.ErrNoSuchAPI, paras.InParas.API)
 		return
 	}
 
 	ret, msg := checkParas(paras)
-	if ret != merrors.ERR_OCT_SUCCESS {
+	if ret != merrors.ErrSuccess {
 		octlog.Error("Not Enough Paras\n")
-		httpresponse.Error(c, merrors.ERR_NOT_ENOUGH_PARAS, msg)
+		httpresponse.Error(c, merrors.ErrNotEnoughParas, msg)
 		return
 	}
 
