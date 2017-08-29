@@ -25,7 +25,7 @@ func pushImage() int {
 		return merrors.ErrBadParas
 	}
 
-	urlPattern := fmt.Sprintf("http://%s/v1/%s/blobs/", address, id)
+	urlPattern := fmt.Sprintf("http://%s/v1/%s/blobs/uploads/", address, id)
 	hashes, size, err := blobs.HTTPWriteBlobs(filepath, urlPattern)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
@@ -44,6 +44,7 @@ func pushImage() int {
 	err = bm.HTTPWrite()
 	if err != nil {
 		fmt.Printf("write blobs-manifest error\n")
+		// TBD remove all posted blobs
 		return merrors.ErrSystemErr
 	}
 

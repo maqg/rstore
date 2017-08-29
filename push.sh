@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go run cmd/cli/main.go push -f ../output.qcow2 -i dddddddddddddd
+go run cmd/cli/main.go push -f ../test.qcow2 -i dddddddddddddd

@@ -15,8 +15,7 @@ func (api *API) Router() *gin.Engine {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	exist := utils.IsFileExist("frontend")
-	if !exist {
+	if !utils.IsFileExist("frontend") {
 		baseDir = "../"
 	}
 
