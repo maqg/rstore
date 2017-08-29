@@ -2,11 +2,11 @@ package clis
 
 import (
 	"fmt"
-	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/merrors"
 
 	"github.com/spf13/cobra"

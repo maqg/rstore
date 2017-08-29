@@ -1,6 +1,6 @@
 package main
 
-import "octlink/rstore/cli/clis"
+import "octlink/rstore/cmd/cli/clis"
 
 func main() {
 	clis.RootCmd.Execute()
