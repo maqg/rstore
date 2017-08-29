@@ -3,10 +3,10 @@ package clis
 import (
 	"fmt"
 	"octlink/mirage/src/utils/merrors"
-	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 
 	"github.com/spf13/cobra"
 )
