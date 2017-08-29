@@ -28,6 +28,10 @@ func InitLog(level int) {
 	logger = octlog.InitLogConfig("blob.log", level)
 }
 
+func init() {
+	InitLog(octlog.DebugLevel)
+}
+
 // DirPath to make blob path
 func DirPath(blobsum string) string {
 	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
@@ -231,9 +235,12 @@ func HTTPWriteBlob(urlPattern string, dgst string, data []byte) ([]byte, error) 
 // HTTPWriteBlobs to write blobs from file by HTTP
 func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error) {
 
+	fmt.Printf("file %s, url %s\n", filepath, urlPattern)
+
 	f, err := os.Open(filepath)
 	if err != nil {
 		octlog.Error("file of %s not exist\n", filepath)
+		fmt.Printf("file of %s not exist\n", filepath)
 		return nil, 0, err
 	}
 	defer f.Close()
@@ -251,20 +258,24 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 
 		if err != nil {
 			octlog.Error("read file error %s", err)
+			fmt.Printf("read file error %s\n", filepath)
 			return hashList, fileLength, err
 		}
 
 		dgst := utils.GetDigest(buffer[:n])
-		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
+		octlog.Debug("got size of %d,with hash:%s\n", n, dgst)
 
 		_, err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
 		if err != nil {
-			octlog.Error("http post blob error url:%s,blob:%s\n")
+			octlog.Error("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
+			fmt.Printf("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
 			return hashList, fileLength, err
 		}
 
 		hashList = append(hashList, dgst)
 	}
+
+	fmt.Printf("file %s, url %s\n", filepath, urlPattern)
 
 	return hashList, fileLength, nil
 }

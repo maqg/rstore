@@ -20,12 +20,6 @@ func init() {
 
 func pushImage() int {
 
-	if id == "" || filepath == "" {
-		fmt.Printf("id or filepath must specified,id:%s,filepath:%s\n",
-			id, filepath)
-		return merrors.ErrBadParas
-	}
-
 	if !utils.IsFileExist(filepath) {
 		fmt.Printf("filepath of %s not exist", filepath)
 		return merrors.ErrBadParas
@@ -81,15 +75,17 @@ func pushImage() int {
 
 var pushCmd = &cobra.Command{
 
-	Use:   "Push",
-	Short: "Push image to remote storage.",
+	Use:   "push",
+	Short: "push image to remote storage.",
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if id != "" {
-			fmt.Printf("got uuid %s\n", id)
+		if id != "" && filepath != "" {
+			pushImage()
 			return
 		}
+		fmt.Printf("id and filepath must specified,id:%s,filepath:%s\n",
+			id, filepath)
 
 		cmd.Usage()
 	},
