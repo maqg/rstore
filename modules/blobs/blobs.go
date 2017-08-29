@@ -16,9 +16,39 @@ import (
 
 var logger *octlog.LogConfig
 
+// Blob base structure
+type Blob struct {
+	ID       string `json:"id"`
+	FilePath string `json:"filepath"`
+	Size     int64  `json:"size"`
+}
+
 // InitLog to init log config
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("blob.log", level)
+}
+
+// DirPath to make blob path
+func DirPath(blobsum string) string {
+	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
+}
+
+// FilePath for blob
+func FilePath(digest string) string {
+	return DirPath(digest) + "/" + digest
+}
+
+// GetBlobSimple for simple blob structure
+func GetBlobSimple(name string, digest string) *Blob {
+	filepath := FilePath(digest)
+	if utils.IsFileExist(filepath) {
+		b := new(Blob)
+		b.FilePath = filepath
+		b.ID = digest
+		return b
+	}
+
+	return nil
 }
 
 // GetBlob to get blob from web api
@@ -145,11 +175,6 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 	return hashList, fileLength, nil
 }
 
-// DirPath to make blob path
-func DirPath(blobsum string) string {
-	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
-}
-
 // HTTPGetBlob will get blob by name and digest
 func HTTPGetBlob(url string) ([]byte, int, error) {
 
@@ -173,7 +198,7 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 // HTTPWriteBlob To write blob from file by HTTP
 func HTTPWriteBlob(urlPattern string, dgst string, data []byte) ([]byte, error) {
 
-	url := urlPattern + dgst
+	url := urlPattern + "?digest=" + dgst
 	reader := bytes.NewReader(data)
 	reqeust, err := http.NewRequest("POST", url, reader)
 	if err != nil {

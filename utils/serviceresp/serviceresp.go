@@ -27,6 +27,12 @@ func FailedResp(errMsg string) *ServiceResp {
 	return sr
 }
 
+// NotFoundResp for not found http response
 func NotFoundResp(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
+}
+
+// StatusOKResp for status ok response
+func StatusOKResp(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusOK)
 }
