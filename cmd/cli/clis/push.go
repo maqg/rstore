@@ -13,8 +13,8 @@ import (
 
 func init() {
 	pushCmd.Flags().StringVarP(&id, "id", "i", "", "id")
-	importCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
-	importCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
+	pushCmd.Flags().StringVarP(&filepath, "filepath", "f", "", "file path of local image")
+	pushCmd.Flags().StringVarP(&callbackurl, "callbackurl", "b", "", "callbackurl to async")
 	pushCmd.Flags().StringVarP(&address, "address", "a", "localhost:5000", "Rstore Server Address")
 }
 
