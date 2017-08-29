@@ -14,7 +14,7 @@ func AddImage(paras *Paras) *Response {
 	resp := new(Response)
 
 	newImage := new(image.Image)
-	newImage.Id = uuid.Generate().Simple()
+	newImage.ID = uuid.Generate().Simple()
 	newImage.Name = paras.InParas.Paras["image"].(string)
 	newImage.Desc = paras.InParas.Paras["desc"].(string)
 

@@ -1,8 +1,6 @@
 package v1
 
-import (
-	"octlink/rstore/reference"
-)
+import "octlink/rstore/utils/reference"
 
 // RouteDescriptorsMap for router map
 var RouteDescriptorsMap map[string]RouteDescriptor
@@ -157,16 +155,16 @@ var RouteDescriptors = []RouteDescriptor{
 	},
 	{
 		Name:        RouteNameBlobUpload,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/{digest:" + reference.DigestRegexp.String() + "}",
-		PathSimple:  "/v1/{name}/blobs/uploads/{digest}",
-		Description: "Upload blob by name and digest.",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/",
+		PathSimple:  "/v1/{name}/blobs/uploads/",
+		Description: "Init a upload for blob",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "POST",
 				Description: "Initiate a resumable blob upload. On success, upload location will be provided. Optionally, if the `digest` parameter is present, the request body will be used to complete the upload in a single request.",
 				Requests: []RequestDescriptor{
 					{
-						Name:        "Initiate Monolithic Blob Upload",
+						Name:        "Initiate Blob Upload",
 						Description: "Upload a blob identified by the `digest` parameter in single request. This upload will not beresumable unless a recoverable error is returned.",
 						Headers: []ParameterDescriptor{
 							{
@@ -177,7 +175,75 @@ var RouteDescriptors = []RouteDescriptor{
 						},
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
-							digestPathParameter,
+						},
+						QueryParameters: []ParameterDescriptor{
+							{
+								Name:        "digest",
+								Type:        "query",
+								Description: `Digest of uploaded blob. If present, the upload will be completed, in a single request, with contents of the request body as the resulting blob.`,
+							},
+						},
+					},
+					{
+						Name:        "Initiate Blob Upload",
+						Description: "Upload a blob identified by the `digest` parameter in single request. This upload will not beresumable unless a recoverable error is returned.",
+						Headers: []ParameterDescriptor{
+							contentLengthZeroHeader,
+						},
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+						},
+					},
+				},
+			},
+		},
+	},
+
+	{
+		Name:        RouteNameBlobUploadChunk,
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/{uuid:[a-zA-Z0-9-_.=]+}",
+		PathSimple:  "/v1/{name}/blobs/uploads/{uuid}",
+		Description: "Blob upload,delete,check status and removing",
+		Methods: []MethodDescriptor{
+			{
+				Method:      "GET",
+				Description: "Retrieve status of upload identified by `uuid`. The primary purpose of this endpoint is to resolve the current status of a resumable upload.",
+				Requests: []RequestDescriptor{
+					{
+						Description: "Retrieve the progress of the current upload, as reported by the `Range` header.",
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							uuidParameterDescriptor,
+						},
+					},
+				},
+			},
+			{
+				Method:      "PATCH",
+				Description: "Upload a chunk of data for the specified upload.",
+				Requests: []RequestDescriptor{
+					{
+						Name:        "Stream upload",
+						Description: "Upload a stream of data to upload without completing the upload.",
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							uuidParameterDescriptor,
+						},
+					},
+				},
+			},
+			{
+				Method:      "DELETE",
+				Description: "Cancel outstanding upload processes, releasing associated resources.",
+				Requests: []RequestDescriptor{
+					{
+						Description: "Cancel the upload specified by `uuid`.",
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							uuidParameterDescriptor,
+						},
+						Headers: []ParameterDescriptor{
+							contentLengthZeroHeader,
 						},
 					},
 				},

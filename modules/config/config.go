@@ -1,8 +1,6 @@
 package config
 
-import (
-	"octlink/rstore/configuration"
-)
+import "octlink/rstore/utils/configuration"
 
 // SystemConfig for system
 type SystemConfig struct {

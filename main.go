@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"octlink/rstore/api"
-	"octlink/rstore/configuration"
 	"octlink/rstore/handlers"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
 )
 

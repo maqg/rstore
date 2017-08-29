@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"octlink/rstore/configuration"
+	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
 	"os"
 	"strings"
@@ -12,16 +12,19 @@ import (
 
 var logger *octlog.LogConfig
 
+// InitLog to init log config
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("image.log", level)
 }
 
 const (
-	IMAGESTORE_FILE = "imagestore_info.json"
+	// ImageStoreFile for image basic info store file
+	ImageStoreFile = "imagestore_info.json"
 )
 
+// Image for Image sturcture
 type Image struct {
-	Id          string `json:"uuid"`
+	ID          string `json:"uuid"`
 	Name        string `json:"name"`
 	State       string `json:"state"`
 	Status      string `json:"status"`
@@ -32,7 +35,7 @@ type Image struct {
 	DiskSize    int64  `json:"diskSize"`
 	VirtualSize int64  `json:"virtualSize"`
 	Md5Sum      string `json:"md5sum"`
-	Url         string `json:"url"`
+	URL         string `json:"url"`
 	Type        string `json:"type"`
 	Arch        string `json:"arch"`
 	Platform    string `json:"platform"`
@@ -42,47 +45,54 @@ type Image struct {
 	InstallPath string `json:"installPath"`
 }
 
+// GetImageCount to return image count by condition
 func GetImageCount() int {
 	return 10
 }
 
+// Brief to return brief info for image
 func (image *Image) Brief() map[string]string {
 	return map[string]string{
-		"id":   image.Id,
+		"id":   image.ID,
 		"name": image.Name,
 	}
 }
 
+// Update to update image
 func (image *Image) Update() int {
 	return 0
 }
 
+// Add for image
 func (image *Image) Add() int {
 	return 0
 }
 
+// Delete for image
 func (image *Image) Delete() int {
-	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.Id)
+	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.ID)
 	return 0
 }
 
+// FindImageByName find image by name
 func FindImageByName(name string) *Image {
 
 	image := new(Image)
 
 	image.Name = "testimage"
-	image.Id = "fffffffffffffff"
+	image.ID = "fffffffffffffff"
 
-	octlog.Debug("id %s, name :%s", image.Id, image.Name)
+	octlog.Debug("id %s, name :%s", image.ID, image.Name)
 
 	return image
 }
 
+// FindImage by ID
 func FindImage(id string) *Image {
 
 	images := GetAllImages("", "", "")
 	for _, image := range images {
-		if image.Id == id {
+		if image.ID == id {
 			return &image
 		}
 	}
@@ -92,9 +102,10 @@ func FindImage(id string) *Image {
 	return nil
 }
 
+// GetAllImages by condition
 func GetAllImages(account string, mediaType string, keyword string) []Image {
 
-	imagePath := configuration.GetConfig().RootDirectory + "/" + IMAGESTORE_FILE
+	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
 	octlog.Debug("find image path[%s]\n", imagePath)
 
 	file, err := os.Open(imagePath)
@@ -138,6 +149,7 @@ func GetAllImages(account string, mediaType string, keyword string) []Image {
 	return images
 }
 
+// ContainAccount check account cantaination
 func ContainAccount(accounts []string, id string) bool {
 	for _, account := range accounts {
 		if account == id {
@@ -147,6 +159,7 @@ func ContainAccount(accounts []string, id string) bool {
 	return false
 }
 
+// GetAccountList return account list for image
 func GetAccountList() []string {
 
 	images := GetAllImages("", "", "")

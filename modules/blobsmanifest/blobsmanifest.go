@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"octlink/rstore/configuration"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"os"
 )
 

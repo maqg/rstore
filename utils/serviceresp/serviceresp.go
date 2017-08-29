@@ -1,5 +1,9 @@
 package serviceresp
 
+import (
+	"net/http"
+)
+
 // ServiceResp for Service Responce base structure
 type ServiceResp struct {
 	Status string      `json:"status"`
@@ -21,4 +25,8 @@ func FailedResp(errMsg string) *ServiceResp {
 	sr.Status = "error"
 	sr.ErrMsg = errMsg
 	return sr
+}
+
+func NotFoundResp(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
 }

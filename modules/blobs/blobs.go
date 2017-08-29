@@ -7,9 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"octlink/rstore/configuration"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
 	"os"
 )
