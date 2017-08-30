@@ -93,20 +93,27 @@ type ParameterDescriptor struct {
 }
 
 var (
+	sizeParameterDescriptor = ParameterDescriptor{
+		Name:        "size",
+		Type:        "int64",
+		Required:    true,
+		Description: `Image size in bytes`,
+	}
+
+	moduleParameterDescriptor = ParameterDescriptor{
+		Name:        "module",
+		Type:        "string",
+		format:      reference.NameRegexp.String(),
+		Required:    true,
+		Description: `Module name supported.`,
+	}
+
 	nameParameterDescriptor = ParameterDescriptor{
 		Name:        "name",
 		Type:        "string",
 		format:      reference.NameRegexp.String(),
 		Required:    true,
 		Description: `Name of the target repository.`,
-	}
-
-	referenceParameterDescriptor = ParameterDescriptor{
-		Name:        "reference",
-		Type:        "string",
-		format:      reference.TagRegexp.String(),
-		Required:    true,
-		Description: `Tag or digest of the target manifest.`,
 	}
 
 	uuidParameterDescriptor = ParameterDescriptor{
@@ -118,7 +125,7 @@ var (
 
 	digestPathParameter = ParameterDescriptor{
 		Name:        "digest",
-		Type:        "path",
+		Type:        "string",
 		Required:    true,
 		format:      reference.DigestRegexp.String(),
 		Description: `Digest of desired blob.`,
@@ -264,7 +271,7 @@ var RouteDescriptors = []RouteDescriptor{
 					{
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
-							referenceParameterDescriptor,
+							digestPathParameter,
 						},
 					},
 				},
@@ -276,7 +283,7 @@ var RouteDescriptors = []RouteDescriptor{
 					{
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
-							referenceParameterDescriptor,
+							digestPathParameter,
 						},
 					},
 				},
@@ -288,7 +295,7 @@ var RouteDescriptors = []RouteDescriptor{
 					{
 						PathParameters: []ParameterDescriptor{
 							nameParameterDescriptor,
-							referenceParameterDescriptor,
+							digestPathParameter,
 						},
 					},
 				},
@@ -315,18 +322,48 @@ var RouteDescriptors = []RouteDescriptor{
 			{
 				Method:      "GET",
 				Description: "Print API Help Message for V1.",
+				Requests: []RequestDescriptor{
+					{
+						PathParameters: []ParameterDescriptor{
+							moduleParameterDescriptor,
+						},
+					},
+				},
 			},
 		},
 	},
 
 	{
 		Name:       RouteNameBlobsManifest,
-		path:       "/v1/{name:" + reference.NameRegexp.String() + "}/blobsmanifest/{blobsum:" + reference.DigestRegexp.String() + "}",
-		PathSimple: "/v1/{name}/blobsmanifest/{blobsum}",
+		path:       "/v1/{name:" + reference.NameRegexp.String() + "}/blobsmanifest/{digest:" + reference.DigestRegexp.String() + "}/",
+		PathSimple: "/v1/{name}/blobsmanifest/{digest}/",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "GET",
 				Description: "Get blobsmanifest config for blobs pulling.",
+				Requests: []RequestDescriptor{
+					{
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							digestPathParameter,
+						},
+					},
+				},
+			},
+			{
+				Method:      "POST",
+				Description: "Post and New Blobs-Manifest config",
+				Requests: []RequestDescriptor{
+					{
+						PathParameters: []ParameterDescriptor{
+							nameParameterDescriptor,
+							digestPathParameter,
+						},
+						QueryParameters: []ParameterDescriptor{
+							sizeParameterDescriptor,
+						},
+					},
+				},
 			},
 		},
 	},

@@ -28,6 +28,14 @@ const (
 	RouteNameBlobsManifest = "blobs-manifest"
 )
 
+const (
+	// APIURLFormatBlobUpload url format for blobs upload, address:name
+	APIURLFormatBlobUpload = "http://%s/v1/%s/blobs/uploads/"
+
+	// APIURLFormatBlobsManifest for blobs-manifest operation address:name:blobsum
+	APIURLFormatBlobsManifest = "http://%s/v1/%s/blobsmanifest/%s/"
+)
+
 // EndPoints for all endpoints
 var EndPoints = []string{
 	RouteNameBase,

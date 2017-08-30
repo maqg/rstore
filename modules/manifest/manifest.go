@@ -170,5 +170,34 @@ func HTTPGetManifest(url string) (*Manifest, error) {
 
 // HTTPWrite for manifest by HTTP
 func (manifest *Manifest) HTTPWrite() error {
+	/*
+		data, err := json.Marshal(bm.Chunks)
+		if err != nil {
+			octlog.Error("convert chunks to json bytes error\n")
+			return err
+		}
+
+		url += fmt.Sprintf("?size=%d", bm.Size)
+		reqeust, err := http.NewRequest("POST", url, bytes.NewReader(data))
+		if err != nil {
+			octlog.Error("New Http Request error on url %s\n", url)
+			return err
+		}
+
+		resp, err := http.DefaultClient.Do(reqeust)
+		if err != nil {
+			octlog.Error("do http post error to url %s\n", url)
+			return err
+		}
+
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			octlog.Error("got bad status when post blob data %s,url:%s\n", resp.Status, url)
+			return errors.New("got bad status " + resp.Status)
+		}
+
+		octlog.Error("HTTP upload blobsmanifest %s to %s OK\n", bm.BlobSum, url)
+	*/
 	return nil
 }

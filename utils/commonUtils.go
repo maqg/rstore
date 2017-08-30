@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 	"unsafe"
@@ -157,4 +158,32 @@ func GetVirtualSize(filepath string) int64 {
 		return ParseInt64(string(data))
 	}
 	return 0
+}
+
+// StringToInt convert string to int value
+func StringToInt(src string) int {
+	ret, err := strconv.Atoi(src)
+	if err != nil {
+		return -1
+	}
+	return ret
+}
+
+// StringToInt64 convert string to int value
+func StringToInt64(src string) int64 {
+	ret, err := strconv.ParseInt(src, 10, 64)
+	if err != nil {
+		return -1
+	}
+	return ret
+}
+
+// IntToString convert int to string value
+func IntToString(src int) string {
+	return strconv.Itoa(src)
+}
+
+// Int64ToString convert int64 to string value
+func Int64ToString(src int64) string {
+	return strconv.FormatInt(src, 10)
 }

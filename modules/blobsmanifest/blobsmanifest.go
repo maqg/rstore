@@ -1,7 +1,9 @@
 package blobsmanifest
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +11,7 @@ import (
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/octlog"
 	"os"
 )
 
@@ -43,7 +46,7 @@ func (bm *BlobsManifest) Write() error {
 
 	fd, err := os.Create(filePath)
 	if err != nil {
-		fmt.Printf("create file %s error\n", filePath)
+		octlog.Error("create file %s error\n", filePath)
 		return err
 	}
 
@@ -58,9 +61,15 @@ func (bm *BlobsManifest) Write() error {
 // GetBlobsManifest to get blobs manifest config
 func GetBlobsManifest(blobsum string) *BlobsManifest {
 	bmPath := dirpath(blobsum) + "/" + blobsum
+
+	if !utils.IsFileExist(bmPath) {
+		octlog.Error("file %s blobs-manifest not exist\n", blobsum)
+		return nil
+	}
+
 	fd, err := os.Open(bmPath)
 	if err != nil {
-		fmt.Printf("open file of %s error %s\n", bmPath, err)
+		octlog.Error("open file of %s error %s\n", bmPath, err)
 		return nil
 	}
 
@@ -68,7 +77,7 @@ func GetBlobsManifest(blobsum string) *BlobsManifest {
 
 	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		fmt.Printf("read data from %s error %s\n", bmPath, err)
+		octlog.Error("read data from %s error %s\n", bmPath, err)
 	}
 
 	bm := new(BlobsManifest)
@@ -147,6 +156,35 @@ func HTTPGetBlobsManifest(url string) (*BlobsManifest, error) {
 }
 
 // HTTPWrite for manifest to write by http
-func (bm *BlobsManifest) HTTPWrite() error {
+func (bm *BlobsManifest) HTTPWrite(url string) error {
+
+	data, err := json.Marshal(bm.Chunks)
+	if err != nil {
+		octlog.Error("convert chunks to json bytes error\n")
+		return err
+	}
+
+	url += fmt.Sprintf("?size=%d", bm.Size)
+	reqeust, err := http.NewRequest("POST", url, bytes.NewReader(data))
+	if err != nil {
+		octlog.Error("New Http Request error on url %s\n", url)
+		return err
+	}
+
+	resp, err := http.DefaultClient.Do(reqeust)
+	if err != nil {
+		octlog.Error("do http post error to url %s\n", url)
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		octlog.Error("got bad status when post blob data %s,url:%s\n", resp.Status, url)
+		return errors.New("got bad status " + resp.Status)
+	}
+
+	octlog.Error("HTTP upload blobsmanifest %s to %s OK\n", bm.BlobSum, url)
+
 	return nil
 }

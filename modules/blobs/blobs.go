@@ -86,46 +86,6 @@ func DeleteBlob(name string, digest string) error {
 	return nil
 }
 
-// GetUploadStatus to get upload status of blob
-func GetUploadStatus(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-// StartBlobUpload to start blob upload
-func StartBlobUpload(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-// PatchBlobData to patch blob data
-func PatchBlobData(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-// PutBlobUploadComplete to put blob upload complete
-func PutBlobUploadComplete(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
-// CancelBlobUpload to cancel blob upload action
-func CancelBlobUpload(w http.ResponseWriter, r *http.Request) {
-	const emptyJSON = "{\"msg\":\"this is blob message\"}"
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(emptyJSON)))
-	fmt.Fprint(w, emptyJSON)
-}
-
 // WriteBlob To write blob from file
 func WriteBlob(dgst string, data []byte) error {
 

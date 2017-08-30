@@ -3,7 +3,6 @@ package blobupload
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"octlink/rstore/modules/blobs"
@@ -63,7 +62,6 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 		return err
 	}
 
-	copied, err := io.Copy(destWriter, r.Body)
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("read all data from r.Body error\n")
@@ -76,7 +74,7 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 		return nil
 	}
 
-	copied = int64(len)
+	copied := int64(len)
 	if clientClosed != nil && (err != nil || (r.ContentLength > 0 && copied < r.ContentLength)) {
 		// Didn't receive as much content as expected. Did the client
 		// disconnect during the request? If so, avoid returning a 400

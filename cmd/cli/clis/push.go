@@ -2,6 +2,7 @@ package clis
 
 import (
 	"fmt"
+	"octlink/rstore/api/v1"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/manifest"
@@ -25,15 +26,11 @@ func pushImage() int {
 		return merrors.ErrBadParas
 	}
 
-	urlPattern := fmt.Sprintf("http://%s/v1/%s/blobs/uploads/", address, id)
+	urlPattern := fmt.Sprintf(v1.APIURLFormatBlobUpload, address, id)
 	hashes, size, err := blobs.HTTPWriteBlobs(filepath, urlPattern)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ErrCommonErr
-	}
-
-	if 1 == 1 {
-		return 0
 	}
 
 	// write blobs-manifest config
@@ -41,7 +38,7 @@ func pushImage() int {
 	bm.Size = size
 	bm.Chunks = hashes
 	bm.BlobSum = bm.GetBlobSum()
-	err = bm.HTTPWrite()
+	err = bm.HTTPWrite(fmt.Sprintf(v1.APIURLFormatBlobsManifest, address, id, bm.BlobSum))
 	if err != nil {
 		fmt.Printf("write blobs-manifest error\n")
 		// TBD remove all posted blobs

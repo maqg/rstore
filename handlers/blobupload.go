@@ -52,19 +52,9 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 	serviceresp.StatusOKResp(w)
 }
 
-// if digest specified,
-func startBlobUpload(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-}
-
-func deleteBlobUpload(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-}
-
 func blobUploadManager(r *http.Request) http.Handler {
 	return handlers.MethodHandler{
-		"POST":   http.HandlerFunc(blobUpload),
-		"PATCH":  http.HandlerFunc(blobUpload),
-		"DELETE": http.HandlerFunc(deleteBlobUpload),
+		"POST":  http.HandlerFunc(blobUpload),
+		"PATCH": http.HandlerFunc(blobUpload),
 	}
 }
