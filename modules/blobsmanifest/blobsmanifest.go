@@ -184,7 +184,7 @@ func (bm *BlobsManifest) HTTPWrite(url string) error {
 		return errors.New("got bad status " + resp.Status)
 	}
 
-	octlog.Error("HTTP upload blobsmanifest %s to %s OK\n", bm.BlobSum, url)
+	octlog.Debug("HTTP upload blobsmanifest %s to %s OK\n", bm.BlobSum, url)
 
 	return nil
 }

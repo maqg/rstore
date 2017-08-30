@@ -1,7 +1,9 @@
 package manifest
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -169,35 +171,34 @@ func HTTPGetManifest(url string) (*Manifest, error) {
 }
 
 // HTTPWrite for manifest by HTTP
-func (manifest *Manifest) HTTPWrite() error {
-	/*
-		data, err := json.Marshal(bm.Chunks)
-		if err != nil {
-			octlog.Error("convert chunks to json bytes error\n")
-			return err
-		}
+func (manifest *Manifest) HTTPWrite(url string) error {
 
-		url += fmt.Sprintf("?size=%d", bm.Size)
-		reqeust, err := http.NewRequest("POST", url, bytes.NewReader(data))
-		if err != nil {
-			octlog.Error("New Http Request error on url %s\n", url)
-			return err
-		}
+	data, err := json.Marshal(manifest)
+	if err != nil {
+		octlog.Error("convert chunks to json bytes error\n")
+		return err
+	}
 
-		resp, err := http.DefaultClient.Do(reqeust)
-		if err != nil {
-			octlog.Error("do http post error to url %s\n", url)
-			return err
-		}
+	reqeust, err := http.NewRequest("POST", url, bytes.NewReader(data))
+	if err != nil {
+		octlog.Error("New Http Request error on url %s\n", url)
+		return err
+	}
 
-		defer resp.Body.Close()
+	resp, err := http.DefaultClient.Do(reqeust)
+	if err != nil {
+		octlog.Error("do http post error to url %s\n", url)
+		return err
+	}
 
-		if resp.StatusCode != http.StatusOK {
-			octlog.Error("got bad status when post blob data %s,url:%s\n", resp.Status, url)
-			return errors.New("got bad status " + resp.Status)
-		}
+	defer resp.Body.Close()
 
-		octlog.Error("HTTP upload blobsmanifest %s to %s OK\n", bm.BlobSum, url)
-	*/
+	if resp.StatusCode != http.StatusOK {
+		octlog.Error("got bad status when post manifest %s,url:%s\n", resp.Status, url)
+		return errors.New("got bad status " + resp.Status)
+	}
+
+	octlog.Debug("HTTP upload manifest %s to %s OK\n", manifest.ID, url)
+
 	return nil
 }

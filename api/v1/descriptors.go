@@ -208,7 +208,7 @@ var RouteDescriptors = []RouteDescriptor{
 
 	{
 		Name:        RouteNameBlobUploadChunk,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/{uuid:[a-zA-Z0-9-_.=]+}",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/uploads/{uuid:[a-zA-Z0-9-_.=]+}/",
 		PathSimple:  "/v1/{name}/blobs/uploads/{uuid}",
 		Description: "Blob upload,delete,check status and removing",
 		Methods: []MethodDescriptor{
@@ -260,7 +260,7 @@ var RouteDescriptors = []RouteDescriptor{
 
 	{
 		Name:        RouteNameManifest,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.DigestRegexp.String() + "}",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/manifests/{digest:" + reference.DigestRegexp.String() + "}/",
 		PathSimple:  "/v1/{name}/manifests/{digest}/",
 		Description: "Create, update, delete and retrieve manifests.",
 		Methods: []MethodDescriptor{
@@ -277,7 +277,7 @@ var RouteDescriptors = []RouteDescriptor{
 				},
 			},
 			{
-				Method:      "PUT",
+				Method:      "POST",
 				Description: "Put the manifest identified by `name` and `reference`",
 				Requests: []RequestDescriptor{
 					{
@@ -316,8 +316,8 @@ var RouteDescriptors = []RouteDescriptor{
 
 	{
 		Name:       RouteNameHelpModule,
-		path:       "/v1/help/{module:" + reference.NameRegexp.String() + "}",
-		PathSimple: "/v1/help/{module}",
+		path:       "/v1/help/{module:" + reference.NameRegexp.String() + "}/",
+		PathSimple: "/v1/help/{module}/",
 		Methods: []MethodDescriptor{
 			{
 				Method:      "GET",
@@ -370,7 +370,7 @@ var RouteDescriptors = []RouteDescriptor{
 
 	{
 		Name:        RouteNameBlob,
-		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/{digest:" + reference.NameRegexp.String() + "}",
+		path:        "/v1/{name:" + reference.NameRegexp.String() + "}/blobs/{digest:" + reference.NameRegexp.String() + "}/",
 		PathSimple:  "/v1/{name}/blobs/{digest}",
 		Description: "Operations on blobs identified by `name` and `digest`. Used to fetch or delete layers by digest.",
 		Methods: []MethodDescriptor{

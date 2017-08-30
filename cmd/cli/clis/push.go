@@ -55,7 +55,7 @@ func pushImage() int {
 	manifest.CreateTime = utils.CurrentTimeStr()
 	manifest.BlobSum = bm.BlobSum
 
-	err = manifest.HTTPWrite()
+	err = manifest.HTTPWrite(fmt.Sprintf(v1.APIURLFormatManifests, address, id, mid))
 	if err != nil {
 		fmt.Printf("Create manifest error[%s]\n", err)
 		// TDB,rollback
@@ -66,7 +66,7 @@ func pushImage() int {
 		callbacking()
 	}
 
-	fmt.Printf("Import image OK")
+	fmt.Printf("Import image %s to %s OK\n", filepath, id)
 
 	return merrors.ErrSuccess
 }

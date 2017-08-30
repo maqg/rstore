@@ -34,6 +34,9 @@ const (
 
 	// APIURLFormatBlobsManifest for blobs-manifest operation address:name:blobsum
 	APIURLFormatBlobsManifest = "http://%s/v1/%s/blobsmanifest/%s/"
+
+	// APIURLFormatManifests for manifests management
+	APIURLFormatManifests = "http://%s/v1/%s/manifests/%s/"
 )
 
 // EndPoints for all endpoints

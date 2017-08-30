@@ -183,7 +183,7 @@ func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
 		return errors.New("got bad status " + resp.Status)
 	}
 
-	octlog.Error("HTTP upload blob %s to %s OK\n", dgst, url)
+	octlog.Debug("HTTP upload blob %s to %s OK\n", dgst, url)
 
 	return nil
 }
@@ -206,7 +206,7 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
-			octlog.Error("reached end of file[%d]\n", n)
+			octlog.Warn("reached end of file[%d]\n", n)
 			break
 		}
 		fileLength += int64(n)
@@ -229,7 +229,7 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 		hashList = append(hashList, dgst)
 	}
 
-	fmt.Printf("file %s, url %s\n", filepath, urlPattern)
+	octlog.Debug("file %s, url %s\n", filepath, urlPattern)
 
 	return hashList, fileLength, nil
 }
