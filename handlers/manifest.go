@@ -76,6 +76,7 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 
 	m := manifest.GetManifest(name, digest)
 	if m != nil {
+		m.UpdateImage()
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -99,6 +100,8 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		octlog.Error("error happend for manifest write %s\n", err)
 		return
 	}
+
+	m.UpdateImage()
 
 	w.WriteHeader(http.StatusOK)
 }

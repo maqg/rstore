@@ -16,9 +16,11 @@
     "arch": "amd64",
     "platform": "Linux",
     "format": "qcow2",
-    "system": false,
+    "isSystem": false,
     "account": "fb56795683ee11e7aa07525400659eb7",
-    "installPath": "zstore://c4fffb59fc8e40899abd824d654ce416/dd6f676840a4b4bf3e2c12581d9f70f0b9da921e"
+    "installPath": "zstore://c4fffb59fc8e40899abd824d654ce416/dd6f676840a4b4bf3e2c12581d9f70f0b9da921e",
+    "username": "",
+    "password": ""
   },
   {
     "uuid": "0e3f138c20b24edd9772c60f463a24c4",
@@ -37,29 +39,33 @@
     "arch": "amd64",
     "platform": "Linux",
     "format": "qcow2",
-    "system": false,
+    "isSystem": false,
     "account": "f3000c7c83ee11e7bfec525400659eb7",
-    "installPath": "zstore://0e3f138c20b24edd9772c60f463a24c4/4d84364d1128e00c8de82f02ada6adbe3e0e4814"
+    "installPath": "zstore://0e3f138c20b24edd9772c60f463a24c4/4d84364d1128e00c8de82f02ada6adbe3e0e4814",
+    "username": "",
+    "password": ""
   },
   {
-    "uuid": "kkkfadsfasdfdasf",
-    "name": "test123",
-    "state": "",
-    "status": "downloading",
+    "uuid": "dddddd",
+    "name": "testkkk",
+    "state": "Enabled",
+    "status": "ready",
     "mediaType": "RootVolumeTemplate",
-    "createTime": "2017-08-30 17:29:55",
-    "lastSync": "",
+    "createTime": "2017-08-30 22:32:35",
+    "lastSync": "2017-08-30 23:10:04",
     "description": "",
-    "diskSize": 0,
+    "diskSize": 7235765,
     "virtualSize": 0,
-    "md5sum": "",
-    "url": "http://fdf/fdfsdaf/fdafsd/fff.rooo",
+    "md5sum": "b1b1cf408fdf254c485a0350465487ac07fc38fd1d8b1dc73533f49c613d6b15",
+    "url": "http://fafd/",
     "guestOsType": "Debian7",
     "arch": "amd64",
     "platform": "Linux",
     "format": "qcow2",
-    "system": true,
+    "isSystem": false,
     "account": "",
-    "installPath": ""
+    "installPath": "rstore://dddddd/b1b1cf408fdf254c485a0350465487ac07fc38fd1d8b1dc73533f49c613d6b15",
+    "username": "",
+    "password": ""
   }
 ]

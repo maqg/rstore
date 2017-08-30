@@ -48,6 +48,11 @@ func (p *Paras) Get(name string) string {
 	return ""
 }
 
+// GetBoolean get boolean para
+func (p *Paras) GetBoolean(name string) bool {
+	return p.InParas.Paras[name].(bool)
+}
+
 // GetInt paras from Paras structure
 func (p *Paras) GetInt(name string) int {
 	return utils.StringToInt(p.Get(name))

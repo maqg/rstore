@@ -38,9 +38,14 @@ func AddImage(paras *Paras) *Response {
 	im.Format = paras.Get("format")
 	im.Account = paras.Get("accountId")
 	im.CreateTime = utils.CurrentTimeStr()
-	im.System = true //
+	im.System = paras.GetBoolean("isSystem")
 	im.URL = paras.Get("url1")
 	im.Status = image.ImageStatusDownloading
+	im.State = image.ImageStateEnabled
+	im.LastSync = utils.CurrentTimeStr()
+
+	im.Username = paras.Get("username")
+	im.Password = paras.Get("password")
 
 	resp.Error = im.Add()
 

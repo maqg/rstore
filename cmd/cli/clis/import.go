@@ -24,11 +24,6 @@ func callbacking() {
 }
 
 func checkParas() bool {
-	if id == "" || filepath == "" || config == "" {
-		fmt.Printf("id or filepath must specified,id:%s,filepath:%s,config:%s\n",
-			id, filepath, config)
-		return false
-	}
 
 	if !utils.IsFileExist(filepath) {
 		fmt.Printf("filepath of %s not exist", filepath)
@@ -94,6 +89,10 @@ func importImage() int {
 		return merrors.ErrSystemErr
 	}
 
+	if err = manifest.UpdateImage(); err != nil {
+		fmt.Printf("update image info %s error, and manifest created OK\n", manifest.Name)
+	}
+
 	if callbackurl != "" {
 		callbacking()
 	}
@@ -110,11 +109,13 @@ var importCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if filepath != "" {
-			importImage()
+		if id == "" || filepath == "" || config == "" {
+			fmt.Printf("id or filepath must specified,id:%s,filepath:%s,config:%s\n",
+				id, filepath, config)
+			cmd.Usage()
 			return
 		}
 
-		cmd.Usage()
+		importImage()
 	},
 }

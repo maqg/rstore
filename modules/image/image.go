@@ -34,6 +34,14 @@ const (
 	ImageStatusError = "error"
 )
 
+const (
+	// ImageStateEnabled for image state of Enabled
+	ImageStateEnabled = "Enabled"
+
+	// ImageStateDisabled for image state disabled
+	ImageStateDisabled = "Disabled"
+)
+
 // Image for Image sturcture
 type Image struct {
 	ID          string `json:"uuid"`
@@ -52,9 +60,11 @@ type Image struct {
 	Arch        string `json:"arch"`
 	Platform    string `json:"platform"`
 	Format      string `json:"format"`
-	System      bool   `json:"system"`
+	System      bool   `json:"isSystem"`
 	Account     string `json:"account"`
-	InstallPath string `json:"installPath"`
+	InstallPath string `json:"installPath"` // rstore://iamgeid/blobsum
+	Username    string `json:"username"`
+	Password    string `json:"password"`
 }
 
 // GetImageCount to return image count by condition
@@ -86,7 +96,8 @@ func (image *Image) Update() int {
 	return 0
 }
 
-// Add for image
+// Add for image, after image added,
+// installpath, diskSize, virtualSize, Status, md5sum need update after manifest installed
 func (image *Image) Add() int {
 	all := GetAllImages("", "", "")
 	all = append(all, *image)
