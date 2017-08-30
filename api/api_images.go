@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"octlink/rstore/modules/image"
+	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
 	"octlink/rstore/utils/uuid"
@@ -13,12 +14,35 @@ func AddImage(paras *Paras) *Response {
 
 	resp := new(Response)
 
-	newImage := new(image.Image)
-	newImage.ID = uuid.Generate().Simple()
-	newImage.Name = paras.InParas.Paras["image"].(string)
-	newImage.Desc = paras.InParas.Paras["desc"].(string)
+	id := paras.Get("id")
+	if id != "" {
+		im := image.FindImage(id)
+		if im != nil {
+			resp.Error = merrors.ErrSegmentAlreadyExist
+			resp.ErrorLog = "User " + id + "Already Exist"
+			return resp
+		}
+	} else {
+		id = uuid.Generate().Simple()
+	}
 
-	resp.Error = newImage.Add()
+	im := new(image.Image)
+
+	im.ID = id
+	im.Arch = paras.Get("arch")
+	im.Platform = paras.Get("platform")
+	im.GuestOsType = paras.Get("guestOsType")
+	im.Name = paras.Get("name")
+	im.Desc = paras.Get("desc")
+	im.MediaType = paras.Get("mediaType")
+	im.Format = paras.Get("format")
+	im.Account = paras.Get("accountId")
+	im.CreateTime = utils.CurrentTimeStr()
+	im.System = true //
+	im.URL = paras.Get("url1")
+	im.Status = image.ImageStatusDownloading
+
+	resp.Error = im.Add()
 
 	return resp
 }
@@ -45,20 +69,24 @@ func ShowImage(paras *Paras) *Response {
 func UpdateImage(paras *Paras) *Response {
 	resp := new(Response)
 
-	id := paras.InParas.Paras["id"].(string)
-
-	ac := image.FindImage(id)
-	if ac == nil {
+	id := paras.Get("id")
+	im := image.FindImage(id)
+	if im == nil {
 		resp.Error = merrors.ErrUserNotExist
 		resp.ErrorLog = "User " + id + "Not Exist"
 		return resp
 	}
 
-	ac.Desc = paras.InParas.Paras["desc"].(string)
+	// Update Image here
+	im.Arch = paras.Get("arch")
+	im.Platform = paras.Get("platform")
+	im.GuestOsType = paras.Get("guestOsType")
+	im.Name = paras.Get("name")
 
-	ret := ac.Update()
+	ret := im.Update()
 	if ret != 0 {
 		resp.Error = ret
+		octlog.Error("update image of %s error\n", im.ID)
 		return resp
 	}
 

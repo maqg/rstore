@@ -1,6 +1,7 @@
 package api
 
 import (
+	"octlink/rstore/utils"
 	"octlink/rstore/utils/httpresponse"
 	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
@@ -37,6 +38,24 @@ type inputParas struct {
 type Paras struct {
 	Proto   *Proto
 	InParas *inputParas
+}
+
+// Get paras from Paras structure
+func (p *Paras) Get(name string) string {
+	if v := p.InParas.Paras[name]; v != nil {
+		return v.(string)
+	}
+	return ""
+}
+
+// GetInt paras from Paras structure
+func (p *Paras) GetInt(name string) int {
+	return utils.StringToInt(p.Get(name))
+}
+
+// GetInt64 paras from Paras structure
+func (p *Paras) GetInt64(name string) int64 {
+	return utils.StringToInt64(p.Get(name))
 }
 
 // Test for api test page

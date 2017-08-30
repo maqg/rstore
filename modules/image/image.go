@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
 	"os"
@@ -22,6 +23,17 @@ const (
 	ImageStoreFile = "imagestore_info.json"
 )
 
+const (
+	// ImageStatusReady for ready state
+	ImageStatusReady = "ready"
+
+	// ImageStatusDownloading for downloading state
+	ImageStatusDownloading = "downloading"
+
+	//ImageStatusError for error status
+	ImageStatusError = "error"
+)
+
 // Image for Image sturcture
 type Image struct {
 	ID          string `json:"uuid"`
@@ -36,7 +48,7 @@ type Image struct {
 	VirtualSize int64  `json:"virtualSize"`
 	Md5Sum      string `json:"md5sum"`
 	URL         string `json:"url"`
-	Type        string `json:"type"`
+	GuestOsType string `json:"guestOsType"` // Guest OS Type
 	Arch        string `json:"arch"`
 	Platform    string `json:"platform"`
 	Format      string `json:"format"`
@@ -46,8 +58,9 @@ type Image struct {
 }
 
 // GetImageCount to return image count by condition
-func GetImageCount() int {
-	return 10
+func GetImageCount(account string, mediaType string, keyword string) int {
+	all := GetAllImages(account, mediaType, keyword)
+	return len(all)
 }
 
 // Brief to return brief info for image
@@ -60,17 +73,46 @@ func (image *Image) Brief() map[string]string {
 
 // Update to update image
 func (image *Image) Update() int {
+	all := GetAllImages("", "", "")
+
+	for i, im := range all {
+		if im.ID == image.ID {
+			all[i] = *image
+		}
+	}
+
+	WriteImageConfig(all)
+
 	return 0
 }
 
 // Add for image
 func (image *Image) Add() int {
+	all := GetAllImages("", "", "")
+	all = append(all, *image)
+	WriteImageConfig(all)
 	return 0
 }
 
 // Delete for image
 func (image *Image) Delete() int {
 	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.ID)
+
+	all := GetAllImages("", "", "")
+	len := len(all)
+
+	for i, im := range all {
+		if im.ID == image.ID {
+			if i == 0 {
+				all = all[1:len]
+			} else {
+				all = append(all[0:i], all[i+1:len]...)
+			}
+		}
+	}
+
+	WriteImageConfig(all)
+
 	return 0
 }
 
@@ -98,6 +140,27 @@ func FindImage(id string) *Image {
 	}
 
 	octlog.Error("image of %S not exist", id)
+
+	return nil
+}
+
+// WriteImageConfig to write all images to image store file
+func WriteImageConfig(images []Image) error {
+
+	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
+	utils.Remove(imagePath)
+
+	fd, err := os.Create(imagePath)
+	if err != nil {
+		octlog.Error("create file of %s error\n", imagePath)
+		return err
+	}
+
+	_, err = fd.Write(utils.JSON2Bytes(images))
+	if err != nil {
+		// roll back
+		return err
+	}
 
 	return nil
 }

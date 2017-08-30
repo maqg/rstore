@@ -118,6 +118,12 @@ func JSON2String(v interface{}) string {
 	return string(data)
 }
 
+// JSON2Bytes convert json to string
+func JSON2Bytes(v interface{}) []byte {
+	data, _ := json.MarshalIndent(v, "", "  ")
+	return data
+}
+
 // TrimDir trim directory name by replace "//"
 func TrimDir(path string) string {
 	return strings.Replace(path, "//", "/", -1)

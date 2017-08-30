@@ -95,6 +95,43 @@ var ImageDescriptors = Module{
 			},
 		},
 
+		"APIUpdateImage": {
+			Name:    "编辑镜像",
+			handler: UpdateImage,
+			Paras: []ProtoPara{
+				{
+					Name:    "id",
+					Type:    ParamTypeString,
+					Desc:    "UUID of Image",
+					Default: ParamNotNull,
+				},
+				{
+					Name:    "name",
+					Type:    ParamTypeString,
+					Desc:    "Image Name",
+					Default: ParamNotNull,
+				},
+				{
+					Name:    "arch",
+					Type:    ParamTypeString,
+					Desc:    "Arch of Image, amd64 or x86",
+					Default: "amd64",
+				},
+				{
+					Name:    "platform",
+					Type:    ParamTypeString,
+					Desc:    "平台类型，如Linux，Windows， Other",
+					Default: "Linux",
+				},
+				{
+					Name:    "guestOsType",
+					Type:    ParamTypeString,
+					Desc:    "客户操作系统类型，如CentOS，Debian",
+					Default: "Debian7",
+				},
+			},
+		},
+
 		"APIDeleteImageByAccount": {
 			Name:    "删除镜像（根据账号）",
 			handler: DeleteImageByAccount,
