@@ -120,20 +120,26 @@ func WriteBlobs(filepath string) ([]string, int64, error) {
 		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
+			if n > 0 {
+				dgst := utils.GetDigest(buffer[:n])
+				octlog.Error("got size of %d,with hash:%s\n", n, dgst)
+				WriteBlob(dgst, buffer[:n])
+				fileLength += int64(n)
+			}
 			octlog.Error("reached end of file[%d]\n", n)
 			break
 		}
-		fileLength += int64(n)
 
 		if err != nil {
-			octlog.Error("read file error %s", err)
+			octlog.Error("read file error %s, %s bytes already read\n", err, fileLength)
+			return nil, fileLength, err
 		}
 
+		fileLength += int64(n)
 		dgst := utils.GetDigest(buffer[:n])
-		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
 		WriteBlob(dgst, buffer[:n])
-
 		hashList = append(hashList, dgst)
+		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
 	}
 
 	return hashList, fileLength, nil
