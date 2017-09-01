@@ -47,7 +47,7 @@ func AddImage(paras *Paras) *Response {
 	im.Username = paras.Get("username")
 	im.Password = paras.Get("password")
 
-	resp.Error = im.Add()
+	resp.Data, resp.Error = im.Add()
 
 	return resp
 }

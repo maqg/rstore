@@ -30,7 +30,7 @@ var ImageDescriptors = Module{
 					Name:    "url1",
 					Type:    ParamTypeString,
 					Desc:    "Url1 of Source Image",
-					Default: ParamNotNull,
+					Default: "",
 				},
 				{
 					Name:    "url2",

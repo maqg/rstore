@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"octlink/mirage/src/utils/merrors"
+	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
+	"octlink/rstore/utils/uuid"
 	"os"
 	"strings"
 )
@@ -98,11 +101,31 @@ func (image *Image) Update() int {
 
 // Add for image, after image added,
 // installpath, diskSize, virtualSize, Status, md5sum need update after manifest installed
-func (image *Image) Add() int {
+func (image *Image) Add() (string, int) {
+
+	var taskID = ""
+
+	if image.URL != "" {
+		t := new(task.Task)
+		t.ID = uuid.Generate().Simple()
+		t.URL = image.URL
+		t.CreateTime = utils.CurrentTimeStr()
+		t.ImageName = image.ID
+		t.Status = task.TaskStatusNew
+
+		if t.Add() != nil {
+			octlog.Error("add image task error for url %s\n", image.URL)
+			return "", merrors.ERR_COMMON_ERR
+		}
+
+		taskID = t.ID
+	}
+
 	all := GetAllImages("", "", "")
 	all = append(all, *image)
 	WriteImageConfig(all)
-	return 0
+
+	return taskID, 0
 }
 
 // Delete for image
