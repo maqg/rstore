@@ -137,7 +137,7 @@ func (manifest *Manifest) Write() error {
 // UpdateImage for manifest
 func (manifest *Manifest) UpdateImage() error {
 
-	im := image.FindImage(manifest.Name)
+	im := image.GetImage(manifest.Name)
 	if im == nil {
 		octlog.Error("image of %s not exist", manifest.Name)
 		return fmt.Errorf("image of %s not exist", manifest.Name)

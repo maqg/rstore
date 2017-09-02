@@ -54,14 +54,14 @@ func GetTaskByImage(imageID string) *Task {
 	return nil
 }
 
-// Add will add a new task to GTasks and run it
-func (t *Task) Add() error {
+// ImageCallBack for image callback
+type ImageCallBack func(string, int64)
 
+// AddAndRun will add a new task to GTasks and run it
+func (t *Task) AddAndRun(callback ImageCallBack) {
 	GTasks[t.ID] = t
-	t.Status = TaskStatusRunning
 	t.Run()
-
-	return nil
+	callback(t.ImageName, 9000)
 }
 
 // GetTask by taskid
@@ -140,9 +140,10 @@ func (t *Task) Download() {
 }
 
 // Run this task
-func (t *Task) Run() error {
+func (t *Task) Run() {
+	t.Status = TaskStatusRunning
 	go t.Download()
-	return nil
+	octlog.Warn("task of %s start to run, %s\n", t.ID, t.URL)
 }
 
 // Stop this task

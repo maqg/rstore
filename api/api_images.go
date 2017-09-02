@@ -16,7 +16,7 @@ func AddImage(paras *Paras) *Response {
 
 	id := paras.Get("id")
 	if id != "" {
-		im := image.FindImage(id)
+		im := image.GetImage(id)
 		if im != nil {
 			resp.Error = merrors.ErrSegmentAlreadyExist
 			resp.ErrorLog = "User " + id + "Already Exist"
@@ -58,7 +58,7 @@ func ShowImage(paras *Paras) *Response {
 	resp := new(Response)
 	imageID := paras.InParas.Paras["id"].(string)
 
-	temp := image.FindImage(imageID)
+	temp := image.GetImage(imageID)
 	if temp == nil {
 		resp.Error = merrors.ErrSegmentNotExist
 		resp.ErrorLog = fmt.Sprintf("user %s not found", imageID)
@@ -75,7 +75,7 @@ func UpdateImage(paras *Paras) *Response {
 	resp := new(Response)
 
 	id := paras.Get("id")
-	im := image.FindImage(id)
+	im := image.GetImage(id)
 	if im == nil {
 		resp.Error = merrors.ErrUserNotExist
 		resp.ErrorLog = "User " + id + "Not Exist"
@@ -125,7 +125,7 @@ func DeleteImage(paras *Paras) *Response {
 
 	resp := new(Response)
 
-	image := image.FindImage(paras.InParas.Paras["id"].(string))
+	image := image.GetImage(paras.InParas.Paras["id"].(string))
 	if image == nil {
 		resp.Error = merrors.ErrSegmentNotExist
 		return resp

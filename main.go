@@ -7,6 +7,7 @@ import (
 	"octlink/rstore/api"
 	"octlink/rstore/handlers"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/image"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
@@ -80,6 +81,9 @@ func main() {
 	}
 
 	initRootDirectory(conf)
+
+	// ReloadImages here
+	image.ReloadImages()
 
 	go runAPIThread(conf)
 

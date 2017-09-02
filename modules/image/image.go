@@ -1,16 +1,11 @@
 package image
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"octlink/mirage/src/utils/merrors"
 	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
-	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
 	"octlink/rstore/utils/uuid"
-	"os"
 	"strings"
 )
 
@@ -86,24 +81,40 @@ func (image *Image) Brief() map[string]string {
 
 // Update to update image
 func (image *Image) Update() int {
-	all := GetAllImages("", "", "")
 
-	for i, im := range all {
+	for i, im := range GImages {
 		if im.ID == image.ID {
-			all[i] = *image
+			GImages[i] = *image
 		}
 	}
 
-	WriteImageConfig(all)
+	WriteImages()
 
 	return 0
+}
+
+// UpdateImage when image download OK, update its info
+func UpdateImage(imageID string, size int64) {
+
+	octlog.Error("got image update callback %s:%d\n", imageID, size)
+
+	for _, im := range GImages {
+		if im.ID == imageID {
+			octlog.Warn("Got image of %s\n", imageID)
+			im.Status = ImageStatusReady
+			im.DiskSize = size
+			octlog.Debug(utils.JSON2String(im))
+			WriteImages()
+		}
+	}
 }
 
 // Add for image, after image added,
 // installpath, diskSize, virtualSize, Status, md5sum need update after manifest installed
 func (image *Image) Add() (string, int) {
 
-	var taskID = ""
+	GImages = append(GImages, *image)
+	WriteImages()
 
 	if image.URL != "" {
 		t := new(task.Task)
@@ -112,62 +123,39 @@ func (image *Image) Add() (string, int) {
 		t.CreateTime = utils.CurrentTimeStr()
 		t.ImageName = image.ID
 		t.Status = task.TaskStatusNew
-
-		if t.Add() != nil {
-			octlog.Error("add image task error for url %s\n", image.URL)
-			return "", merrors.ERR_COMMON_ERR
-		}
-
-		taskID = t.ID
+		t.AddAndRun(UpdateImage)
+		return t.ID, merrors.ErrSuccess
 	}
 
-	all := GetAllImages("", "", "")
-	all = append(all, *image)
-	WriteImageConfig(all)
-
-	return taskID, 0
+	return "", merrors.ErrSuccess
 }
 
 // Delete for image
 func (image *Image) Delete() int {
+
 	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.ID)
 
-	all := GetAllImages("", "", "")
-	len := len(all)
+	len := len(GImages)
 
-	for i, im := range all {
+	for i, im := range GImages {
 		if im.ID == image.ID {
 			if i == 0 {
-				all = all[1:len]
+				GImages = GImages[1:len]
 			} else {
-				all = append(all[0:i], all[i+1:len]...)
+				GImages = append(GImages[0:i], GImages[i+1:len]...)
 			}
 		}
 	}
 
-	WriteImageConfig(all)
+	WriteImages()
 
 	return 0
 }
 
-// FindImageByName find image by name
-func FindImageByName(name string) *Image {
+// GetImage by ID
+func GetImage(id string) *Image {
 
-	image := new(Image)
-
-	image.Name = "testimage"
-	image.ID = "fffffffffffffff"
-
-	octlog.Debug("id %s, name :%s", image.ID, image.Name)
-
-	return image
-}
-
-// FindImage by ID
-func FindImage(id string) *Image {
-
-	images := GetAllImages("", "", "")
-	for _, image := range images {
+	for _, image := range GImages {
 		if image.ID == id {
 			return &image
 		}
@@ -178,52 +166,11 @@ func FindImage(id string) *Image {
 	return nil
 }
 
-// WriteImageConfig to write all images to image store file
-func WriteImageConfig(images []Image) error {
-
-	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
-	utils.Remove(imagePath)
-
-	fd, err := os.Create(imagePath)
-	if err != nil {
-		octlog.Error("create file of %s error\n", imagePath)
-		return err
-	}
-
-	_, err = fd.Write(utils.JSON2Bytes(images))
-	if err != nil {
-		// roll back
-		return err
-	}
-
-	return nil
-}
-
 // GetAllImages by condition
 func GetAllImages(account string, mediaType string, keyword string) []Image {
 
-	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
-	octlog.Debug("find image path[%s]\n", imagePath)
-
-	file, err := os.Open(imagePath)
-	if err != nil {
-		fmt.Println("open file " + imagePath + "error")
-		return make([]Image, 0)
-	}
-
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-
-	imageList := make([]Image, 0)
-	err = json.Unmarshal(data, &imageList)
-	if err != nil {
-		octlog.Warn("Transfer json bytes error %s\n", err)
-		return make([]Image, 0)
-	}
-
 	images := make([]Image, 0)
-	for _, image := range imageList {
+	for _, image := range GImages {
 
 		// filter account
 		if account != "" && image.Account != account {
