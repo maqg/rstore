@@ -15,10 +15,10 @@ const (
 )
 
 // GImages for all image loaded from config
-var GImages = make([]Image, MaxImagesCount)
+var GImages = make([]*Image, MaxImagesCount)
 
 // GImagesMap Global Images Map
-var GImagesMap = make(map[string]Image, MaxImagesCount)
+var GImagesMap = make(map[string]*Image, MaxImagesCount)
 
 func loadImages() error {
 

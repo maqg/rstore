@@ -81,31 +81,20 @@ func (image *Image) Brief() map[string]string {
 
 // Update to update image
 func (image *Image) Update() int {
-
-	for i, im := range GImages {
-		if im.ID == image.ID {
-			GImages[i] = *image
-		}
-	}
-
 	WriteImages()
-
 	return 0
 }
 
 // UpdateImage when image download OK, update its info
 func UpdateImage(imageID string, size int64) {
 
-	octlog.Error("got image update callback %s:%d\n", imageID, size)
-
-	for _, im := range GImages {
-		if im.ID == imageID {
-			octlog.Warn("Got image of %s\n", imageID)
-			im.Status = ImageStatusReady
-			im.DiskSize = size
-			octlog.Debug(utils.JSON2String(im))
-			WriteImages()
-		}
+	im := GetImage(imageID)
+	if im != nil {
+		octlog.Warn("Got image of %s\n", imageID)
+		im.Status = ImageStatusReady
+		im.DiskSize = size
+		octlog.Debug(utils.JSON2String(im))
+		WriteImages()
 	}
 }
 
@@ -113,7 +102,9 @@ func UpdateImage(imageID string, size int64) {
 // installpath, diskSize, virtualSize, Status, md5sum need update after manifest installed
 func (image *Image) Add() (string, int) {
 
-	GImages = append(GImages, *image)
+	GImages = append(GImages, image)
+	GImagesMap[image.ID] = image
+
 	WriteImages()
 
 	if image.URL != "" {
@@ -144,6 +135,7 @@ func (image *Image) Delete() int {
 			} else {
 				GImages = append(GImages[0:i], GImages[i+1:len]...)
 			}
+			delete(GImagesMap, im.ID)
 		}
 	}
 
@@ -154,22 +146,14 @@ func (image *Image) Delete() int {
 
 // GetImage by ID
 func GetImage(id string) *Image {
-
-	for _, image := range GImages {
-		if image.ID == id {
-			return &image
-		}
-	}
-
-	octlog.Error("image of %S not exist", id)
-
-	return nil
+	return GImagesMap[id]
 }
 
 // GetAllImages by condition
-func GetAllImages(account string, mediaType string, keyword string) []Image {
+func GetAllImages(account string, mediaType string, keyword string) []*Image {
 
-	images := make([]Image, 0)
+	images := make([]*Image, 0)
+
 	for _, image := range GImages {
 
 		// filter account
