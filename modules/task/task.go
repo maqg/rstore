@@ -42,6 +42,7 @@ type Task struct {
 	FileName   string `json:"fileName"`
 	FileLength int64  `json:"fileLength"`
 	ImageName  string `json:"imageName"`
+	Callback   ImageCallBack
 }
 
 // GTasks all tasks map management
@@ -58,16 +59,12 @@ func GetTaskByImage(imageID string) *Task {
 }
 
 // ImageCallBack for image callback
-type ImageCallBack func(string, int64)
+type ImageCallBack func(string, int64, int64, string, string) error
 
 // AddAndRun will add a new task to GTasks and run it
 func (t *Task) AddAndRun(callback ImageCallBack) {
-
 	GTasks[t.ID] = t
-
-	t.Run()
-
-	callback(t.ImageName, 9000)
+	t.Run(callback)
 }
 
 // GetTask by taskid
@@ -185,14 +182,15 @@ func (t *Task) Download() {
 }
 
 // Run this task
-func (t *Task) Run() {
+func (t *Task) Run(callback ImageCallBack) {
 	t.Status = TaskStatusRunning
 	go t.Download()
 	octlog.Warn("task of %s start to run, %s\n", t.ID, t.URL)
 }
 
 // Stop this task
-func (t *Task) Stop() error {
+func (t *Task) Stop(callback ImageCallBack) error {
+	callback(t.ImageName, 0, 0, "", TaskStatusError)
 	return nil
 }
 
@@ -205,9 +203,11 @@ func (t *Task) Delete() error {
 func (t *Task) Finish() {
 	t.Status = TaskStatusFinished
 	t.FinishTime = utils.CurrentTimeStr()
+	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
 }
 
 func (t *Task) Error() {
 	t.Status = TaskStatusError
 	t.FinishTime = utils.CurrentTimeStr()
+	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
 }

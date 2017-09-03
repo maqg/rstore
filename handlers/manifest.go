@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"octlink/rstore/modules/image"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/octlog"
@@ -76,7 +77,11 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 
 	m := manifest.GetManifest(name, digest)
 	if m != nil {
-		m.UpdateImage()
+		err := image.UpdateImageCallback(m.Name, m.DiskSize, m.VirtualSize,
+			m.BlobSum, image.ImageStatusReady)
+		if err != nil {
+			octlog.Error("update image info %s error, and manifest created OK\n", m.Name)
+		}
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -101,7 +106,11 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.UpdateImage()
+	err = image.UpdateImageCallback(m.Name, m.DiskSize, m.VirtualSize,
+		m.BlobSum, image.ImageStatusReady)
+	if err != nil {
+		octlog.Error("update image info %s error, and manifest created OK\n", m.Name)
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -9,7 +9,6 @@ import (
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/merrors"
-	"octlink/rstore/utils/octlog"
 
 	"github.com/spf13/cobra"
 )
@@ -23,30 +22,6 @@ func init() {
 
 func callbacking() {
 	fmt.Printf("callbackurl of %s called\n", callbackurl)
-}
-
-// UpdateImage for manifest
-func UpdateImage(m *manifest.Manifest) error {
-
-	im := image.GetImage(m.Name)
-	if im == nil {
-		octlog.Error("image of %s not exist", m.Name)
-		return fmt.Errorf("image of %s not exist", m.Name)
-	}
-
-	im.LastSync = utils.CurrentTimeStr()
-	im.DiskSize = m.DiskSize
-	im.VirtualSize = m.VirtualSize
-	im.Md5Sum = m.BlobSum
-	im.Status = image.ImageStatusReady
-	im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
-
-	if ret := im.Update(); ret != 0 {
-		octlog.Error("update image of %s error\n", im.ID)
-		return fmt.Errorf("update image of %s error", im.ID)
-	}
-
-	return nil
 }
 
 func checkParas() bool {
@@ -114,8 +89,9 @@ func importImage() int {
 		// TDB,rollback
 		return merrors.ErrSystemErr
 	}
-
-	if err = UpdateImage(manifest); err != nil {
+	err = image.UpdateImageCallback(manifest.Name, manifest.DiskSize, manifest.VirtualSize,
+		manifest.BlobSum, image.ImageStatusReady)
+	if err != nil {
 		fmt.Printf("update image info %s error, and manifest created OK\n", manifest.Name)
 	}
 

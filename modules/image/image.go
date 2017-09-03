@@ -1,6 +1,7 @@
 package image
 
 import (
+	"fmt"
 	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
@@ -85,17 +86,28 @@ func (image *Image) Update() int {
 	return 0
 }
 
-// UpdateImage when image download OK, update its info
-func UpdateImage(imageID string, size int64) {
+// UpdateImageCallback when image download OK, update its info
+func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
+	blobsum string, status string) error {
 
 	im := GetImage(imageID)
 	if im != nil {
 		octlog.Warn("Got image of %s\n", imageID)
 		im.Status = ImageStatusReady
-		im.DiskSize = size
+		im.DiskSize = diskSize
+		im.VirtualSize = virtualSize
+		im.Md5Sum = blobsum
+		im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
+		if status == "error" {
+			im.Status = ImageStatusError
+		} else {
+			im.Status = ImageStatusReady
+		}
 		octlog.Debug(utils.JSON2String(im))
 		WriteImages()
 	}
+
+	return nil
 }
 
 // Add for image, after image added,
@@ -114,7 +126,8 @@ func (image *Image) Add() (string, int) {
 		t.CreateTime = utils.CurrentTimeStr()
 		t.ImageName = image.ID
 		t.Status = task.TaskStatusNew
-		t.AddAndRun(UpdateImage)
+		t.Callback = UpdateImageCallback
+		t.AddAndRun(UpdateImageCallback)
 		return t.ID, merrors.ErrSuccess
 	}
 
