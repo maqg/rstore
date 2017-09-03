@@ -2,6 +2,7 @@ package image
 
 import (
 	"fmt"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
@@ -20,17 +21,6 @@ func InitLog(level int) {
 const (
 	// ImageStoreFile for image basic info store file
 	ImageStoreFile = "imagestore_info.json"
-)
-
-const (
-	// ImageStatusReady for ready state
-	ImageStatusReady = "ready"
-
-	// ImageStatusDownloading for downloading state
-	ImageStatusDownloading = "downloading"
-
-	//ImageStatusError for error status
-	ImageStatusError = "error"
 )
 
 const (
@@ -93,21 +83,19 @@ func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
 	im := GetImage(imageID)
 	if im != nil {
 		octlog.Warn("Got image of %s\n", imageID)
-		im.Status = ImageStatusReady
+		im.Status = config.ImageStatusReady
 		im.DiskSize = diskSize
 		im.VirtualSize = virtualSize
 		im.Md5Sum = blobsum
 		im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
-		if status == "error" {
-			im.Status = ImageStatusError
-		} else {
-			im.Status = ImageStatusReady
-		}
-		octlog.Debug(utils.JSON2String(im))
+		im.Status = status
+
 		WriteImages()
+
+		return nil
 	}
 
-	return nil
+	return fmt.Errorf("Image of %s not exist", imageID)
 }
 
 // Add for image, after image added,

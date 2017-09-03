@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/image"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
@@ -40,7 +41,7 @@ func AddImage(paras *Paras) *Response {
 	im.CreateTime = utils.CurrentTimeStr()
 	im.System = paras.GetBoolean("isSystem")
 	im.URL = paras.Get("url1")
-	im.Status = image.ImageStatusDownloading
+	im.Status = config.ImageStatusDownloading
 	im.State = image.ImageStateEnabled
 	im.LastSync = utils.CurrentTimeStr()
 

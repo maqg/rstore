@@ -99,6 +99,7 @@ func WriteBlob(dgst string, data []byte) error {
 	}
 
 	defer fd.Close()
+
 	fd.Write(data)
 
 	return nil
@@ -126,7 +127,7 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 				WriteBlob(dgst, buffer[:n])
 				fileLength += int64(n)
 			}
-			octlog.Error("reached end of file[%d]\n", n)
+			octlog.Warn("reached end of file[%d]\n", n)
 			break
 		}
 
@@ -139,7 +140,8 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 		dgst := utils.GetDigest(buffer[:n])
 		WriteBlob(dgst, buffer[:n])
 		hashList = append(hashList, dgst)
-		octlog.Error("got size of %d,with hash:%s\n", n, dgst)
+
+		octlog.Debug("got size of %d,with hash:%s\n", n, dgst)
 	}
 
 	return hashList, fileLength, nil

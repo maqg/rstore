@@ -13,21 +13,21 @@ import (
 
 func init() {
 	exportCmd.Flags().StringVarP(&blobsum, "blobsum", "s", "", "manifest blob sum")
-	exportCmd.Flags().StringVarP(&config, "config", "c", "./config.yml", "Config file for rstore")
+	exportCmd.Flags().StringVarP(&configfile, "configfile", "c", "./config.yml", "Config file for rstore")
 	exportCmd.Flags().StringVarP(&outpath, "outpath", "o", "./out.qcow2", "output file path of local image")
 }
 
 func exportImage() int {
 
-	if blobsum == "" || outpath == "" || config == "" {
+	if blobsum == "" || outpath == "" || configfile == "" {
 		fmt.Printf("id or filepath must specified,blobsum:%s,out:%s,config:%s\n",
-			blobsum, outpath, config)
+			blobsum, outpath, configfile)
 		return merrors.ERR_UNACCP_PARAS
 	}
 
-	conf, err := configuration.ResolveConfig(config)
+	conf, err := configuration.ResolveConfig(configfile)
 	if err != nil {
-		fmt.Printf("parse config %s error\n", config)
+		fmt.Printf("parse config %s error\n", configfile)
 		return merrors.ERR_CMD_ERR
 	}
 

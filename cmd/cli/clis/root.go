@@ -8,7 +8,7 @@ import (
 
 var (
 	showVersion bool
-	config      string
+	configfile  string
 	arch        string // architecture, defautl amd64
 	id          string // image uuid
 	filepath    string // image file path

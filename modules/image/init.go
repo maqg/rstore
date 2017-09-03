@@ -78,9 +78,3 @@ func WriteImages() error {
 
 	return nil
 }
-
-func init() {
-	if configuration.GetConfig() != nil {
-		ReloadImages()
-	}
-}

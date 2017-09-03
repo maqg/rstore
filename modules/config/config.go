@@ -2,6 +2,17 @@ package config
 
 import "octlink/rstore/utils/configuration"
 
+const (
+	// ImageStatusReady for ready state
+	ImageStatusReady = "ready"
+
+	// ImageStatusDownloading for downloading state
+	ImageStatusDownloading = "downloading"
+
+	//ImageStatusError for error status
+	ImageStatusError = "error"
+)
+
 // SystemConfig for system
 type SystemConfig struct {
 	Version       string `json:"version"`
