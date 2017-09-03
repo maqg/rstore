@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"octlink/rstore/modules/image"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
@@ -130,30 +129,6 @@ func (manifest *Manifest) Write() error {
 
 	data, _ := json.MarshalIndent(manifest, "", "  ")
 	fd.Write(data)
-
-	return nil
-}
-
-// UpdateImage for manifest
-func (manifest *Manifest) UpdateImage() error {
-
-	im := image.GetImage(manifest.Name)
-	if im == nil {
-		octlog.Error("image of %s not exist", manifest.Name)
-		return fmt.Errorf("image of %s not exist", manifest.Name)
-	}
-
-	im.LastSync = utils.CurrentTimeStr()
-	im.DiskSize = manifest.DiskSize
-	im.VirtualSize = manifest.VirtualSize
-	im.Md5Sum = manifest.BlobSum
-	im.Status = image.ImageStatusReady
-	im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
-
-	if ret := im.Update(); ret != 0 {
-		octlog.Error("update image of %s error\n", im.ID)
-		return fmt.Errorf("update image of %s error", im.ID)
-	}
 
 	return nil
 }

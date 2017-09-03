@@ -3,6 +3,9 @@ package task
 import (
 	"io"
 	"net/http"
+	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/blobsmanifest"
+	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
@@ -59,8 +62,11 @@ type ImageCallBack func(string, int64)
 
 // AddAndRun will add a new task to GTasks and run it
 func (t *Task) AddAndRun(callback ImageCallBack) {
+
 	GTasks[t.ID] = t
+
 	t.Run()
+
 	callback(t.ImageName, 9000)
 }
 
@@ -130,6 +136,45 @@ func (t *Task) Download() {
 			t.Error()
 			return
 		}
+	}
+
+	hashes, len, err := blobs.ImportBlobs(t.FilePath)
+	if err != nil {
+		octlog.Error("got file hashlist error\n")
+		return
+	}
+
+	if len != t.FileLength {
+		octlog.Error("filelen of blobs and http contentlen not match %d:%d\n", len, t.FileLength)
+		return
+	}
+
+	// write blobs-manifest config
+	bm := new(blobsmanifest.BlobsManifest)
+	bm.Size = t.FileLength
+	bm.Chunks = hashes
+	bm.BlobSum = bm.GetBlobSum()
+	err = bm.Write()
+	if err != nil {
+		octlog.Error("write blobs-manifest error\n")
+		return
+	}
+
+	// write manifest config
+	mid := utils.GetDigestStr(t.ImageName)
+	manifest := new(manifest.Manifest)
+	manifest.Name = t.ImageName
+	manifest.ID = mid
+	manifest.DiskSize = t.FileLength
+	manifest.VirtualSize = utils.GetVirtualSize(t.FilePath)
+	manifest.CreateTime = utils.CurrentTimeStr()
+	manifest.BlobSum = bm.BlobSum
+
+	err = manifest.Write()
+	if err != nil {
+		octlog.Error("Create manifest error[%s]\n", err)
+		// TDB,rollback
+		return
 	}
 
 	// update task status and image info

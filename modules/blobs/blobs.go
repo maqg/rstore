@@ -104,8 +104,8 @@ func WriteBlob(dgst string, data []byte) error {
 	return nil
 }
 
-// WriteBlobs to write blobs from file and return its hash values
-func WriteBlobs(filepath string) ([]string, int64, error) {
+// ImportBlobs to write blobs from file and return its hash values
+func ImportBlobs(filepath string) ([]string, int64, error) {
 
 	f, err := os.Open(filepath)
 	if err != nil {
