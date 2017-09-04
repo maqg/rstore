@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"reflect"
@@ -192,4 +193,30 @@ func IntToString(src int) string {
 // Int64ToString convert int64 to string value
 func Int64ToString(src int64) string {
 	return strconv.FormatInt(src, 10)
+}
+
+// FileToBytes for filepath convert to bytes
+func FileToBytes(filepath string) []byte {
+	if !IsFileExist(filepath) {
+		return nil
+	}
+
+	fd, err := os.Open(filepath)
+	if err != nil {
+		return nil
+	}
+
+	defer fd.Close()
+
+	data, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return nil
+	}
+
+	return data
+}
+
+// FileToString convert file content to string
+func FileToString(filepath string) string {
+	return BytesToString(FileToBytes(filepath))
 }

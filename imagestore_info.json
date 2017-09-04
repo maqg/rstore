@@ -54,9 +54,9 @@
     "createTime": "2017-08-30 22:32:35",
     "lastSync": "2017-08-30 23:10:04",
     "description": "",
-    "diskSize": 7235765,
+    "diskSize": 10107580,
     "virtualSize": 0,
-    "md5sum": "b1b1cf408fdf254c485a0350465487ac07fc38fd1d8b1dc73533f49c613d6b15",
+    "md5sum": "5e6403bbef2bb1a3c29d707b86b69a34e7abee3a9824c008311029a58eff6dcc",
     "url": "http://fafd/",
     "guestOsType": "Debian7",
     "arch": "amd64",
@@ -64,7 +64,7 @@
     "format": "qcow2",
     "isSystem": false,
     "account": "",
-    "installPath": "rstore://dddddd/b1b1cf408fdf254c485a0350465487ac07fc38fd1d8b1dc73533f49c613d6b15",
+    "installPath": "rstore://dddddd/5e6403bbef2bb1a3c29d707b86b69a34e7abee3a9824c008311029a58eff6dcc",
     "username": "",
     "password": ""
   }

@@ -120,8 +120,9 @@ func (bm *BlobsManifest) Export(outpath string) error {
 	defer fd.Close()
 
 	for _, hash := range bm.Chunks {
-		blobPath := blobs.DirPath(hash) + "/" + hash
-		data := readBlob(blobPath)
+		b := new(blobs.Blob)
+		b.ID = hash
+		data := readBlob(b.FilePath())
 		fd.Write(data)
 	}
 

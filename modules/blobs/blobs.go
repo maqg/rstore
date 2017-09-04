@@ -19,8 +19,9 @@ var logger *octlog.LogConfig
 // Blob base structure
 type Blob struct {
 	ID       string `json:"id"`
-	FilePath string `json:"filepath"`
 	Size     int64  `json:"size"`
+	RefCount int    `json:"refCount"`
+	Data     []byte
 }
 
 // InitLog to init log config
@@ -33,74 +34,181 @@ func init() {
 }
 
 // DirPath to make blob path
-func DirPath(blobsum string) string {
-	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobDir + "/" + blobsum[0:2] + "/" + blobsum[2:4])
+func (b *Blob) DirPath() string {
+	return utils.TrimDir(configuration.GetConfig().RootDirectory +
+		manifest.BlobDir + "/" + b.ID[0:2] + "/" + b.ID[2:4])
 }
 
 // FilePath for blob
-func FilePath(digest string) string {
-	return DirPath(digest) + "/" + digest
+func (b *Blob) FilePath() string {
+	return b.DirPath() + "/" + b.ID
 }
 
-// GetBlobSimple for simple blob structure
-func GetBlobSimple(name string, digest string) *Blob {
-	filepath := FilePath(digest)
-	if utils.IsFileExist(filepath) {
-		b := new(Blob)
-		b.FilePath = filepath
-		b.ID = digest
-		return b
+// RefCountPath of blob
+func (b *Blob) RefCountPath() string {
+	return b.DirPath() + "/" + b.ID + ".refcount"
+}
+
+// GetRefCount of blob
+func (b *Blob) GetRefCount() int {
+
+	refcountFile := b.RefCountPath()
+	if !utils.IsFileExist(refcountFile) {
+		b.RefCount = 0
+		return b.RefCount
 	}
 
-	return nil
+	data := utils.FileToString(refcountFile)
+	if data == "" {
+		utils.Remove(refcountFile)
+		b.RefCount = 0
+		return b.RefCount
+	}
+
+	b.RefCount = utils.StringToInt(data)
+	return b.RefCount
+}
+
+// IsBlobExist for simple blob structure
+func IsBlobExist(digest string) bool {
+
+	b := Blob{
+		ID: digest,
+	}
+
+	return utils.IsFileExist(b.FilePath())
+}
+
+// IsExist for simple blob structure
+func (b *Blob) IsExist() bool {
+
+	filepath := b.FilePath()
+	if utils.IsFileExist(filepath) {
+		return true
+	}
+
+	return false
+}
+
+// GetBlobPartial for partial blob fetching
+func GetBlobPartial(name string, digest string) *Blob {
+	b := Blob{
+		ID: digest,
+	}
+
+	if !b.IsExist() {
+		return nil
+	}
+
+	b.Size = utils.GetFileSize(b.FilePath())
+	b.GetRefCount()
+
+	return &b
 }
 
 // GetBlob to get blob from web api
-func GetBlob(name string, digest string) ([]byte, int, error) {
+func GetBlob(name string, digest string) *Blob {
 
-	blobpath := DirPath(digest) + "/" + digest
-	if !utils.IsFileExist(blobpath) {
-		octlog.Error("blob of %s not exist\n", blobpath)
-		return nil, 0, errors.New("blob file of " + blobpath + " not exist")
+	b := new(Blob)
+	b.ID = digest
+
+	if !b.IsExist() {
+		octlog.Error("blob of %s not exist\n", digest)
+		return nil
 	}
 
-	fd, err := os.Open(blobpath)
+	fd, err := os.Open(b.FilePath())
 	if err != nil {
-		octlog.Error("open file of %s error\n", blobpath)
-		return nil, 0, err
+		octlog.Error("open file of %s error\n", b.FilePath())
+		return nil
 	}
 
 	defer fd.Close()
 
 	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		octlog.Error("read file from %s error\n", blobpath)
-		return nil, 0, err
+		octlog.Error("read file from %s error\n", b.FilePath())
+		return nil
 	}
 
-	return data, int(utils.GetFileSize(blobpath)), nil
+	b.Data = data
+	b.Size = utils.GetFileSize(b.FilePath())
+	b.RefCount = b.GetRefCount()
+
+	return b
 }
 
-// DeleteBlob to delete blob from api
-func DeleteBlob(name string, digest string) error {
+// Delete to delete blob from api
+func (b *Blob) Delete() error {
+	if ref := b.DecRefCount(); ref == 0 {
+		utils.Remove(b.FilePath())
+		utils.Remove(b.RefCountPath())
+	}
 	return nil
 }
 
-// WriteBlob To write blob from file
-func WriteBlob(dgst string, data []byte) error {
+// DecRefCount of blob
+func (b *Blob) DecRefCount() int {
+	if b.RefCount > 0 {
+		b.RefCount = b.RefCount - 1
+	}
+	return 0
+}
 
-	blobDir := DirPath(dgst)
-	utils.CreateDir(blobDir)
+// IncRefCount of blob
+func (b *Blob) IncRefCount() int {
+	b.RefCount = b.RefCount + 1
+	return b.RefCount
+}
 
-	fd, err := os.Create(blobDir + "/" + dgst)
+// WriteRefCount of blobs
+func (b *Blob) WriteRefCount() {
+	refcountFile := b.RefCountPath()
+	octlog.Debug("refcount file path %s\n", refcountFile)
+	if utils.IsFileExist(refcountFile) {
+		utils.Remove(refcountFile)
+	}
+
+	fd, err := os.Create(refcountFile)
 	if err != nil {
-		octlog.Error("create blob of %s error\n", blobDir+"/"+dgst)
-		return err
+		octlog.Error("create file %s error %s\n", refcountFile, err)
 	}
 
 	defer fd.Close()
 
-	fd.Write(data)
+	octlog.Warn("refcount of %d:%s to write %s\n", b.RefCount,
+		utils.IntToString(b.RefCount), b.FilePath())
+
+	_, err = fd.WriteString(utils.IntToString(b.RefCount))
+	if err != nil {
+		octlog.Warn("write refcount of %s error %s\n", b.ID, err)
+	}
+}
+
+// WriteBlob To write blob from file
+func (b *Blob) Write() error {
+
+	utils.CreateDir(b.DirPath())
+
+	// if blob exists, just increase refcount by 1
+	if utils.IsFileExist(b.FilePath()) {
+		b.IncRefCount()
+		b.WriteRefCount()
+		octlog.Warn("blob of %s already exist, just increase its refcount\n", b.ID)
+		return nil
+	}
+
+	fd, err := os.Create(b.FilePath())
+	if err != nil {
+		octlog.Error("create blob of %s error\n", b.FilePath())
+		return err
+	}
+
+	defer fd.Close()
+	fd.Write(b.Data)
+
+	b.IncRefCount()
+	b.WriteRefCount()
 
 	return nil
 }
@@ -124,7 +232,14 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 			if n > 0 {
 				dgst := utils.GetDigest(buffer[:n])
 				octlog.Error("got size of %d,with hash:%s\n", n, dgst)
-				WriteBlob(dgst, buffer[:n])
+				b := &Blob{
+					ID:   dgst,
+					Data: buffer[:n],
+				}
+				b.GetRefCount()
+				b.Write()
+
+				//	WriteBlob(dgst, buffer[:n])
 				fileLength += int64(n)
 			}
 			octlog.Warn("reached end of file[%d]\n", n)
@@ -138,7 +253,14 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 
 		fileLength += int64(n)
 		dgst := utils.GetDigest(buffer[:n])
-		WriteBlob(dgst, buffer[:n])
+		b := &Blob{
+			ID:   dgst,
+			Data: buffer[:n],
+		}
+		b.GetRefCount()
+		b.Write()
+
+		//WriteBlob(dgst, buffer[:n])
 		hashList = append(hashList, dgst)
 
 		octlog.Debug("got size of %d,with hash:%s\n", n, dgst)

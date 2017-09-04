@@ -28,7 +28,11 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if b := blobs.GetBlobSimple(name, digest); b != nil {
+	b := blobs.Blob{
+		ID: digest,
+	}
+
+	if b.IsExist() {
 		serviceresp.StatusOKResp(w)
 		fmt.Printf("blob of %s already exist", digest)
 		return
@@ -38,7 +42,7 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 
 	bu := blobupload.BlobUpload{
 		ID:         digest,
-		FilePath:   blobs.FilePath(digest),
+		FilePath:   b.FilePath(),
 		RespWriter: w,
 		Request:    r,
 	}

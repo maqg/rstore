@@ -20,7 +20,9 @@ type BlobUpload struct {
 
 // CreateDir for blob
 func (bu *BlobUpload) CreateDir() {
-	dir := blobs.DirPath(bu.ID)
+	b := new(blobs.Blob)
+	b.ID = bu.ID
+	dir := b.DirPath()
 	utils.CreateDir(dir)
 }
 

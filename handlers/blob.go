@@ -34,16 +34,16 @@ func getBlob(w http.ResponseWriter, r *http.Request) {
 	digest := mux.Vars(r)["digest"]
 	// digest := r.FormValue("digest")
 
-	data, len, err := blobs.GetBlob(name, digest)
-	if err != nil {
+	b := blobs.GetBlob(name, digest)
+	if b == nil {
 		fmt.Printf("get blob by %s:%s error\n", name, digest)
 		RenderErrorMsg(w, r, "blob of "+digest+" not exist")
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/octet-stream")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len))
-	n, err := w.Write(data)
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", b.Size))
+	n, err := w.Write(b.Data)
 	if err != nil {
 		fmt.Printf("Write to client error\n")
 		return
@@ -57,17 +57,13 @@ func deleteBlob(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["name"]
 	digest := r.FormValue("digest")
 
-	var data string
-	err := blobs.DeleteBlob(name, digest)
-	if err != nil {
-		data = "{\"status\":\"Error\"}"
-	} else {
-		data = "{\"status\":\"OK\"}"
+	b := blobs.GetBlobPartial(name, digest)
+	if b == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Content-Length", fmt.Sprint(len(data)))
-	fmt.Fprint(w, data)
+	w.WriteHeader(http.StatusOK)
 }
 
 func blobManager(r *http.Request) http.Handler {
