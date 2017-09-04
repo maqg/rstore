@@ -153,22 +153,27 @@ func HTTPGetManifest(url string) (*Manifest, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("get url %s error\n", url)
+		octlog.Error("get url %s error\n", url)
 		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		octlog.Error("manifest not exist, with httpcode %d", http.StatusOK)
+		return nil, fmt.Errorf("manifest not exist, with httpcode %d", http.StatusOK)
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Read body from url %s error\n", url)
+		octlog.Error("Read body from url %s error\n", url)
 		return nil, err
 	}
 
 	manifest := new(Manifest)
 	err = json.Unmarshal(body, manifest)
 	if err != nil {
-		fmt.Printf("parse body to manifest error[%s]\n", string(body))
+		octlog.Error("parse body to manifest error[%s],url[%s]\n", string(body), url)
 		return nil, err
 	}
 

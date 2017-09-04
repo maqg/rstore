@@ -34,6 +34,8 @@ func getManifest(w http.ResponseWriter, r *http.Request) {
 
 	data := utils.JSON2String(manifest)
 
+	octlog.Error("data of manifest is %s\n", data)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Content-Length", fmt.Sprint(len(data)))
 	fmt.Fprint(w, data)

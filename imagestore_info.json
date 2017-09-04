@@ -21,5 +21,28 @@
     "installPath": "zstore://c4fffb59fc8e40899abd824d654ce416/dd6f676840a4b4bf3e2c12581d9f70f0b9da921e",
     "username": "",
     "password": ""
+  },
+  {
+    "uuid": "dddddd",
+    "name": "dddddd",
+    "state": "Enabled",
+    "status": "finished",
+    "mediaType": "RootVolumeTemplate",
+    "createTime": "2017-09-04 23:30:12",
+    "lastSync": "2017-09-04 23:30:12",
+    "description": "",
+    "diskSize": 7995392,
+    "virtualSize": 0,
+    "md5sum": "6f0a5968aa249abdfcb51fd7aa00f233c4f11934326c9a1f4ae73d37b170b952",
+    "url": "http://cdn.zstack.io/product_downloads/images/zstack-image.qcow2",
+    "guestOsType": "Debian7",
+    "arch": "amd64",
+    "platform": "Linux",
+    "format": "qcow2",
+    "isSystem": false,
+    "account": "",
+    "installPath": "rstore://dddddd/6f0a5968aa249abdfcb51fd7aa00f233c4f11934326c9a1f4ae73d37b170b952",
+    "username": "",
+    "password": ""
   }
 ]
