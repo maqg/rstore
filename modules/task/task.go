@@ -63,8 +63,13 @@ type ImageCallBack func(string, int64, int64, string, string) error
 
 // AddAndRun will add a new task to GTasks and run it
 func (t *Task) AddAndRun(callback ImageCallBack) {
+	t.Callback = callback
+	t.Status = TaskStatusRunning
+
 	GTasks[t.ID] = t
-	t.Run(callback)
+	go t.Download()
+
+	octlog.Warn("task of %s start to run, %s\n", t.ID, t.URL)
 }
 
 // GetTask by taskid
@@ -175,22 +180,15 @@ func (t *Task) Download() {
 	}
 
 	// update task status and image info
-	t.Finish()
+	t.Finish(manifest.DiskSize, manifest.VirtualSize, manifest.BlobSum)
 	octlog.Warn("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
 
 	return
 }
 
-// Run this task
-func (t *Task) Run(callback ImageCallBack) {
-	t.Status = TaskStatusRunning
-	go t.Download()
-	octlog.Warn("task of %s start to run, %s\n", t.ID, t.URL)
-}
-
 // Stop this task
-func (t *Task) Stop(callback ImageCallBack) error {
-	callback(t.ImageName, 0, 0, "", TaskStatusError)
+func (t *Task) Stop() error {
+	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
 	return nil
 }
 
@@ -200,10 +198,10 @@ func (t *Task) Delete() error {
 }
 
 // Finish task here
-func (t *Task) Finish() {
+func (t *Task) Finish(diskSize int64, virtualSize int64, blobsum string) {
 	t.Status = TaskStatusFinished
 	t.FinishTime = utils.CurrentTimeStr()
-	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
+	t.Callback(t.ImageName, diskSize, virtualSize, blobsum, TaskStatusFinished)
 }
 
 func (t *Task) Error() {
