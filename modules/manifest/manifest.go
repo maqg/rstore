@@ -40,6 +40,9 @@ const (
 	// ManifestDirProto manifest directory proto type
 	ManifestDirProto = "/registry/repos/%s/manifests"
 
+	// ImageManifestDirProto of image manifest base directory
+	ImageManifestDirProto = "/registry/repos/%s/"
+
 	// ManifestFileProto manifest file of json proto type
 	ManifestFileProto = "/registry/repos/%s/manifests/%s.json"
 )
@@ -103,6 +106,8 @@ func init() {
 
 // Delete for manifest self delete
 func (manifest *Manifest) Delete() error {
+	dirPath := dirpath(manifest.Name)
+	utils.RemoveDir(dirPath)
 	return nil
 }
 

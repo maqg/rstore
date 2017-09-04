@@ -31,14 +31,34 @@ func (bm *BlobsManifest) GetBlobSum() string {
 	return utils.GetDigestStr(blobsum)
 }
 
-func dirpath(dgst string) string {
+func blobsManifestDirPath(dgst string) string {
 	return utils.TrimDir(configuration.GetConfig().RootDirectory + manifest.BlobManifestDir + "/" + dgst[0:2])
+}
+
+func blobsManifestPath(dgst string) string {
+	return blobsManifestDirPath(dgst) + "/" + dgst
+}
+
+// Delete blobs-manifest and blobs bellow it
+func (bm *BlobsManifest) Delete() error {
+
+	for _, chunk := range bm.Chunks {
+
+		b := blobs.GetBlobPartial("", chunk)
+		if b != nil {
+			b.Delete()
+		}
+	}
+
+	utils.Remove(blobsManifestPath(bm.BlobSum))
+
+	return nil
 }
 
 // Write for manifest self delete
 func (bm *BlobsManifest) Write() error {
 
-	dirpath := dirpath(bm.BlobSum)
+	dirpath := blobsManifestDirPath(bm.BlobSum)
 	utils.CreateDir(dirpath)
 
 	filePath := dirpath + "/" + bm.BlobSum
@@ -60,7 +80,7 @@ func (bm *BlobsManifest) Write() error {
 
 // GetBlobsManifest to get blobs manifest config
 func GetBlobsManifest(blobsum string) *BlobsManifest {
-	bmPath := dirpath(blobsum) + "/" + blobsum
+	bmPath := blobsManifestDirPath(blobsum) + "/" + blobsum
 
 	if !utils.IsFileExist(bmPath) {
 		octlog.Error("file %s blobs-manifest not exist\n", blobsum)

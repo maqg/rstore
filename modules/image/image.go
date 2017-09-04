@@ -2,9 +2,12 @@ package image
 
 import (
 	"fmt"
+	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/config"
+	"octlink/rstore/modules/manifest"
 	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
 	"octlink/rstore/utils/uuid"
@@ -114,7 +117,6 @@ func (image *Image) Add() (string, int) {
 		t.CreateTime = utils.CurrentTimeStr()
 		t.ImageName = image.ID
 		t.Status = task.TaskStatusNew
-		t.Callback = UpdateImageCallback
 		t.AddAndRun(UpdateImageCallback)
 		return t.ID, merrors.ErrSuccess
 	}
@@ -122,10 +124,48 @@ func (image *Image) Add() (string, int) {
 	return "", merrors.ErrSuccess
 }
 
+func (image *Image) removeManifest() {
+	m := manifest.GetManifest(image.ID, utils.GetDigestStr(image.ID))
+	if m != nil {
+		m.Delete()
+		octlog.Warn("deleted manifest (%s:%s)\n", image.Name, m.ID)
+	}
+}
+
+func isBlobsManifestUsed(imageID string, blobsum string) bool {
+
+	for _, im := range GImages {
+		if im.Md5Sum == blobsum && im.ID != imageID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (image *Image) removeBlobsManifest() {
+
+	bm := blobsmanifest.GetBlobsManifest(image.Md5Sum)
+	if bm == nil {
+		octlog.Error("blobs-manifest of %s not exist\n", image.Md5Sum)
+		return
+	}
+
+	if !isBlobsManifestUsed(image.ID, image.Md5Sum) {
+		bm.Delete()
+		octlog.Warn("deleted blobs-manifest (%s:%s)\n", image.ID, image.Md5Sum)
+	}
+}
+
+func (image *Image) removeManifestDir() {
+	baseDir := configuration.GetConfig().RootDirectory + fmt.Sprintf(manifest.ImageManifestDirProto, image.ID)
+	utils.RemoveDir(baseDir)
+}
+
 // Delete for image
 func (image *Image) Delete() int {
 
-	octlog.Warn("image (%s:%s) deleted\n", image.Name, image.ID)
+	octlog.Warn("now to delete image (%s:%s)\n", image.Name, image.ID)
 
 	len := len(GImages)
 
@@ -137,6 +177,17 @@ func (image *Image) Delete() int {
 				GImages = append(GImages[0:i], GImages[i+1:len]...)
 			}
 			delete(GImagesMap, im.ID)
+
+			// To remove manifest firstly
+			im.removeManifest()
+
+			// To remove base manifest directory
+			im.removeManifestDir()
+
+			// then remove all blobs
+			im.removeBlobsManifest()
+
+			octlog.Warn("deleted image (%s:%s)\n", image.Name, image.ID)
 		}
 	}
 

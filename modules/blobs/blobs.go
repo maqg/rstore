@@ -163,8 +163,8 @@ func (b *Blob) IncRefCount() int {
 
 // WriteRefCount of blobs
 func (b *Blob) WriteRefCount() {
+
 	refcountFile := b.RefCountPath()
-	octlog.Debug("refcount file path %s\n", refcountFile)
 	if utils.IsFileExist(refcountFile) {
 		utils.Remove(refcountFile)
 	}
@@ -175,9 +175,6 @@ func (b *Blob) WriteRefCount() {
 	}
 
 	defer fd.Close()
-
-	octlog.Warn("refcount of %d:%s to write %s\n", b.RefCount,
-		utils.IntToString(b.RefCount), b.FilePath())
 
 	_, err = fd.WriteString(utils.IntToString(b.RefCount))
 	if err != nil {
@@ -262,8 +259,6 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 
 		//WriteBlob(dgst, buffer[:n])
 		hashList = append(hashList, dgst)
-
-		octlog.Debug("got size of %d,with hash:%s\n", n, dgst)
 	}
 
 	return hashList, fileLength, nil

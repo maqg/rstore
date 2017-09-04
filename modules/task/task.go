@@ -42,7 +42,7 @@ type Task struct {
 	FileName   string `json:"fileName"`
 	FileLength int64  `json:"fileLength"`
 	ImageName  string `json:"imageName"`
-	Callback   ImageCallBack
+	callback   ImageCallBack
 }
 
 // GTasks all tasks map management
@@ -63,7 +63,7 @@ type ImageCallBack func(string, int64, int64, string, string) error
 
 // AddAndRun will add a new task to GTasks and run it
 func (t *Task) AddAndRun(callback ImageCallBack) {
-	t.Callback = callback
+	t.callback = callback
 	t.Status = TaskStatusRunning
 
 	GTasks[t.ID] = t
@@ -188,7 +188,7 @@ func (t *Task) Download() {
 
 // Stop this task
 func (t *Task) Stop() error {
-	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
+	t.callback(t.ImageName, 0, 0, "", TaskStatusError)
 	return nil
 }
 
@@ -201,11 +201,11 @@ func (t *Task) Delete() error {
 func (t *Task) Finish(diskSize int64, virtualSize int64, blobsum string) {
 	t.Status = TaskStatusFinished
 	t.FinishTime = utils.CurrentTimeStr()
-	t.Callback(t.ImageName, diskSize, virtualSize, blobsum, TaskStatusFinished)
+	t.callback(t.ImageName, diskSize, virtualSize, blobsum, TaskStatusFinished)
 }
 
 func (t *Task) Error() {
 	t.Status = TaskStatusError
 	t.FinishTime = utils.CurrentTimeStr()
-	t.Callback(t.ImageName, 0, 0, "", TaskStatusError)
+	t.callback(t.ImageName, 0, 0, "", TaskStatusError)
 }

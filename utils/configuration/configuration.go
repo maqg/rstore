@@ -11,7 +11,7 @@ import (
 
 const (
 	// BlobSize for blob manage in bytes
-	BlobSize = 4 * 1024 * 1024
+	BlobSize = 16 * 1024 * 1024
 )
 
 // Configuration for global config
