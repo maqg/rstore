@@ -1,7 +1,5 @@
 package config
 
-import "octlink/rstore/utils/configuration"
-
 const (
 	// ImageStatusReady for ready state
 	ImageStatusReady = "ready"
@@ -13,30 +11,13 @@ const (
 	ImageStatusError = "error"
 )
 
-// SystemConfig for system
-type SystemConfig struct {
-	Version       string `json:"version"`
-	RootDirectiry string `json:"rootDirectory"`
-	Available     int64  `json:"available"`
-	Used          int64  `json:"used"`
-	Account       int    `json:"acccount"`
-	Capacity      int64  `json:"capacity"`
-	Rate          string `json:"rate"`
-	Iso           int    `json:"iso"`
-	File          int    `json:"file"`
-	Snapshot      int    `json:"snapshot"`
-	Root          int    `json:"root"`
-	DataDisk      int    `json:"dataDisk"`
-}
+const (
+	// ImageTypeRootTemplate for root template
+	ImageTypeRootTemplate = "RootVolumeTemplate"
 
-// GetSystemConfig get system config of this backupstorage
-func GetSystemConfig() *SystemConfig {
+	// ImageTypeDataVolume image type of data volume
+	ImageTypeDataVolume = "DataVolumeTemplate"
 
-	conf := configuration.GetConfig()
-
-	sc := new(SystemConfig)
-	sc.Version = conf.Version
-	sc.RootDirectiry = conf.RootDirectory
-
-	return sc
-}
+	// ImageTypeIso for iso type
+	ImageTypeIso = "ISO"
+)

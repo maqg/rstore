@@ -1,10 +1,10 @@
 package api
 
-import "octlink/rstore/modules/config"
+import "octlink/rstore/modules/systemconfig"
 
 // ShowSystemConfig to add image by API
 func ShowSystemConfig(paras *Paras) *Response {
 	resp := new(Response)
-	resp.Data = config.GetSystemConfig()
+	resp.Data = systemconfig.GetSystemConfig()
 	return resp
 }

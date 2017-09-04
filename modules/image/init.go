@@ -3,6 +3,7 @@ package image
 import (
 	"encoding/json"
 	"io/ioutil"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
@@ -15,10 +16,19 @@ const (
 )
 
 // GImages for all image loaded from config
-var GImages = make([]*Image, MaxImagesCount)
+var GImages = make([]*Image, 0)
 
 // GImagesMap Global Images Map
 var GImagesMap = make(map[string]*Image, MaxImagesCount)
+
+// GImagesIsoMap iso map list
+var GImagesIsoMap = make(map[string]*Image, MaxImagesCount)
+
+// GImagesRootTemplateMap for root template map
+var GImagesRootTemplateMap = make(map[string]*Image, MaxImagesCount)
+
+// GImagesDataTemplateMap for data volume template map
+var GImagesDataTemplateMap = make(map[string]*Image, MaxImagesCount)
 
 func loadImages() error {
 
@@ -52,6 +62,19 @@ func ReloadImages() error {
 
 	for _, im := range GImages {
 		GImagesMap[im.ID] = im
+
+		switch im.MediaType {
+		case config.ImageTypeRootTemplate:
+			GImagesRootTemplateMap[im.ID] = im
+			break
+
+		case config.ImageTypeDataVolume:
+			GImagesDataTemplateMap[im.ID] = im
+
+		case config.ImageTypeIso:
+			GImagesIsoMap[im.ID] = im
+			break
+		}
 	}
 
 	return nil
