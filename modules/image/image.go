@@ -87,6 +87,20 @@ func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
 	im := GetImage(imageID)
 	if im == nil {
 		im = new(Image)
+
+		// default type to RootVolumeTemplate
+		im.State = ImageStateEnabled
+		im.Name = imageID
+		im.ID = imageID
+		im.MediaType = config.ImageTypeRootTemplate
+		im.CreateTime = utils.CurrentTimeStr()
+		im.LastSync = utils.CurrentTimeStr()
+		im.GuestOsType = "unknown"
+		im.Arch = "amd64"
+		im.Platform = "Linux"
+		im.Format = "qcow2"
+
+		appendImage(im)
 	}
 	im.Status = config.ImageStatusReady
 	im.DiskSize = diskSize
@@ -104,8 +118,7 @@ func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
 // installpath, diskSize, virtualSize, Status, md5sum need update after manifest installed
 func (image *Image) Add() (string, int) {
 
-	GImages = append(GImages, image)
-	GImagesMap[image.ID] = image
+	appendImage(image)
 
 	WriteImages()
 
@@ -161,6 +174,45 @@ func (image *Image) removeManifestDir() {
 	utils.RemoveDir(baseDir)
 }
 
+// append image to list
+func appendImage(im *Image) {
+
+	// append to Global image list
+	GImages = append(GImages, im)
+
+	// to Images map
+	GImagesMap[im.ID] = im
+
+	switch im.MediaType {
+	case config.ImageTypeRootTemplate:
+		GImagesRootTemplateMap[im.ID] = im
+		break
+
+	case config.ImageTypeDataVolume:
+		GImagesDataTemplateMap[im.ID] = im
+
+	case config.ImageTypeIso:
+		GImagesIsoMap[im.ID] = im
+		break
+	}
+}
+
+// remove image from list
+func removeImage(im *Image) {
+
+	// remove from images map
+	delete(GImagesMap, im.ID)
+
+	// remove from root images map
+	delete(GImagesRootTemplateMap, im.ID)
+
+	// remove from data images map
+	delete(GImagesDataTemplateMap, im.ID)
+
+	// remove from iso images map
+	delete(GImagesIsoMap, im.ID)
+}
+
 // Delete for image
 func (image *Image) Delete() int {
 
@@ -175,7 +227,8 @@ func (image *Image) Delete() int {
 			} else {
 				GImages = append(GImages[0:i], GImages[i+1:len]...)
 			}
-			delete(GImagesMap, im.ID)
+
+			removeImage(im)
 
 			// To remove manifest firstly
 			im.removeManifest()

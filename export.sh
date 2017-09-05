@@ -1,3 +1,3 @@
 #!/bin/sh
 
-go run cmd/cli/main.go export -o ../out.qcow2 -s "f5755a250b60cb7f555a7536e956f8562ab600188850b9acead1a38c5de42360"
+go run cmd/cli/main.go export -o ../out.qcow2 -s caa139bc6a55bdfc0a3d433ed410f720f596b818db6f7fe4070bf3201f255d11
