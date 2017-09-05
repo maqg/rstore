@@ -1,6 +1,7 @@
 package task
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"octlink/rstore/modules/blobs"
@@ -85,6 +86,67 @@ func (t *Task) UpdateFilePath() {
 		uuid.Generate().Simple() + "EEEEE" + t.FileName
 }
 
+// ImportBlobs and then write blobs-manifest config
+func (t *Task) ImportBlobs() (*blobsmanifest.BlobsManifest, error) {
+
+	hashes, len, err := blobs.ImportBlobs(t.FilePath)
+	if err != nil {
+		octlog.Error("got file hashlist error\n")
+		return nil, err
+	}
+
+	if len != t.FileLength {
+		octlog.Error("filelen of blobs and http contentlen not match %d:%d\n", len, t.FileLength)
+		return nil, fmt.Errorf("filelen %d not match imported len of %d", t.FileLength, len)
+	}
+
+	blobsum := blobsmanifest.CalcBlobSum(hashes)
+	bm := blobsmanifest.GetBlobsManifest(blobsum)
+	if bm != nil {
+		octlog.Warn("blobs-manifest %s already exist, just return it\n", bm.BlobSum)
+		return bm, nil
+	}
+
+	// write blobs-manifest config
+	bm = new(blobsmanifest.BlobsManifest)
+	bm.Size = t.FileLength
+	bm.Chunks = hashes
+	bm.BlobSum = blobsum
+	err = bm.Write()
+	if err != nil {
+		octlog.Error("write blobs-manifest error\n")
+		return nil, err
+	}
+
+	return bm, nil
+}
+
+// WriteManifest to write manifest file
+func (t *Task) WriteManifest(blobsum string) (*manifest.Manifest, error) {
+
+	m := manifest.GetManifest(t.ImageName, blobsum)
+	if m != nil {
+		octlog.Warn("manifest of %s:%s already exist\n", t.ImageName, blobsum)
+		return m, nil
+	}
+
+	// write manifest config
+	m = new(manifest.Manifest)
+	m.Name = t.ImageName
+	m.DiskSize = t.FileLength
+	m.VirtualSize = utils.GetVirtualSize(t.FilePath)
+	m.CreateTime = utils.CurrentTimeStr()
+	m.BlobSum = blobsum
+
+	err := m.Write()
+	if err != nil {
+		octlog.Error("Create manifest error[%s]\n", err)
+		return nil, err
+	}
+
+	return m, nil
+}
+
 // Download Image from URL
 func (t *Task) Download() {
 
@@ -140,47 +202,23 @@ func (t *Task) Download() {
 		}
 	}
 
-	hashes, len, err := blobs.ImportBlobs(t.FilePath)
+	bm, err := t.ImportBlobs()
 	if err != nil {
-		octlog.Error("got file hashlist error\n")
+		octlog.Error("import blobs error %s for %s\n", err, t.FileName)
+		t.Error()
+		// TBD remove template file
 		return
 	}
 
-	if len != t.FileLength {
-		octlog.Error("filelen of blobs and http contentlen not match %d:%d\n", len, t.FileLength)
-		return
-	}
-
-	// write blobs-manifest config
-	bm := new(blobsmanifest.BlobsManifest)
-	bm.Size = t.FileLength
-	bm.Chunks = hashes
-	bm.BlobSum = bm.GetBlobSum()
-	err = bm.Write()
+	m, err := t.WriteManifest(bm.BlobSum)
 	if err != nil {
-		octlog.Error("write blobs-manifest error\n")
-		return
-	}
-
-	// write manifest config
-	mid := utils.GetDigestStr(t.ImageName)
-	manifest := new(manifest.Manifest)
-	manifest.Name = t.ImageName
-	manifest.ID = mid
-	manifest.DiskSize = t.FileLength
-	manifest.VirtualSize = utils.GetVirtualSize(t.FilePath)
-	manifest.CreateTime = utils.CurrentTimeStr()
-	manifest.BlobSum = bm.BlobSum
-
-	err = manifest.Write()
-	if err != nil {
-		octlog.Error("Create manifest error[%s]\n", err)
-		// TDB,rollback
+		octlog.Error("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
+		t.Error()
 		return
 	}
 
 	// update task status and image info
-	t.Finish(manifest.DiskSize, manifest.VirtualSize, manifest.BlobSum)
+	t.Finish(m.DiskSize, m.VirtualSize, m.BlobSum)
 	octlog.Warn("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
 
 	return

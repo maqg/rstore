@@ -22,13 +22,18 @@ type BlobsManifest struct {
 	BlobSum string   `json:""`
 }
 
-// GetBlobSum for sum hash value of blobs
-func (bm *BlobsManifest) GetBlobSum() string {
+// CalcBlobSum for blob chunks
+func CalcBlobSum(chunks []string) string {
 	var blobsum string
-	for _, v := range bm.Chunks {
+	for _, v := range chunks {
 		blobsum += v
 	}
 	return utils.GetDigestStr(blobsum)
+}
+
+// GetBlobSum for sum hash value of blobs
+func (bm *BlobsManifest) GetBlobSum() string {
+	return CalcBlobSum(bm.Chunks)
 }
 
 func blobsManifestDirPath(dgst string) string {

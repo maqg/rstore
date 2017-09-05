@@ -46,16 +46,14 @@ func pushImage() int {
 	}
 
 	// write manifest config
-	mid := utils.GetDigestStr(id)
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
-	manifest.ID = mid
 	manifest.DiskSize = size
 	manifest.VirtualSize = utils.GetVirtualSize(filepath)
 	manifest.CreateTime = utils.CurrentTimeStr()
 	manifest.BlobSum = bm.BlobSum
 
-	err = manifest.HTTPWrite(fmt.Sprintf(v1.APIURLFormatManifests, address, id, mid))
+	err = manifest.HTTPWrite(fmt.Sprintf(v1.APIURLFormatManifests, address, id, bm.BlobSum))
 	if err != nil {
 		fmt.Printf("Create manifest error[%s]\n", err)
 		// TDB,rollback

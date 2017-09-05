@@ -77,10 +77,8 @@ func importImage() int {
 	}
 
 	// write manifest config
-	mid := utils.GetDigestStr(id)
 	manifest := new(manifest.Manifest)
 	manifest.Name = id
-	manifest.ID = mid
 	manifest.DiskSize = size
 	manifest.VirtualSize = utils.GetVirtualSize(filepath)
 	manifest.CreateTime = utils.CurrentTimeStr()

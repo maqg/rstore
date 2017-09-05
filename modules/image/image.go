@@ -128,7 +128,7 @@ func (image *Image) removeManifest() {
 	m := manifest.GetManifest(image.ID, utils.GetDigestStr(image.ID))
 	if m != nil {
 		m.Delete()
-		octlog.Warn("deleted manifest (%s:%s)\n", image.Name, m.ID)
+		octlog.Warn("deleted manifest (%s:%s)\n", image.Name, m.BlobSum)
 	}
 }
 

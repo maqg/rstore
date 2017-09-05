@@ -16,7 +16,6 @@ import (
 
 // Manifest base Manifest structure
 type Manifest struct {
-	ID          string `json:"uuid"`
 	Name        string `json:"name"`    // Image UUID
 	BlobSum     string `json:"blobsum"` // Sum of Blob Digests
 	DiskSize    int64  `json:"diskSize"`
@@ -122,7 +121,7 @@ func (manifest *Manifest) Write() error {
 	manifestPath := dirpath(manifest.Name)
 	utils.CreateDir(manifestPath)
 
-	filePath := manifestPath + "/" + manifest.ID + ".json"
+	filePath := manifestPath + "/" + manifest.BlobSum + ".json"
 	utils.Remove(filePath)
 	fd, err := os.Create(filePath)
 	if err != nil {
@@ -208,7 +207,7 @@ func (manifest *Manifest) HTTPWrite(url string) error {
 		return errors.New("got bad status " + resp.Status)
 	}
 
-	octlog.Debug("HTTP upload manifest %s to %s OK\n", manifest.ID, url)
+	octlog.Debug("HTTP upload manifest %s to %s OK\n", manifest.BlobSum, url)
 
 	return nil
 }
