@@ -79,26 +79,25 @@ func (image *Image) Update() int {
 	return 0
 }
 
-// UpdateImageCallback when image download OK, update its info
+// UpdateImageCallback when image download OK, update its info,
+// if Image not exist, just create a new one and update it.
 func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
 	blobsum string, status string) error {
 
 	im := GetImage(imageID)
-	if im != nil {
-		octlog.Warn("Got image of %s\n", imageID)
-		im.Status = config.ImageStatusReady
-		im.DiskSize = diskSize
-		im.VirtualSize = virtualSize
-		im.Md5Sum = blobsum
-		im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
-		im.Status = status
-
-		WriteImages()
-
-		return nil
+	if im == nil {
+		im = new(Image)
 	}
+	im.Status = config.ImageStatusReady
+	im.DiskSize = diskSize
+	im.VirtualSize = virtualSize
+	im.Md5Sum = blobsum
+	im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
+	im.Status = status
 
-	return fmt.Errorf("Image of %s not exist", imageID)
+	WriteImages()
+
+	return nil
 }
 
 // Add for image, after image added,
