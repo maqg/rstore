@@ -11,3 +11,9 @@ clean::
 
 fmt::
 	go fmt .
+
+package::
+	./PACKAGE.sh
+
+build::
+	./PACKAGE.sh

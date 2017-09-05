@@ -33,6 +33,9 @@ const (
 	// BlobDir for blobs tree directory
 	BlobDir = "/registry/blobs"
 
+	// TempDir for blobs tree directory
+	TempDir = "/registry/temp"
+
 	// ImageDirProto Image Dir Proto Type
 	ImageDirProto = "/registry/repos/%s"
 

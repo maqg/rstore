@@ -67,6 +67,7 @@ func initRootDirectory(conf *configuration.Configuration) {
 	utils.CreateDir(conf.RootDirectory + manifest.ReposDir)
 	utils.CreateDir(conf.RootDirectory + manifest.BlobDir)
 	utils.CreateDir(conf.RootDirectory + manifest.BlobManifestDir)
+	utils.CreateDir(conf.RootDirectory + manifest.TempDir)
 }
 
 func main() {

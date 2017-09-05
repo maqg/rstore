@@ -7,6 +7,13 @@
 rstore
 rstcli
 
+main
+
+dist
+package
+
+*.tgz
+
 # Folders
 _obj
 _test
