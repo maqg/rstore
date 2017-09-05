@@ -143,15 +143,14 @@ func ShowAllImages(paras *Paras) *Response {
 
 	octlog.Debug("running in APIShowAllImage\n")
 
-	imageList := image.GetAllImages(paras.InParas.Paras["accountId"].(string),
-		paras.InParas.Paras["mediaType"].(string), paras.InParas.Paras["keyword"].(string))
+	imageList := image.GetAllImages(paras.Get("accountId"),
+		paras.Get("mediaType"), paras.Get("keyword"))
 
-	result := make(map[string]interface{}, 3)
-	result["total"] = 0
-	result["count"] = len(imageList)
-	result["data"] = imageList
-
-	resp.Data = result
+	resp.Data = map[string]interface{}{
+		"total": len(imageList),
+		"count": len(imageList),
+		"data":  imageList,
+	}
 
 	return resp
 }
