@@ -2,6 +2,7 @@ package image
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"octlink/rstore/modules/config"
 	"octlink/rstore/utils"
@@ -33,6 +34,11 @@ var GImagesDataTemplateMap = make(map[string]*Image, MaxImagesCount)
 func loadImages() error {
 
 	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
+	if !utils.IsFileExist(imagePath) {
+		octlog.Error("file of %s not exist\n", imagePath)
+		return fmt.Errorf("file of %s not exist", imagePath)
+	}
+
 	file, err := os.Open(imagePath)
 	if err != nil {
 		octlog.Error("open image store file " + imagePath + "error\n")
