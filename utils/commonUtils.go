@@ -145,26 +145,35 @@ const (
 	QemuImgTool = "/usr/bin/qemu-img"
 )
 
+func OCTSystem(cmdstr string) (string, error) {
+
+	cmd := exec.Command("/bin/sh", "-c", cmdstr)
+	data, err := cmd.Output()
+	if err != nil {
+		fmt.Printf("get cmd output error of %s,%s\n", cmdstr, err)
+		return "", err
+	}
+
+	return BytesToString(data), nil
+}
+
 // GetVirtualSize to get file's virtual size
 func GetVirtualSize(filepath string) int64 {
 
-	if IsFileExist(QemuImgTool) {
-		cmdStr := fmt.Sprintf("%s info %s | grep \"virtual size\" | awk -F' ' '{print $4}' | cut -b2-", QemuImgTool, filepath)
-		cmd := exec.Command(cmdStr)
-		if err := cmd.Run(); err != nil {
-			fmt.Printf("exec cmd %s error\n", cmdStr)
-			return 0
-		}
-
-		data, err := cmd.Output()
-		if err != nil {
-			fmt.Printf("get output error\n")
-			return 0
-		}
-
-		return ParseInt64(string(data))
+	if !IsFileExist(QemuImgTool) {
+		return 0
 	}
-	return 0
+
+	cmdStr := fmt.Sprintf("%s info %s | grep \"virtual size\" | awk -F' ' '{print $4}' | cut -b2-",
+		QemuImgTool, filepath)
+
+	result, err := OCTSystem(cmdStr)
+	if err != nil {
+		fmt.Printf("exec cmd error %s:%s\n", cmdStr, err)
+		return 0
+	}
+
+	return StringToInt64(result)
 }
 
 // StringToInt convert string to int value
@@ -178,6 +187,7 @@ func StringToInt(src string) int {
 
 // StringToInt64 convert string to int value
 func StringToInt64(src string) int64 {
+	src = strings.Replace(src, "\n", "", -1)
 	ret, err := strconv.ParseInt(src, 10, 64)
 	if err != nil {
 		return -1
