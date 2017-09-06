@@ -2,7 +2,7 @@ package api
 
 // ImageDescriptors for image management by API
 var ImageDescriptors = Module{
-	Name: "images",
+	Name: "image",
 	Protos: map[string]Proto{
 		"APIAddImage": {
 			Name:    "添加镜像",
@@ -158,7 +158,7 @@ var ImageDescriptors = Module{
 			},
 		},
 
-		"APIShowAllImages": {
+		"APIShowAllImage": {
 			Name:    "获取所有镜像",
 			handler: ShowAllImages,
 			Paras: []ProtoPara{

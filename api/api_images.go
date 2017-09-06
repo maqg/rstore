@@ -37,7 +37,7 @@ func AddImage(paras *Paras) *Response {
 	im.Desc = paras.Get("desc")
 	im.MediaType = paras.Get("mediaType")
 	im.Format = paras.Get("format")
-	im.Account = paras.Get("accountId")
+	im.AccountID = paras.Get("accountId")
 	im.CreateTime = utils.CurrentTimeStr()
 	im.System = paras.GetBoolean("isSystem")
 	im.URL = paras.Get("url1")
@@ -145,13 +145,7 @@ func ShowAllImages(paras *Paras) *Response {
 
 	imageList := image.GetAllImages(paras.Get("accountId"),
 		paras.Get("mediaType"), paras.Get("keyword"))
-
-	resp.Data = map[string]interface{}{
-		"total": len(imageList),
-		"count": len(imageList),
-		"data":  imageList,
-	}
-
+	resp.Data = imageList
 	return resp
 }
 

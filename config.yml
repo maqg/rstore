@@ -3,5 +3,5 @@ debuglevel: 5
 loglevel: 5
 http:
     addr: :5000
-    apiAddr: :5001
+    apiAddr: :4443
 rootdirectory: ./

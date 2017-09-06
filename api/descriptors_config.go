@@ -4,7 +4,7 @@ package api
 var ConfigDescriptors = Module{
 	Name: "config",
 	Protos: map[string]Proto{
-		"APIShowSystemInfo": {
+		"APIShowBsInfo": {
 			Name:    "查看系统信息",
 			handler: ShowSystemConfig,
 			Paras:   []ProtoPara{},

@@ -14,6 +14,8 @@ type Response struct {
 	Error    int         `json:"error"`
 	ErrorLog string      `json:"errorLog"`
 	Data     interface{} `json:"data"`
+	Total    int         `json:"total"`
+	Count    int         `json:"count"`
 }
 
 /*

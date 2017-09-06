@@ -36,8 +36,8 @@ const (
 
 // Image for Image sturcture
 type Image struct {
-	ID          string `json:"uuid"`
-	Name        string `json:"name"`
+	ID          string `json:"id"`
+	Name        string `json:"imageName"`
 	State       string `json:"state"`
 	Status      string `json:"status"`
 	MediaType   string `json:"mediaType"`
@@ -53,7 +53,7 @@ type Image struct {
 	Platform    string `json:"platform"`
 	Format      string `json:"format"`
 	System      bool   `json:"isSystem"`
-	Account     string `json:"account"`
+	AccountID   string `json:"accountId"`
 	InstallPath string `json:"installPath"` // rstore://iamgeid/blobsum
 	Username    string `json:"username"`
 	Password    string `json:"password"`
@@ -261,7 +261,7 @@ func GetAllImages(account string, mediaType string, keyword string) []*Image {
 	for _, image := range GImages {
 
 		// filter account
-		if account != "" && image.Account != account {
+		if account != "" && image.AccountID != account {
 			continue
 		}
 
@@ -297,8 +297,8 @@ func GetAccountList() []string {
 	images := GetAllImages("", "", "")
 	accounts := make([]string, 0)
 	for _, image := range images {
-		if image.Account != "" && !ContainAccount(accounts, image.Account) {
-			accounts = append(accounts, image.Account)
+		if image.AccountID != "" && !ContainAccount(accounts, image.AccountID) {
+			accounts = append(accounts, image.AccountID)
 		}
 	}
 
