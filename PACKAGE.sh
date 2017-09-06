@@ -29,7 +29,8 @@ strip rstcli
 PACKAGE=RSTORE-$TODAY".tgz"
 
 echo "Packaging..."
-tar -zcf $PACKAGE ../frontend rstore rstcli apihelper var ../config.yml
+cp ../config.yml config-raw.yml
+tar -zcf $PACKAGE ../frontend rstore rstcli apihelper var *.yml
 
 echo ""
 echo "Build Successfully, got file $PACKAGE"

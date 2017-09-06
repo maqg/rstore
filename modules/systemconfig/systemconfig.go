@@ -43,8 +43,8 @@ func (sc *SystemConfig) GetCapacity() {
 	segs := strings.Split(data, " ")
 	sc.Capacity = utils.StringToInt64(segs[0])
 	sc.Used = utils.StringToInt64(segs[1])
-	sc.Rate = segs[2]
-	sc.Available = utils.StringToInt64(segs[3])
+	sc.Available = utils.StringToInt64(segs[2])
+	sc.Rate = segs[3]
 }
 
 // GetSystemConfig get system config of this backupstorage
@@ -58,6 +58,8 @@ func GetSystemConfig() *SystemConfig {
 	sc.Iso = len(image.GImagesIsoMap)
 	sc.Root = len(image.GImagesRootTemplateMap)
 	sc.DataDisk = len(image.GImagesDataTemplateMap)
+
+	sc.GetCapacity()
 
 	return sc
 }
