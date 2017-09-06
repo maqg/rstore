@@ -1,8 +1,12 @@
 package systemconfig
 
 import (
+	"fmt"
 	"octlink/rstore/modules/image"
+	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/octlog"
+	"strings"
 )
 
 // SystemConfig for system
@@ -19,6 +23,28 @@ type SystemConfig struct {
 	Snapshot      int    `json:"snapshot"`
 	Root          int    `json:"root"`
 	DataDisk      int    `json:"dataDisk"`
+}
+
+// GetCapacity for Capacity fetching
+func (sc *SystemConfig) GetCapacity() {
+
+	if utils.IsPlatformWindows() {
+		return
+	}
+
+	cmd := fmt.Sprintf("df %s --total | grep total | grep -v grep | awk -F' ' '{print$2,$3,$4,$5}'",
+		configuration.GetConfig().RootDirectory)
+	data, err := utils.OCTSystem(cmd)
+	if err != nil {
+		octlog.Error("exec cmd [%s] error [%s]\n", cmd, err)
+		return
+	}
+
+	segs := strings.Split(data, " ")
+	sc.Capacity = utils.StringToInt64(segs[0])
+	sc.Used = utils.StringToInt64(segs[1])
+	sc.Rate = segs[2]
+	sc.Available = utils.StringToInt64(segs[3])
 }
 
 // GetSystemConfig get system config of this backupstorage

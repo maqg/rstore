@@ -230,3 +230,8 @@ func FileToBytes(filepath string) []byte {
 func FileToString(filepath string) string {
 	return BytesToString(FileToBytes(filepath))
 }
+
+// IsPlatformWindows for platform type judgement
+func IsPlatformWindows() bool {
+	return !IsFileExist("/etc")
+}
