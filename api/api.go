@@ -26,7 +26,7 @@ const (
 	ParamNotNull = "NotNull"
 
 	// APIPrefixCenter API Prefix of Center API
-	APIPrefixCenter = "octlink.rstore.center"
+	APIPrefixCenter = "octlink.backupstorage.v5"
 )
 
 var logger *octlog.LogConfig
