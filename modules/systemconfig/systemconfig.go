@@ -40,7 +40,7 @@ func (sc *SystemConfig) GetCapacity() {
 		return
 	}
 
-	segs := strings.Split(data, " ")
+	segs := strings.Split(strings.Replace(data, "\n", "", -1), " ")
 	sc.Capacity = utils.StringToInt64(segs[0])
 	sc.Used = utils.StringToInt64(segs[1])
 	sc.Available = utils.StringToInt64(segs[2])
