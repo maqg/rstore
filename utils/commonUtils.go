@@ -235,3 +235,18 @@ func FileToString(filepath string) string {
 func IsPlatformWindows() bool {
 	return !IsFileExist("/etc")
 }
+
+// NumberToInt convert int,int32,int64,float,float32, to int
+func NumberToInt(value interface{}) int {
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.Int:
+		return value.(int)
+	case reflect.Int64:
+		return int(value.(int64))
+	case reflect.Float32:
+		return int(value.(float32))
+	case reflect.Float64:
+		return int(value.(float64))
+	}
+	return 0
+}

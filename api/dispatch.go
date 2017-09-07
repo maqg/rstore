@@ -5,6 +5,7 @@ import (
 	"octlink/rstore/utils/httpresponse"
 	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,8 +51,12 @@ func (p *Paras) Get(name string) string {
 	return ""
 }
 
-// GetBoolean get boolean para
+// GetBoolean get boolean para, name can be false,true,0,1
 func (p *Paras) GetBoolean(name string) bool {
+	raw := p.InParas.Paras[name]
+	if reflect.TypeOf(raw).Kind() != reflect.Bool {
+		return utils.NumberToInt(raw) != 0
+	}
 	return p.InParas.Paras[name].(bool)
 }
 
