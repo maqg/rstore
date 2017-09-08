@@ -80,18 +80,6 @@ var ImageDescriptors = Module{
 					Desc:    "是否为系统镜像",
 					Default: false,
 				},
-				{
-					Name:    "username",
-					Type:    ParamTypeString,
-					Desc:    "FTP or HTTP username",
-					Default: "",
-				},
-				{
-					Name:    "password",
-					Type:    ParamTypeString,
-					Desc:    "FTP or HTTP password",
-					Default: "",
-				},
 			},
 		},
 

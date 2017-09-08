@@ -13,44 +13,42 @@ import (
 // AddImage to add image by API
 func AddImage(paras *Paras) *Response {
 
-	resp := new(Response)
-
 	id := paras.Get("id")
 	if id != "" {
 		im := image.GetImage(id)
 		if im != nil {
-			resp.Error = merrors.ErrSegmentAlreadyExist
-			resp.ErrorLog = "User " + id + "Already Exist"
-			return resp
+			return &Response{
+				Error:    merrors.ErrSegmentAlreadyExist,
+				ErrorLog: "User " + id + "Already Exist",
+			}
 		}
 	} else {
 		id = uuid.Generate().Simple()
 	}
 
-	im := new(image.Image)
+	im := &image.Image{
+		ID:          id,
+		Arch:        paras.Get("arch"),
+		Platform:    paras.Get("platform"),
+		GuestOsType: paras.Get("guestOsType"),
+		Name:        paras.Get("name"),
+		Desc:        paras.Get("desc"),
+		MediaType:   paras.Get("mediaType"),
+		Format:      paras.Get("format"),
+		AccountID:   paras.Get("accountId"),
+		CreateTime:  utils.CurrentTimeStr(),
+		System:      paras.GetBoolean("isSystem"),
+		URL:         paras.Get("url1"),
+		Status:      config.ImageStatusDownloading,
+		State:       image.ImageStateEnabled,
+		LastSync:    utils.CurrentTimeStr(),
+	}
 
-	im.ID = id
-	im.Arch = paras.Get("arch")
-	im.Platform = paras.Get("platform")
-	im.GuestOsType = paras.Get("guestOsType")
-	im.Name = paras.Get("name")
-	im.Desc = paras.Get("desc")
-	im.MediaType = paras.Get("mediaType")
-	im.Format = paras.Get("format")
-	im.AccountID = paras.Get("accountId")
-	im.CreateTime = utils.CurrentTimeStr()
-	im.System = paras.GetBoolean("isSystem")
-	im.URL = paras.Get("url1")
-	im.Status = config.ImageStatusDownloading
-	im.State = image.ImageStateEnabled
-	im.LastSync = utils.CurrentTimeStr()
-
-	im.Username = paras.Get("username")
-	im.Password = paras.Get("password")
-
-	resp.Data, resp.Error = im.Add()
-
-	return resp
+	data, err := im.Add()
+	return &Response{
+		Data:  data,
+		Error: err,
+	}
 }
 
 // ShowImage by api
@@ -160,12 +158,7 @@ func ShowAllImages(paras *Paras) *Response {
 
 // ShowAccountList of this rstore server
 func ShowAccountList(paras *Paras) *Response {
-
-	octlog.Debug("running in APIShowAllImage\n")
-
-	resp := new(Response)
-
-	resp.Data = image.GetAccountList()
-
-	return resp
+	return &Response{
+		Data: image.GetAccountList(),
+	}
 }
