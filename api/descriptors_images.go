@@ -132,7 +132,7 @@ var ImageDescriptors = Module{
 			},
 		},
 
-		"APIDeleteImageByAccount": {
+		"APIRemoveImageByAccount": {
 			Name:    "删除镜像（根据账号）",
 			handler: DeleteImageByAccount,
 			Paras: []ProtoPara{
@@ -201,7 +201,7 @@ var ImageDescriptors = Module{
 			Paras:   []ProtoPara{},
 		},
 
-		"APIDeleteImage": {
+		"APIRemoveImage": {
 			Name:    "删除镜像",
 			handler: DeleteImage,
 			Paras: []ProtoPara{

@@ -135,7 +135,7 @@ func DeleteImage(paras *Paras) *Response {
 
 	resp := new(Response)
 
-	image := image.GetImage(paras.InParas.Paras["id"].(string))
+	image := image.GetImage(paras.Get("id"))
 	if image == nil {
 		resp.Error = merrors.ErrSegmentNotExist
 		return resp
