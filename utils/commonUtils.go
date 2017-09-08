@@ -260,3 +260,9 @@ func NumberToInt(value interface{}) int {
 	}
 	return 0
 }
+
+// SendUserSignal send USR1 Signal to process name
+func SendUserSignal(pname string) {
+	cmd := fmt.Sprintf("pidof %s | xargs kill -ALRM > /dev/null 2>&1", pname)
+	OCTSystem(cmd)
+}

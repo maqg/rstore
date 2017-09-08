@@ -101,6 +101,8 @@ func importImage() int {
 		callbacking()
 	}
 
+	utils.SendUserSignal("rstore")
+
 	fmt.Printf("Import image OK\n")
 
 	return 0

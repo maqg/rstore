@@ -128,7 +128,8 @@ func WriteImages() error {
 // ReloadSignal for image reload signal handler
 func ReloadSignal() {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGUSR1, syscall.SIGUSR2)
+	// 10 for SIGUSR1, 12 for SIGUSR2
+	signal.Notify(c, syscall.Signal(10), syscall.Signal(12))
 	for {
 		s := <-c
 		fmt.Print("Got signal:", s)
