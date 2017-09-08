@@ -126,10 +126,21 @@ func WriteImages() error {
 }
 
 // ReloadSignal for image reload signal handler
+// linux: 10 for SIGUSR1, 12 for SIGUSR2
+// mac 	SIGUSR1 = Signal(0x1e), SIGUSR2   = Signal(0x1f)
 func ReloadSignal() {
 	c := make(chan os.Signal, 1)
-	// 10 for SIGUSR1, 12 for SIGUSR2
-	signal.Notify(c, syscall.Signal(10), syscall.Signal(12))
+
+	ostype := utils.OSType()
+	switch ostype {
+	case config.OSTypeLinux:
+		signal.Notify(c, syscall.Signal(10), syscall.Signal(12))
+	case config.OSTypeMac:
+		signal.Notify(c, syscall.Signal(0x1e), syscall.Signal(0x1f))
+	default:
+		signal.Notify(c, syscall.Signal(10), syscall.Signal(12))
+	}
+
 	for {
 		s := <-c
 		fmt.Print("Got signal:", s)

@@ -8,9 +8,11 @@ import (
 	"io"
 	"io/ioutil"
 	"octlink/mirage/src/utils/octlog"
+	"octlink/rstore/modules/config"
 	"os"
 	"os/exec"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -157,6 +159,7 @@ const (
 	QemuImgTool = "/usr/bin/qemu-img"
 )
 
+// OCTSystem for syscal command calling
 func OCTSystem(cmdstr string) (string, error) {
 
 	cmd := exec.Command("/bin/sh", "-c", cmdstr)
@@ -243,11 +246,6 @@ func FileToString(filepath string) string {
 	return BytesToString(FileToBytes(filepath))
 }
 
-// IsPlatformWindows for platform type judgement
-func IsPlatformWindows() bool {
-	return !IsFileExist("/etc")
-}
-
 // NumberToInt convert int,int32,int64,float,float32, to int
 func NumberToInt(value interface{}) int {
 	switch reflect.TypeOf(value).Kind() {
@@ -289,4 +287,15 @@ func CopyFile(srcFile, dstFile string) (int64, error) {
 	defer dd.Close()
 
 	return io.Copy(dd, sd)
+}
+
+// OSType return os type
+func OSType() string {
+	// can be darwin,windows,linux
+	return runtime.GOOS
+}
+
+// IsPlatformWindows for platform type judgement
+func IsPlatformWindows() bool {
+	return OSType() == config.OSTypeWindows
 }

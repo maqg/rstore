@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
-	"time"
 )
 
+// ReloadImage for signal handler
 func ReloadImage() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGUSR1, syscall.SIGUSR2)
@@ -19,7 +20,9 @@ func ReloadImage() {
 
 func main() {
 
-	go ReloadImage()
+	fmt.Println(runtime.GOOS)
 
-	time.Sleep(time.Hour)
+	//	go ReloadImage()
+
+	//	time.Sleep(time.Hour)
 }
