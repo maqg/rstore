@@ -24,6 +24,11 @@ func Time2Str(timeVal int64) string {
 	return time.Unix(timeVal, 0).Format(timeStrFormat)
 }
 
+// Time2StrSimple convert int64 time to string
+func Time2StrSimple(timeVal int64) string {
+	return time.Unix(timeVal, 0).Format("20060102150405")
+}
+
 // CurrentTime get current time in int64 format
 func CurrentTime() int64 {
 	return int64(time.Now().Unix())
@@ -32,6 +37,11 @@ func CurrentTime() int64 {
 // CurrentTimeStr get current time in string format
 func CurrentTimeStr() string {
 	return Time2Str(CurrentTime())
+}
+
+// CurrentTimeSimple get current time in string format
+func CurrentTimeSimple() string {
+	return Time2StrSimple(CurrentTime())
 }
 
 // Version of this program

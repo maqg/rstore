@@ -9,6 +9,8 @@ import (
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -17,21 +19,21 @@ const (
 )
 
 // GImages for all image loaded from config
-var GImages = make([]*Image, 0)
+var GImages []*Image
 
 // GImagesMap Global Images Map
-var GImagesMap = make(map[string]*Image, MaxImagesCount)
+var GImagesMap map[string]*Image
 
 // GImagesIsoMap iso map list
-var GImagesIsoMap = make(map[string]*Image, MaxImagesCount)
+var GImagesIsoMap map[string]*Image
 
 // GImagesRootTemplateMap for root template map
-var GImagesRootTemplateMap = make(map[string]*Image, MaxImagesCount)
+var GImagesRootTemplateMap map[string]*Image
 
 // GImagesDataTemplateMap for data volume template map
-var GImagesDataTemplateMap = make(map[string]*Image, MaxImagesCount)
+var GImagesDataTemplateMap map[string]*Image
 
-func loadImages() error {
+func loadImagesFromConfig() error {
 
 	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
 	if !utils.IsFileExist(imagePath) {
@@ -57,16 +59,29 @@ func loadImages() error {
 	return nil
 }
 
+func zeroImages() {
+	GImages = make([]*Image, 0)
+	GImagesMap = make(map[string]*Image, MaxImagesCount)
+	GImagesIsoMap = make(map[string]*Image, MaxImagesCount)
+	GImagesRootTemplateMap = make(map[string]*Image, MaxImagesCount)
+	GImagesDataTemplateMap = make(map[string]*Image, MaxImagesCount)
+}
+
 // ReloadImages for images reloading
 func ReloadImages() error {
 
-	err := loadImages()
+	// zero images firstly
+	zeroImages()
+
+	err := loadImagesFromConfig()
 	if err != nil {
 		octlog.Error("load images error [%s]\n", err)
 		return nil
 	}
 
 	for _, im := range GImages {
+
+		// global map
 		GImagesMap[im.ID] = im
 
 		switch im.MediaType {
@@ -90,7 +105,9 @@ func ReloadImages() error {
 func WriteImages() error {
 
 	imagePath := configuration.GetConfig().RootDirectory + "/" + ImageStoreFile
-	utils.Remove(imagePath)
+	if utils.IsFileExist(imagePath) {
+		os.Rename(imagePath, imagePath+"."+utils.CurrentTimeSimple())
+	}
 
 	fd, err := os.Create(imagePath)
 	if err != nil {
@@ -106,4 +123,16 @@ func WriteImages() error {
 	}
 
 	return nil
+}
+
+// ReloadSignal for image reload signal handler
+func ReloadSignal() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGUSR1, syscall.SIGUSR2)
+	for {
+		s := <-c
+		fmt.Print("Got signal:", s)
+		fmt.Println(", now reload images from config file")
+		ReloadImages()
+	}
 }

@@ -85,6 +85,7 @@ func main() {
 
 	// ReloadImages here
 	image.ReloadImages()
+	go image.ReloadSignal()
 
 	go runAPIThread(conf)
 
