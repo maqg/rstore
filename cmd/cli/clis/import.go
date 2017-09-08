@@ -76,6 +76,13 @@ func importImage() int {
 		return merrors.ErrSystemErr
 	}
 
+	// for hugeblob supporting, copy file to blobs
+	if configuration.HugeBlob() {
+		dstFile := configuration.RootDirectory() + manifest.BlobDir + "/" + bm.BlobSum
+		fmt.Printf("for huge blob mode, copy %s to %s\n", filepath, dstFile)
+		utils.CopyFile(filepath, dstFile)
+	}
+
 	// write manifest config
 	manifest := new(manifest.Manifest)
 	manifest.Name = id

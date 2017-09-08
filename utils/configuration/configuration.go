@@ -26,6 +26,9 @@ type Configuration struct {
 	// Debuglevel is the level for debugging.
 	Debuglevel string `yaml:"debuglevel,omitempty"`
 
+	// HugeBlob true to support huge blob, false to split blobs
+	HugeBlob bool `yaml:"hugeblob,omitempty"`
+
 	HTTP struct {
 		Addr    string `yaml:"addr,omitempty"`
 		APIAddr string `yaml:"apiAddr,omitempty"`
@@ -40,6 +43,19 @@ var Conf *Configuration
 // GetConfig for global
 func GetConfig() *Configuration {
 	return Conf
+}
+
+// RootDirectory for reposity directory fetching
+func RootDirectory() string {
+	if Conf == nil {
+		return "./"
+	}
+	return Conf.RootDirectory
+}
+
+// HugeBlob for huge blob support or not
+func HugeBlob() bool {
+	return Conf.HugeBlob
 }
 
 // ParseConfig from yml

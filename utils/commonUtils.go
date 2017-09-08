@@ -5,7 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"octlink/mirage/src/utils/octlog"
 	"os"
 	"os/exec"
 	"reflect"
@@ -263,6 +265,28 @@ func NumberToInt(value interface{}) int {
 
 // SendUserSignal send USR1 Signal to process name
 func SendUserSignal(pname string) {
-	cmd := fmt.Sprintf("pidof %s | xargs kill -USR1 > /dev/null 2>&1", pname)
-	OCTSystem(cmd)
+	if !IsPlatformWindows() {
+		cmd := fmt.Sprintf("pidof %s | xargs kill -USR1 > /dev/null 2>&1", pname)
+		OCTSystem(cmd)
+	}
+}
+
+// CopyFile for srcfile to dst file, return size on success
+func CopyFile(srcFile, dstFile string) (int64, error) {
+	sd, err := os.Open(srcFile)
+	if err != nil {
+		octlog.Error("open src file of %s error: %s\n", srcFile, err)
+		return 0, err
+	}
+
+	defer sd.Close()
+
+	dd, err := os.Create(dstFile)
+	if err != nil {
+		octlog.Error("open dst file of %s error: %s\n", dstFile, err)
+		return 0, err
+	}
+	defer dd.Close()
+
+	return io.Copy(dd, sd)
 }

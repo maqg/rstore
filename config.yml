@@ -1,6 +1,7 @@
 version: 0.1
 debuglevel: 5
 loglevel: 5
+hugeblob: false
 http:
     addr: :5000
     apiAddr: :4443

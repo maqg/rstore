@@ -210,6 +210,19 @@ func (b *Blob) Write() error {
 	return nil
 }
 
+func writeBlob(data []byte) string {
+	dgst := utils.GetDigest(data)
+	if !configuration.HugeBlob() {
+		b := &Blob{
+			ID:   dgst,
+			Data: data,
+		}
+		b.GetRefCount()
+		b.Write()
+	}
+	return dgst
+}
+
 // ImportBlobs to write blobs from file and return its hash values
 func ImportBlobs(filepath string) ([]string, int64, error) {
 
@@ -227,37 +240,18 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 		n, err := f.Read(buffer)
 		if err == io.EOF {
 			if n > 0 {
-				dgst := utils.GetDigest(buffer[:n])
-				octlog.Error("got size of %d,with hash:%s\n", n, dgst)
-				b := &Blob{
-					ID:   dgst,
-					Data: buffer[:n],
-				}
-				b.GetRefCount()
-				b.Write()
-
-				//	WriteBlob(dgst, buffer[:n])
+				dgst := writeBlob(buffer[:n])
+				hashList = append(hashList, dgst)
 				fileLength += int64(n)
 			}
-			octlog.Warn("reached end of file[%d]\n", n)
 			break
-		}
-
-		if err != nil {
+		} else if err != nil {
 			octlog.Error("read file error %s, %s bytes already read\n", err, fileLength)
 			return nil, fileLength, err
 		}
 
+		dgst := writeBlob(buffer[:n])
 		fileLength += int64(n)
-		dgst := utils.GetDigest(buffer[:n])
-		b := &Blob{
-			ID:   dgst,
-			Data: buffer[:n],
-		}
-		b.GetRefCount()
-		b.Write()
-
-		//WriteBlob(dgst, buffer[:n])
 		hashList = append(hashList, dgst)
 	}
 
