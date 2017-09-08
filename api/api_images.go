@@ -87,14 +87,13 @@ func UpdateImage(paras *Paras) *Response {
 	im.Platform = paras.Get("platform")
 	im.GuestOsType = paras.Get("guestOsType")
 	im.Name = paras.Get("name")
+	im.AccountID = paras.Get("accountId")
 	if paras.Get("arch") != "" {
 		im.Arch = paras.Get("arch")
 	}
-
 	if paras.Get("mediaType") != "" {
 		im.MediaType = paras.Get("mediaType")
 	}
-
 	if paras.Get("format") != "" {
 		im.Format = paras.Get("format")
 	}
