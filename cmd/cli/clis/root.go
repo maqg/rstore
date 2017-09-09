@@ -2,6 +2,13 @@ package clis
 
 import (
 	"fmt"
+	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/blobsmanifest"
+	"octlink/rstore/modules/image"
+	"octlink/rstore/modules/manifest"
+	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/octlog"
 
 	"github.com/spf13/cobra"
 )
@@ -31,6 +38,27 @@ func init() {
 	RootCmd.AddCommand(imagesCmd)
 	RootCmd.AddCommand(exportCmd)
 	RootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "show the version and exit")
+
+	conf = configuration.GetConfig()
+
+	initLogConfig()
+}
+
+func initLogConfig() {
+
+	// debug level
+	octlog.InitDebugConfig(conf.DebugLevel)
+
+	// for log config
+	utils.CreateDir(conf.RootDirectory + conf.LogDirectory)
+
+	blobs.InitLog(conf.LogLevel)
+
+	image.InitLog(conf.LogLevel)
+
+	manifest.InitLog(conf.LogLevel)
+
+	blobsmanifest.InitLog(conf.LogLevel)
 }
 
 // RootCmd Root Cmd

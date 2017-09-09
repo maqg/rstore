@@ -53,7 +53,7 @@ func getLogDir() string {
 func InitLogConfig(logFile string, level int) *LogConfig {
 	config := new(LogConfig)
 
-	config.LogFile = getLogDir() + logFile
+	config.LogFile = getLogDir() + "/" + logFile
 	config.level = level
 
 	logfile, err := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE, 0644)

@@ -10,7 +10,6 @@ import (
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/merrors"
-	"octlink/rstore/utils/octlog"
 
 	"github.com/spf13/cobra"
 )
@@ -36,22 +35,6 @@ func checkParas() bool {
 	}
 
 	return true
-}
-
-func initLogConfig() {
-	// debug level
-	octlog.InitDebugConfig(conf.DebugLevel)
-
-	// for log config
-	utils.CreateDir(conf.RootDirectory + conf.LogDirectory)
-
-	blobs.InitLog(conf.LogLevel)
-
-	image.InitLog(conf.LogLevel)
-
-	manifest.InitLog(conf.LogLevel)
-
-	blobsmanifest.InitLog(conf.LogLevel)
 }
 
 func importImage() int {
