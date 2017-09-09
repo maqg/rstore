@@ -2,6 +2,7 @@ package systemconfig
 
 import (
 	"fmt"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/image"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
@@ -28,12 +29,18 @@ type SystemConfig struct {
 // GetCapacity for Capacity fetching
 func (sc *SystemConfig) GetCapacity() {
 
-	if utils.IsPlatformWindows() {
+	var cmd string
+
+	if utils.OSType() == config.OSTypeLinux {
+		cmd = fmt.Sprintf("df %s --total | grep total | grep -v grep | awk -F' ' '{print$2,$3,$4,$5}'",
+			configuration.GetConfig().RootDirectory)
+	} else if utils.OSType() == config.OSTypeMac { // for mac system
+		cmd = fmt.Sprintf("df %s | grep -v Used | grep -v grep | awk -F' ' '{print$2,$3,$4,$5}'",
+			configuration.GetConfig().RootDirectory)
+	} else {
 		return
 	}
 
-	cmd := fmt.Sprintf("df %s --total | grep total | grep -v grep | awk -F' ' '{print$2,$3,$4,$5}'",
-		configuration.GetConfig().RootDirectory)
 	data, err := utils.OCTSystem(cmd)
 	if err != nil {
 		octlog.Error("exec cmd [%s] error [%s]\n", cmd, err)
