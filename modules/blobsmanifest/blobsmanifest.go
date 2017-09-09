@@ -15,6 +15,13 @@ import (
 	"os"
 )
 
+var logger *octlog.LogConfig
+
+// InitLog for blobs-manifest config
+func InitLog(level int) {
+	logger = octlog.InitLogConfig("blobs-manifest.log", level)
+}
+
 // BlobsManifest for base blobs and Manifest relationship
 type BlobsManifest struct {
 	Size    int64    `json:"size"`
@@ -71,7 +78,7 @@ func (bm *BlobsManifest) Write() error {
 
 	fd, err := os.Create(filePath)
 	if err != nil {
-		octlog.Error("create file %s error\n", filePath)
+		logger.Errorf("create file %s error\n", filePath)
 		return err
 	}
 
@@ -85,16 +92,16 @@ func (bm *BlobsManifest) Write() error {
 
 // GetBlobsManifest to get blobs manifest config
 func GetBlobsManifest(blobsum string) *BlobsManifest {
-	bmPath := blobsManifestDirPath(blobsum) + "/" + blobsum
 
+	bmPath := blobsManifestDirPath(blobsum) + "/" + blobsum
 	if !utils.IsFileExist(bmPath) {
-		octlog.Error("file %s blobs-manifest not exist\n", blobsum)
+		logger.Errorf("file %s blobs-manifest not exist\n", blobsum)
 		return nil
 	}
 
 	fd, err := os.Open(bmPath)
 	if err != nil {
-		octlog.Error("open file of %s error %s\n", bmPath, err)
+		logger.Errorf("open file of %s error %s\n", bmPath, err)
 		return nil
 	}
 
@@ -102,7 +109,7 @@ func GetBlobsManifest(blobsum string) *BlobsManifest {
 
 	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		octlog.Error("read data from %s error %s\n", bmPath, err)
+		logger.Errorf("read data from %s error %s\n", bmPath, err)
 	}
 
 	bm := new(BlobsManifest)
@@ -112,9 +119,10 @@ func GetBlobsManifest(blobsum string) *BlobsManifest {
 }
 
 func readBlob(filepath string) []byte {
+
 	fd, err := os.Open(filepath)
 	if err != nil {
-		fmt.Printf("open blob file %s error\n", filepath)
+		logger.Errorf("open blob file %s error\n", filepath)
 		return nil
 	}
 
@@ -122,7 +130,7 @@ func readBlob(filepath string) []byte {
 
 	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		fmt.Printf("read data from blob file %s error\n", filepath)
+		logger.Errorf("read data from blob file %s error\n", filepath)
 		return nil
 	}
 

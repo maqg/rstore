@@ -7,8 +7,10 @@ import (
 	"octlink/rstore/api"
 	"octlink/rstore/handlers"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/blobsmanifest"
 	"octlink/rstore/modules/image"
 	"octlink/rstore/modules/manifest"
+	"octlink/rstore/modules/task"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/octlog"
@@ -35,7 +37,15 @@ func initLogConfig() {
 
 	blobs.InitLog(conf.LogLevel)
 
+	blobsmanifest.InitLog(conf.LogLevel)
+
 	utils.InitLog(conf.LogLevel)
+
+	image.InitLog(conf.LogLevel)
+
+	handlers.InitLog(conf.LogLevel)
+
+	task.InitLog(conf.LogLevel)
 }
 
 func initDebugAndLog() {

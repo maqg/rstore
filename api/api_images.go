@@ -6,7 +6,6 @@ import (
 	"octlink/rstore/modules/image"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
-	"octlink/rstore/utils/octlog"
 	"octlink/rstore/utils/uuid"
 )
 
@@ -61,6 +60,7 @@ func ShowImage(paras *Paras) *Response {
 	if temp == nil {
 		resp.Error = merrors.ErrSegmentNotExist
 		resp.ErrorLog = fmt.Sprintf("user %s not found", imageID)
+		logger.Errorf("get image of %s error\n", imageID)
 		return resp
 	}
 
@@ -99,7 +99,7 @@ func UpdateImage(paras *Paras) *Response {
 	ret := im.Update()
 	if ret != 0 {
 		resp.Error = ret
-		octlog.Error("update image of %s error\n", im.ID)
+		logger.Errorf("update image of %s error\n", im.ID)
 		return resp
 	}
 
@@ -109,51 +109,36 @@ func UpdateImage(paras *Paras) *Response {
 // DeleteImageByAccount to delete image by account
 func DeleteImageByAccount(paras *Paras) *Response {
 
-	octlog.Debug("running in APIDeleteImage\n")
-
-	resp := new(Response)
-
-	images := image.GetAllImages(paras.InParas.Paras["accountId"].(string), "", "")
+	images := image.GetAllImages(paras.Get("accountId"), "", "")
 	for _, image := range images {
-		err := image.Delete()
-		if err != 0 {
-			resp.Error = err
-			octlog.Error("Errored when deleting image of %s\n", image.Name)
-			return resp
-		}
+		image.Delete()
 	}
 
-	return resp
+	return &Response{}
 }
 
 // DeleteImage to delete image
 func DeleteImage(paras *Paras) *Response {
 
-	octlog.Debug("running in APIDeleteImage\n")
-
-	resp := new(Response)
-
 	image := image.GetImage(paras.Get("id"))
 	if image == nil {
-		resp.Error = merrors.ErrSegmentNotExist
-		return resp
+		logger.Errorf("image of %s not exit\n", paras.Get("id"))
+		return &Response{
+			Error: merrors.ErrSegmentNotExist,
+		}
 	}
 
-	resp.Error = image.Delete()
-
-	return resp
+	return &Response{
+		Error: image.Delete(),
+	}
 }
 
 // ShowAllImages to display all images by condition
 func ShowAllImages(paras *Paras) *Response {
-	resp := new(Response)
-
-	octlog.Debug("running in APIShowAllImage\n")
-
-	imageList := image.GetAllImages(paras.Get("accountId"),
-		paras.Get("mediaType"), paras.Get("keyword"))
-	resp.Data = imageList
-	return resp
+	return &Response{
+		Data: image.GetAllImages(paras.Get("accountId"),
+			paras.Get("mediaType"), paras.Get("keyword")),
+	}
 }
 
 // ShowAccountList of this rstore server

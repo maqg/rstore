@@ -32,11 +32,10 @@ func getBlob(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
 	digest := mux.Vars(r)["digest"]
-	// digest := r.FormValue("digest")
 
 	b := blobs.GetBlob(name, digest)
 	if b == nil {
-		fmt.Printf("get blob by %s:%s error\n", name, digest)
+		logger.Errorf("get blob by %s:%s error\n", name, digest)
 		RenderErrorMsg(w, r, "blob of "+digest+" not exist")
 		return
 	}
@@ -45,11 +44,11 @@ func getBlob(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", b.Size))
 	n, err := w.Write(b.Data)
 	if err != nil {
-		fmt.Printf("Write to client error\n")
+		logger.Errorf("Write blob %s to client error\n", digest)
 		return
 	}
 
-	fmt.Printf("Write to Client %d bytes blob OK\n", n)
+	logger.Debugf("Write to Client %d bytes blob %s OK\n", n, digest)
 }
 
 // DeleteBlob to delete blob from api

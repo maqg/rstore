@@ -9,7 +9,6 @@ import (
 	"octlink/rstore/modules/image"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
-	"octlink/rstore/utils/octlog"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -29,12 +28,11 @@ func getManifest(w http.ResponseWriter, r *http.Request) {
 	manifest := manifest.GetManifest(name, digest)
 	if manifest == nil {
 		w.WriteHeader(http.StatusNotFound)
+		logger.Warnf("manifest of %s not exist\n", digest)
 		return
 	}
 
 	data := utils.JSON2String(manifest)
-
-	octlog.Error("data of manifest is %s\n", data)
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Content-Length", fmt.Sprint(len(data)))
@@ -54,14 +52,19 @@ func deleteManifest(w http.ResponseWriter, r *http.Request) {
 	manifest := manifest.GetManifest(name, digest)
 	if manifest == nil {
 		w.WriteHeader(http.StatusNotFound)
+		logger.Warnf("manifest of %s not exist\n", digest)
 		return
 	}
 
 	err := manifest.Delete()
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
+		logger.Warnf("delete manifest of %s error %s\n",
+			digest, err)
 		return
 	}
+
+	logger.Debugf("delete of manifest %s OK\n", digest)
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -76,14 +79,14 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	octlog.Debug("got manifest post request %s:%s\n", name, digest)
+	logger.Debugf("got manifest post request %s:%s\n", name, digest)
 
 	m := manifest.GetManifest(name, digest)
 	if m != nil {
 		err := image.UpdateImageCallback(m.Name, m.DiskSize, m.VirtualSize,
 			m.BlobSum, config.ImageStatusReady)
 		if err != nil {
-			octlog.Error("update image info %s error, and manifest created OK\n", m.Name)
+			logger.Warnf("update image info %s error, and manifest created OK\n", m.Name)
 		}
 		w.WriteHeader(http.StatusOK)
 		return
@@ -92,27 +95,27 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		octlog.Error("readall data from http body error %s\n", err)
+		logger.Errorf("readall data from http body error %s\n", err)
 		return
 	}
 
 	m = new(manifest.Manifest)
 	if err = json.Unmarshal(data, m); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		octlog.Error("convert data to json error %s\n", err)
+		logger.Errorf("convert data to json error %s\n", err)
 		return
 	}
 
 	if err = m.Write(); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		octlog.Error("error happend for manifest write %s\n", err)
+		logger.Errorf("error happend for manifest write %s\n", err)
 		return
 	}
 
 	err = image.UpdateImageCallback(m.Name, m.DiskSize, m.VirtualSize,
 		m.BlobSum, config.ImageStatusReady)
 	if err != nil {
-		octlog.Error("update image info %s error, and manifest created OK\n", m.Name)
+		logger.Infof("update image info %s error, and manifest created OK\n", m.Name)
 	}
 
 	w.WriteHeader(http.StatusOK)

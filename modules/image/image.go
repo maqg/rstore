@@ -140,7 +140,7 @@ func (image *Image) removeManifest() {
 	m := manifest.GetManifest(image.ID, utils.GetDigestStr(image.ID))
 	if m != nil {
 		m.Delete()
-		octlog.Warn("deleted manifest (%s:%s)\n", image.Name, m.BlobSum)
+		logger.Warnf("deleted manifest (%s:%s)\n", image.Name, m.BlobSum)
 	}
 }
 
@@ -159,13 +159,13 @@ func (image *Image) removeBlobsManifest() {
 
 	bm := blobsmanifest.GetBlobsManifest(image.Md5Sum)
 	if bm == nil {
-		octlog.Error("blobs-manifest of %s not exist\n", image.Md5Sum)
+		logger.Errorf("blobs-manifest of %s not exist\n", image.Md5Sum)
 		return
 	}
 
 	if !isBlobsManifestUsed(image.ID, image.Md5Sum) {
 		bm.Delete()
-		octlog.Warn("deleted blobs-manifest (%s:%s)\n", image.ID, image.Md5Sum)
+		logger.Warnf("deleted blobs-manifest (%s:%s)\n", image.ID, image.Md5Sum)
 	}
 }
 
@@ -216,7 +216,7 @@ func removeImage(im *Image) {
 // Delete for image
 func (image *Image) Delete() int {
 
-	octlog.Warn("now to delete image (%s:%s)\n", image.Name, image.ID)
+	logger.Warnf("now to delete image (%s:%s)\n", image.Name, image.ID)
 
 	len := len(GImages)
 
@@ -239,7 +239,7 @@ func (image *Image) Delete() int {
 			// then remove all blobs
 			im.removeBlobsManifest()
 
-			octlog.Warn("deleted image (%s:%s)\n", image.Name, image.ID)
+			logger.Warnf("deleted image (%s:%s)\n", image.Name, image.ID)
 		}
 	}
 

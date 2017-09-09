@@ -61,6 +61,7 @@ func FileToManifest(filePath string) (*Manifest, error) {
 
 	fp, err := os.Open(filePath)
 	if err != nil {
+		logger.Errorf("open manifest file of %s error\n", filePath)
 		return nil, err
 	}
 
@@ -68,11 +69,13 @@ func FileToManifest(filePath string) (*Manifest, error) {
 
 	in, err := ioutil.ReadAll(fp)
 	if err != nil {
+		logger.Errorf("read from file of %s error\n", filePath)
 		return nil, err
 	}
 
 	manifest := new(Manifest)
 	if err := json.Unmarshal(in, manifest); err != nil {
+		logger.Errorf("unmarshal manifest data to objs error\n")
 		return nil, err
 	}
 
@@ -87,14 +90,12 @@ func GetManifest(name string, dgst string) *Manifest {
 	conf := configuration.GetConfig()
 	maniPath := conf.RootDirectory + fmt.Sprintf(ManifestFileProto, name, dgst)
 	if !utils.IsFileExist(maniPath) {
-		octlog.Error("manifest not exist %s\n", maniPath)
 		logger.Errorf("manifest not exist %s\n", maniPath)
 		return nil
 	}
 
 	manifest, err := FileToManifest(maniPath)
 	if err != nil {
-		octlog.Error("manifest parse error %s\n", maniPath)
 		logger.Errorf("manifest parse error %s\n", maniPath)
 		return nil
 	}
@@ -128,7 +129,7 @@ func (manifest *Manifest) Write() error {
 	utils.Remove(filePath)
 	fd, err := os.Create(filePath)
 	if err != nil {
-		fmt.Printf("create file %s error\n", filePath)
+		logger.Errorf("create file %s error\n", filePath)
 		return err
 	}
 

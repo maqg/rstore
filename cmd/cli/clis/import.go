@@ -10,9 +10,12 @@ import (
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/utils/merrors"
+	"octlink/rstore/utils/octlog"
 
 	"github.com/spf13/cobra"
 )
+
+var conf *configuration.Configuration
 
 func init() {
 	importCmd.Flags().StringVarP(&id, "id", "i", "", "Image UUID")
@@ -35,6 +38,22 @@ func checkParas() bool {
 	return true
 }
 
+func initLogConfig() {
+	// debug level
+	octlog.InitDebugConfig(conf.DebugLevel)
+
+	// for log config
+	utils.CreateDir(conf.RootDirectory + conf.LogDirectory)
+
+	blobs.InitLog(conf.LogLevel)
+
+	image.InitLog(conf.LogLevel)
+
+	manifest.InitLog(conf.LogLevel)
+
+	blobsmanifest.InitLog(conf.LogLevel)
+}
+
 func importImage() int {
 
 	fmt.Printf("got image id[%s],filepath[%s],config[%s],callbackurl[%s]\n",
@@ -45,11 +64,15 @@ func importImage() int {
 		return merrors.ErrBadParas
 	}
 
-	conf, err := configuration.ResolveConfig(configfile)
+	c, err := configuration.ResolveConfig(configfile)
 	if err != nil {
 		fmt.Printf("parse config %s error\n", configfile)
 		return merrors.ErrCmdErr
 	}
+	conf = c
+
+	// to init log config
+	initLogConfig()
 
 	image.ReloadImages()
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"octlink/rstore/utils/octlog"
 	"os"
 
 	yaml "gopkg.in/yaml.v2"
@@ -47,6 +46,11 @@ var Conf *Configuration
 // GetConfig for global
 func GetConfig() *Configuration {
 	return Conf
+}
+
+// LogDirectory for configuration
+func LogDirectory() string {
+	return Conf.RootDirectory + Conf.LogDirectory
 }
 
 // RootDirectory for reposity directory fetching
@@ -116,9 +120,9 @@ func ResolveConfig(configfile string) (*Configuration, error) {
 
 func init() {
 	Conf = &Configuration{
-		LogLevel:      octlog.DebugLevel,
-		DebugLevel:    octlog.DebugLevel,
+		LogLevel:      5,
+		DebugLevel:    5,
 		RootDirectory: "./",
-		LogDirectory:  "./var/logs",
+		LogDirectory:  "./logs",
 	}
 }

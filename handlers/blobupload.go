@@ -34,11 +34,11 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 
 	if b.IsExist() {
 		serviceresp.StatusOKResp(w)
-		fmt.Printf("blob of %s already exist", digest)
+		logger.Warnf("blob of %s already exist", digest)
 		return
 	}
 
-	fmt.Printf("start to upload blob %s\n", digest)
+	logger.Debugf("start to upload blob %s\n", digest)
 
 	bu := blobupload.BlobUpload{
 		ID:         digest,
@@ -48,10 +48,12 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	err := bu.Upload()
 	if err != nil {
-		fmt.Printf("upload blob of %s failed\n", bu.FilePath)
+		logger.Errorf("upload blob of %s failed\n", bu.FilePath)
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+
+	logger.Debugf("Upload blob %s OK\n", digest)
 
 	serviceresp.StatusOKResp(w)
 }

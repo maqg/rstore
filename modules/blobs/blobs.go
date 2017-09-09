@@ -3,7 +3,6 @@ package blobs
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -113,13 +112,13 @@ func GetBlob(name string, digest string) *Blob {
 	b.ID = digest
 
 	if !b.IsExist() {
-		octlog.Error("blob of %s not exist\n", digest)
+		logger.Errorf("blob of %s not exist\n", digest)
 		return nil
 	}
 
 	fd, err := os.Open(b.FilePath())
 	if err != nil {
-		octlog.Error("open file of %s error\n", b.FilePath())
+		logger.Errorf("open file of %s error\n", b.FilePath())
 		return nil
 	}
 
@@ -127,7 +126,7 @@ func GetBlob(name string, digest string) *Blob {
 
 	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		octlog.Error("read file from %s error\n", b.FilePath())
+		logger.Errorf("read file from %s error\n", b.FilePath())
 		return nil
 	}
 
@@ -171,14 +170,14 @@ func (b *Blob) WriteRefCount() {
 
 	fd, err := os.Create(refcountFile)
 	if err != nil {
-		octlog.Error("create file %s error %s\n", refcountFile, err)
+		logger.Errorf("create file %s error %s\n", refcountFile, err)
 	}
 
 	defer fd.Close()
 
 	_, err = fd.WriteString(utils.IntToString(b.RefCount))
 	if err != nil {
-		octlog.Warn("write refcount of %s error %s\n", b.ID, err)
+		logger.Warnf("write refcount of %s error %s\n", b.ID, err)
 	}
 }
 
@@ -191,13 +190,13 @@ func (b *Blob) Write() error {
 	if utils.IsFileExist(b.FilePath()) {
 		b.IncRefCount()
 		b.WriteRefCount()
-		octlog.Warn("blob of %s already exist, just increase its refcount\n", b.ID)
+		logger.Errorf("blob of %s already exist, just increase its refcount\n", b.ID)
 		return nil
 	}
 
 	fd, err := os.Create(b.FilePath())
 	if err != nil {
-		octlog.Error("create blob of %s error\n", b.FilePath())
+		logger.Errorf("create blob of %s error\n", b.FilePath())
 		return err
 	}
 
@@ -228,7 +227,7 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 
 	f, err := os.Open(filepath)
 	if err != nil {
-		octlog.Error("file of %s not exist\n", filepath)
+		logger.Errorf("file of %s not exist\n", filepath)
 		return nil, 0, err
 	}
 	defer f.Close()
@@ -246,7 +245,7 @@ func ImportBlobs(filepath string) ([]string, int64, error) {
 			}
 			break
 		} else if err != nil {
-			octlog.Error("read file error %s, %s bytes already read\n", err, fileLength)
+			logger.Errorf("read file error %s, %s bytes already read\n", err, filepath)
 			return nil, fileLength, err
 		}
 
@@ -263,7 +262,7 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		octlog.Error("get url %s error\n", url)
+		logger.Errorf("get url %s error\n", url)
 		return nil, 0, err
 	}
 
@@ -271,7 +270,7 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		octlog.Error("Read body from url %s error\n", url)
+		logger.Errorf("Read body from url %s error\n", url)
 		return nil, 0, err
 	}
 
@@ -285,24 +284,24 @@ func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
 	reader := bytes.NewReader(data)
 	reqeust, err := http.NewRequest("POST", url, reader)
 	if err != nil {
-		octlog.Error("New Http Request error on url %s\n", url)
+		logger.Errorf("New Http Request error on url %s\n", url)
 		return err
 	}
 
 	resp, err := http.DefaultClient.Do(reqeust)
 	if err != nil {
-		octlog.Error("do http post error to url %s\n", url)
+		logger.Errorf("do http post error to url %s\n", url)
 		return err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		octlog.Error("got bad status when post blob data %s\n", resp.Status)
+		logger.Errorf("got bad status when post blob data %s\n", resp.Status)
 		return errors.New("got bad status " + resp.Status)
 	}
 
-	octlog.Debug("HTTP upload blob %s to %s OK\n", dgst, url)
+	logger.Debugf("HTTP upload blob %s to %s OK\n", dgst, url)
 
 	return nil
 }
@@ -310,13 +309,14 @@ func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
 // HTTPWriteBlobs to write blobs from file by HTTP
 func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error) {
 
-	octlog.Debug("file %s, url %s\n", filepath, urlPattern)
+	logger.Debugf("file %s, url %s\n", filepath, urlPattern)
 
 	f, err := os.Open(filepath)
 	if err != nil {
-		octlog.Error("file of %s not exist\n", filepath)
+		logger.Debugf("file of %s not exist\n", filepath)
 		return nil, 0, err
 	}
+
 	defer f.Close()
 
 	var fileLength int64
@@ -325,30 +325,28 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 		buffer := make([]byte, configuration.BlobSize)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
-			octlog.Warn("reached end of file[%d]\n", n)
+			logger.Warnf("reached end of file[%d]\n", n)
 			break
 		}
 		fileLength += int64(n)
 
 		if err != nil {
-			octlog.Error("read file error %s", err)
-			fmt.Printf("read file error %s\n", filepath)
+			logger.Errorf("read file error %s for file %s", err, filepath)
 			return hashList, fileLength, err
 		}
 
 		dgst := utils.GetDigest(buffer[:n])
-		octlog.Debug("got size of %d,with hash:%s\n", n, dgst)
 
 		err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
 		if err != nil {
-			octlog.Error("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
+			logger.Errorf("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
 			return hashList, fileLength, err
 		}
 
 		hashList = append(hashList, dgst)
 	}
 
-	octlog.Debug("file %s, url %s\n", filepath, urlPattern)
+	logger.Debugf("file %s, url %s\n", filepath, urlPattern)
 
 	return hashList, fileLength, nil
 }

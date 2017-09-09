@@ -5,9 +5,17 @@ import (
 	"net/http"
 	"net/url"
 	"octlink/rstore/api/v1"
+	"octlink/rstore/utils/octlog"
 
 	"github.com/gorilla/mux"
 )
+
+var logger *octlog.LogConfig
+
+// InitLog for handlers
+func InitLog(level int) {
+	logger = octlog.InitLogConfig("handlers.log", level)
+}
 
 // App is a global registry application object. Shared resources can be placed
 // on this object that will be accessible from all requests. Any writable
@@ -63,6 +71,7 @@ func NewApp() *App {
 
 	// Register the handler dispatchers.
 	app.register(v1.RouteNameBase, func(r *http.Request) http.Handler {
+		logger.Errorf("register base routers error\n")
 		return http.HandlerFunc(apiBase)
 	})
 
@@ -72,6 +81,8 @@ func NewApp() *App {
 	app.register(v1.RouteNameBlob, blobManager)
 	app.register(v1.RouteNameBlobUpload, blobUploadManager)
 	app.register(v1.RouteNameBlobsManifest, blobsmanifestManager)
+
+	logger.Infof("Created App and registered all routes OK\n")
 
 	return app
 }

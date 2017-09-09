@@ -2,13 +2,20 @@ package blobupload
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/octlog"
 	"os"
 )
+
+var logger *octlog.LogConfig
+
+// InitLog for blobsupload config
+func InitLog(level int) {
+	logger = octlog.InitLogConfig("blobupload.log", level)
+}
 
 // BlobUpload base structure
 type BlobUpload struct {
@@ -34,7 +41,7 @@ func (bu *BlobUpload) Upload() error {
 
 	err := CopyFullPayload(bu.RespWriter, bu.Request, bu.FilePath)
 	if err != nil {
-		fmt.Printf("copy full data for blob %s error\n", bu.ID)
+		logger.Errorf("copy full data for blob %s error\n", bu.ID)
 		return nil
 	}
 
@@ -54,25 +61,25 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 	if notifier, ok := responseWriter.(http.CloseNotifier); ok {
 		clientClosed = notifier.CloseNotify()
 	} else {
-		fmt.Printf("the ResponseWriter does not implement CloseNotifier (type: %T)", responseWriter)
+		logger.Errorf("the ResponseWriter does not implement CloseNotifier (type: %T)", responseWriter)
 	}
 
 	// Read in the data, if any.
 	destWriter, err := os.Create(filepath)
 	if err != nil {
-		fmt.Printf("create file of %s error\n", filepath)
+		logger.Errorf("create file of %s error\n", filepath)
 		return err
 	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("read all data from r.Body error\n")
+		logger.Errorf("read all data from r.Body error\n")
 		return err
 	}
 
 	len, err := destWriter.Write(data)
 	if err != nil {
-		fmt.Printf("Write data to dest writer error\n")
+		logger.Errorf("Write data to dest writer error\n")
 		return nil
 	}
 
@@ -94,7 +101,7 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 	}
 
 	if err != nil {
-		fmt.Printf("error got, copy data failed")
+		logger.Errorf("error got, copy data failed")
 		return err
 	}
 

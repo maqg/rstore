@@ -6,27 +6,30 @@ import (
 
 // ShowAllTasks by condition
 func ShowAllTasks(paras *Paras) *Response {
-
-	resp := new(Response)
-	resp.Data = task.GetTasks()
-
-	return resp
+	return &Response{
+		Data: task.GetTasks(),
+	}
 }
 
 // ShowTask get one task by task id
 func ShowTask(paras *Paras) *Response {
-	resp := new(Response)
-	return resp
+	return &Response{
+		Data: task.GetTask(paras.Get("id")),
+	}
 }
 
 // DeleteTask task by id
 func DeleteTask(paras *Paras) *Response {
-	resp := new(Response)
-	return resp
+	t := task.GetTask(paras.Get("id"))
+	return &Response{
+		Error: t.Delete(),
+	}
 }
 
 // StopTask by id
 func StopTask(paras *Paras) *Response {
-	resp := new(Response)
-	return resp
+	t := task.GetTask(paras.Get("id"))
+	return &Response{
+		Error: t.Stop(),
+	}
 }

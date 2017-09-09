@@ -3,7 +3,7 @@ package octlog
 import (
 	"fmt"
 	"log"
-	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"os"
 )
 
@@ -46,10 +46,7 @@ type LogConfig struct {
 }
 
 func getLogDir() string {
-	if utils.IsFileExist("var/logs") {
-		return "var/logs/"
-	}
-	return ""
+	return configuration.LogDirectory()
 }
 
 // InitLogConfig to init log config

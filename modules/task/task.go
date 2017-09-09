@@ -9,6 +9,7 @@ import (
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/merrors"
 	"octlink/rstore/utils/octlog"
 	"octlink/rstore/utils/uuid"
 	"os"
@@ -46,6 +47,13 @@ type Task struct {
 	callback   ImageCallBack
 }
 
+var logger *octlog.LogConfig
+
+// InitLog for tasks
+func InitLog(level int) {
+	logger = octlog.InitLogConfig("task.log", level)
+}
+
 // GTasks all tasks map management
 var GTasks = make(map[string]*Task, 0)
 
@@ -70,12 +78,12 @@ func (t *Task) AddAndRun(callback ImageCallBack) {
 	GTasks[t.ID] = t
 	go t.Download()
 
-	octlog.Warn("task of %s start to run, %s\n", t.ID, t.URL)
+	logger.Warnf("task of %s start to run, %s\n", t.ID, t.URL)
 }
 
 // GetTask by taskid
 func GetTask(id string) *Task {
-	return nil
+	return GTasks[id]
 }
 
 // UpdateFilePath update and write file path
@@ -84,6 +92,8 @@ func (t *Task) UpdateFilePath() {
 	t.FileName = segs[len(segs)-1]
 	t.FilePath = configuration.GetConfig().RootDirectory + "/registry/temp/" +
 		uuid.Generate().Simple() + "EEEEE" + t.FileName
+
+	logger.Debugf("update file dst path %s\n", t.FilePath)
 }
 
 // ImportBlobs and then write blobs-manifest config
@@ -91,19 +101,19 @@ func (t *Task) ImportBlobs() (*blobsmanifest.BlobsManifest, error) {
 
 	hashes, len, err := blobs.ImportBlobs(t.FilePath)
 	if err != nil {
-		octlog.Error("got file hashlist error\n")
+		logger.Errorf("got file hashlist error\n")
 		return nil, err
 	}
 
 	if len != t.FileLength {
-		octlog.Error("filelen of blobs and http contentlen not match %d:%d\n", len, t.FileLength)
+		logger.Errorf("filelen of blobs and http contentlen not match %d:%d\n", len, t.FileLength)
 		return nil, fmt.Errorf("filelen %d not match imported len of %d", t.FileLength, len)
 	}
 
 	blobsum := blobsmanifest.CalcBlobSum(hashes)
 	bm := blobsmanifest.GetBlobsManifest(blobsum)
 	if bm != nil {
-		octlog.Warn("blobs-manifest %s already exist, just return it\n", bm.BlobSum)
+		logger.Warnf("blobs-manifest %s already exist, just return it\n", bm.BlobSum)
 		return bm, nil
 	}
 
@@ -114,7 +124,7 @@ func (t *Task) ImportBlobs() (*blobsmanifest.BlobsManifest, error) {
 	bm.BlobSum = blobsum
 	err = bm.Write()
 	if err != nil {
-		octlog.Error("write blobs-manifest error\n")
+		logger.Errorf("write blobs-manifest %s error\n", bm.BlobSum)
 		return nil, err
 	}
 
@@ -126,7 +136,7 @@ func (t *Task) WriteManifest(blobsum string) (*manifest.Manifest, error) {
 
 	m := manifest.GetManifest(t.ImageName, blobsum)
 	if m != nil {
-		octlog.Warn("manifest of %s:%s already exist\n", t.ImageName, blobsum)
+		logger.Warnf("manifest of %s:%s already exist\n", t.ImageName, blobsum)
 		return m, nil
 	}
 
@@ -140,9 +150,11 @@ func (t *Task) WriteManifest(blobsum string) (*manifest.Manifest, error) {
 
 	err := m.Write()
 	if err != nil {
-		octlog.Error("Create manifest error[%s]\n", err)
+		logger.Errorf("Create manifest error[%s]\n", err)
 		return nil, err
 	}
+
+	logger.Debugf("Write manifest of %s OK\n", blobsum)
 
 	return m, nil
 }
@@ -152,7 +164,7 @@ func (t *Task) Download() {
 
 	r, err := http.Get(t.URL)
 	if err != nil {
-		octlog.Error("get url %s error\n", t.URL)
+		logger.Errorf("create URL response error on url %s\n", t.URL)
 		t.Error()
 		return
 	}
@@ -162,7 +174,7 @@ func (t *Task) Download() {
 	t.UpdateFilePath()
 	fd, err := os.Create(t.FilePath)
 	if err != nil {
-		octlog.Error("create temp file %s error\n", t.FilePath)
+		logger.Errorf("create temp file %s error\n", t.FilePath)
 		t.Error()
 		return
 	}
@@ -178,7 +190,7 @@ func (t *Task) Download() {
 				t.FileLength += int64(n)
 				wlen, err := fd.Write(buf[:n])
 				if err != nil {
-					octlog.Warn("got len %d and wroted %d, total %d\n", n, wlen, t.FileLength)
+					logger.Warnf("got len %d and wroted %d, total %d\n", n, wlen, t.FileLength)
 					t.Error()
 					return
 				}
@@ -187,7 +199,7 @@ func (t *Task) Download() {
 		}
 
 		if err != nil {
-			octlog.Error("read file error %s", err)
+			logger.Errorf("read file error %s", err)
 			// TBD clear
 			t.Error()
 			return
@@ -196,7 +208,7 @@ func (t *Task) Download() {
 		t.FileLength += int64(n)
 		wlen, err := fd.Write(buf[:n])
 		if err != nil {
-			octlog.Warn("got len %d and wroted %d, total %d\n", n, wlen, t.FileLength)
+			logger.Errorf("got len %d and wroted %d, total %d\n", n, wlen, t.FileLength)
 			t.Error()
 			return
 		}
@@ -204,7 +216,7 @@ func (t *Task) Download() {
 
 	bm, err := t.ImportBlobs()
 	if err != nil {
-		octlog.Error("import blobs error %s for %s\n", err, t.FileName)
+		logger.Errorf("import blobs error %s for %s\n", err, t.FileName)
 		t.Error()
 		// TBD remove template file
 		return
@@ -212,27 +224,28 @@ func (t *Task) Download() {
 
 	m, err := t.WriteManifest(bm.BlobSum)
 	if err != nil {
-		octlog.Error("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
+		logger.Errorf("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
 		t.Error()
 		return
 	}
 
 	// update task status and image info
 	t.Finish(m.DiskSize, m.VirtualSize, m.BlobSum)
-	octlog.Warn("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
+
+	logger.Debugf("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
 
 	return
 }
 
 // Stop this task
-func (t *Task) Stop() error {
+func (t *Task) Stop() int {
 	t.callback(t.ImageName, 0, 0, "", TaskStatusError)
-	return nil
+	return merrors.ErrSuccess
 }
 
 // Delete this task
-func (t *Task) Delete() error {
-	return nil
+func (t *Task) Delete() int {
+	return merrors.ErrSuccess
 }
 
 // Finish task here
