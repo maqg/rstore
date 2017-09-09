@@ -21,20 +21,30 @@ var (
 	cert   string
 )
 
+var conf *configuration.Configuration
+
 func initDebugConfig() {
-	octlog.InitDebugConfig(octlog.DebugLevel)
+	octlog.InitDebugConfig(conf.DebugLevel)
 }
 
 func initLogConfig() {
-	api.InitAPILog(octlog.DebugLevel)
-	blobs.InitLog(octlog.DebugLevel)
+
+	utils.CreateDir(conf.RootDirectory + conf.LogDirectory)
+
+	api.InitAPILog(conf.LogLevel)
+
+	blobs.InitLog(conf.LogLevel)
+
+	utils.InitLog(conf.LogLevel)
+}
+
+func initDebugAndLog() {
+	initDebugConfig()
+	initLogConfig()
 }
 
 func init() {
 	flag.StringVar(&config, "config", "./config.yml", "Config file path")
-
-	initDebugConfig()
-	initLogConfig()
 }
 
 func usage() {
@@ -43,7 +53,7 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func runAPIThread(conf *configuration.Configuration) {
+func runAPIThread() {
 
 	api := &api.API{
 		Name: "Rstore API Server",
@@ -59,11 +69,11 @@ func runAPIThread(conf *configuration.Configuration) {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		octlog.Error("error to listen\n")
+		octlog.Error("error to listen at %s\n", conf.HTTP.APIAddr)
 	}
 }
 
-func initRootDirectory(conf *configuration.Configuration) {
+func initRootDirectory() {
 	utils.CreateDir(conf.RootDirectory + manifest.ReposDir)
 	utils.CreateDir(conf.RootDirectory + manifest.BlobDir)
 	utils.CreateDir(conf.RootDirectory + manifest.BlobManifestDir)
@@ -75,23 +85,31 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
-	conf, err := configuration.ResolveConfig(config)
+	c, err := configuration.ResolveConfig(config)
 	if err != nil {
 		fmt.Printf("Resolve Configuration Error[%s]\n", err)
 		return
 	}
+	conf = c
 
-	initRootDirectory(conf)
+	// for root direcotry
+	initRootDirectory()
+
+	// for debug and log config
+	initDebugAndLog()
 
 	// ReloadImages here
 	image.ReloadImages()
 	go image.ReloadSignal()
 
-	go runAPIThread(conf)
+	go runAPIThread()
 
 	app := handlers.NewApp()
 
 	octlog.Warn("RSTORE HTTP Engine Started ON %s\n", conf.HTTP.Addr)
 
-	http.ListenAndServe(conf.HTTP.Addr, app.Router)
+	err = http.ListenAndServe(conf.HTTP.Addr, app.Router)
+	if err != nil {
+		fmt.Printf("error to listen at data address %s\n", conf.HTTP.Addr)
+	}
 }

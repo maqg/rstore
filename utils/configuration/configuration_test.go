@@ -22,6 +22,6 @@ func TestParseConfig(t *testing.T) {
 	}
 
 	fmt.Printf("version %s\n", config.Version)
-	fmt.Printf("debuglevel %s\n", config.Debuglevel)
-	fmt.Printf("loglevel %s\n", config.Loglevel)
+	fmt.Printf("debuglevel %d\n", config.DebugLevel)
+	fmt.Printf("loglevel %d\n", config.LogLevel)
 }

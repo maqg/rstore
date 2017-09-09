@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"octlink/rstore/utils/octlog"
 	"os"
 
 	yaml "gopkg.in/yaml.v2"
@@ -21,10 +22,13 @@ type Configuration struct {
 	Version string `yaml:"version"`
 
 	// Loglevel is the level at which registry operations are logged.
-	Loglevel string `yaml:"loglevel,omitempty"`
+	LogLevel int `yaml:"loglevel,omitempty"`
+
+	// LogDirectory log dir like "var/logs/"
+	LogDirectory string `yaml:"logdirectory,omitempty"`
 
 	// Debuglevel is the level for debugging.
-	Debuglevel string `yaml:"debuglevel,omitempty"`
+	DebugLevel int `yaml:"debuglevel,omitempty"`
 
 	// HugeBlob true to support huge blob, false to split blobs
 	HugeBlob bool `yaml:"hugeblob,omitempty"`
@@ -47,9 +51,6 @@ func GetConfig() *Configuration {
 
 // RootDirectory for reposity directory fetching
 func RootDirectory() string {
-	if Conf == nil {
-		return "./"
-	}
 	return Conf.RootDirectory
 }
 
@@ -111,4 +112,13 @@ func ResolveConfig(configfile string) (*Configuration, error) {
 	Conf = config
 
 	return config, nil
+}
+
+func init() {
+	Conf = &Configuration{
+		LogLevel:      octlog.DebugLevel,
+		DebugLevel:    octlog.DebugLevel,
+		RootDirectory: "./",
+		LogDirectory:  "./var/logs",
+	}
 }

@@ -299,3 +299,10 @@ func OSType() string {
 func IsPlatformWindows() bool {
 	return OSType() == config.OSTypeWindows
 }
+
+var logger *octlog.LogConfig
+
+// InitLog to init api log config
+func InitLog(level int) {
+	logger = octlog.InitLogConfig("utils.log", level)
+}
