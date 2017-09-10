@@ -22,25 +22,25 @@ func exportImage() int {
 	if blobsum == "" || outpath == "" || configfile == "" {
 		fmt.Printf("id or filepath must specified,blobsum:%s,out:%s,config:%s\n",
 			blobsum, outpath, configfile)
-		return merrors.ERR_UNACCP_PARAS
+		return merrors.ErrBadParas
 	}
 
 	conf, err := configuration.ResolveConfig(configfile)
 	if err != nil {
 		fmt.Printf("parse config %s error\n", configfile)
-		return merrors.ERR_CMD_ERR
+		return merrors.ErrCmdErr
 	}
 
 	reposDir := utils.TrimDir(conf.RootDirectory + "/" + manifest.ReposDir)
 	if !utils.IsFileExist(reposDir) {
 		fmt.Printf("Directory of %s not exist\n", reposDir)
-		return merrors.ERR_UNACCP_PARAS
+		return merrors.ErrBadParas
 	}
 
 	bm := blobsmanifest.GetBlobsManifest(blobsum)
 	if bm == nil {
 		fmt.Printf("blobs manifest of %s not exist\n", blobsum)
-		return merrors.ERR_SEGMENT_NOT_EXIST
+		return merrors.ErrSegmentNotExist
 	}
 
 	fmt.Println(utils.JSON2String(bm))
