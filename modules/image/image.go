@@ -198,7 +198,7 @@ func appendImage(im *Image) {
 }
 
 // remove image from list
-func removeImage(im *Image) {
+func removeImageFromMaps(im *Image) {
 
 	// remove from images map
 	delete(GImagesMap, im.ID)
@@ -213,22 +213,21 @@ func removeImage(im *Image) {
 	delete(GImagesIsoMap, im.ID)
 }
 
+func removeFromImageArray(s int) []*Image {
+	return append(GImages[:s], GImages[s+1:]...)
+}
+
 // Delete for image
 func (image *Image) Delete() int {
 
 	logger.Warnf("now to delete image (%s:%s)\n", image.Name, image.ID)
 
-	len := len(GImages)
-
 	for i, im := range GImages {
 		if im.ID == image.ID {
-			if i == 0 {
-				GImages = GImages[1:len]
-			} else {
-				GImages = append(GImages[0:i], GImages[i+1:len]...)
-			}
 
-			removeImage(im)
+			GImages = removeFromImageArray(i)
+
+			removeImageFromMaps(im)
 
 			// To remove manifest firstly
 			im.removeManifest()

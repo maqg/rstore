@@ -306,3 +306,14 @@ var logger *octlog.LogConfig
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("utils.log", level)
 }
+
+// RemoveFromArray for remove from array
+func RemoveFromArray(slice []interface{}, s int) []interface{} {
+	return append(slice[:s], slice[s+1:]...)
+}
+
+// RemoveFromArrayEx for remove from array without seq indexing
+func RemoveFromArrayEx(s []interface{}, i int) []interface{} {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
+}
