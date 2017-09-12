@@ -14,8 +14,6 @@ go build -o $DISTDIR/rstcli cmd/cli/main.go
 
 cd $DISTDIR
 
-mkdir -p var/logs
-
 if [ ! -x rstore ] || [ ! -x apihelper ] || [ ! -x rstcli ]; then
 	echo "Build rstore error"
 	exit 1
