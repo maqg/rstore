@@ -29,7 +29,7 @@ PACKAGE=RSTORE-$TODAY".tgz"
 echo "Packaging..."
 cp ../config.yml config-raw.yml
 cp ../restart.sh .
-tar -zcf $PACKAGE ../frontend rstore rstcli apihelper var *.yml *.sh
+tar -zcf $PACKAGE ../frontend rstore rstcli apihelper *.yml *.sh
 
 echo ""
 echo "Build Successfully, got file $PACKAGE"
