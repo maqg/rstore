@@ -55,7 +55,7 @@ func importImage() int {
 	conf = c
 
 	// to init log config
-	initLogConfig()
+	//initLogConfig()
 
 	image.ReloadImages()
 

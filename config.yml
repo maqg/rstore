@@ -6,4 +6,4 @@ logdirectory: logs
 http:
     addr: :5000
     apiAddr: :4443
-rootdirectory: ./
+rootdirectory: /rstore

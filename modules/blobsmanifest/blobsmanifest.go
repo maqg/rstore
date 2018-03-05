@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"octlink/rstore/modules/blobs"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
@@ -153,10 +154,15 @@ func (bm *BlobsManifest) Export(outpath string) error {
 	defer fd.Close()
 
 	for _, hash := range bm.Chunks {
-		b := new(blobs.Blob)
-		b.ID = hash
-		data := readBlob(b.FilePath())
-		fd.Write(data)
+		if hash == config.ZeroDataDigest8M {
+			fd.Write(config.ZeroData8M)
+			logger.Infof("no need to read zero data of %s\n", hash)
+		} else {
+			b := new(blobs.Blob)
+			b.ID = hash
+			data := readBlob(b.FilePath())
+			fd.Write(data)
+		}
 	}
 
 	return nil

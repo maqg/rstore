@@ -103,10 +103,6 @@ func GetManifest(name string, dgst string) *Manifest {
 	return manifest
 }
 
-func init() {
-	InitLog(octlog.DebugLevel)
-}
-
 // Delete for manifest self delete
 func (manifest *Manifest) Delete() error {
 	dirPath := dirpath(manifest.Name)

@@ -8,6 +8,7 @@ import (
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/merrors"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -77,12 +78,14 @@ var pushCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if id != "" && filepath != "" {
-			pushImage()
-			return
+			os.Exit(pushImage())
 		}
+
 		fmt.Printf("id and filepath must specified,id:%s,filepath:%s\n",
 			id, filepath)
 
 		cmd.Usage()
+
+		os.Exit(merrors.ErrBadParas)
 	},
 }

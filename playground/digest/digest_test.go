@@ -2,18 +2,16 @@ package dg
 
 import (
 	"fmt"
+	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
 	"testing"
 )
 
 func TestDigest(t *testing.T) {
-	a := []string{"a", "b", "c"}
-	fmt.Printf("len of a is %d\n", len(a))
-	fmt.Println(a[0:0])
-	/*
-		dd := []byte{1, 2, 4}
 
-		dgst := utils.GetDigest(dd)
+	a := make([]byte, configuration.BlobSize/2)
 
-		fmt.Printf("got digest of %s\n", dgst)
-	*/
+	digest := utils.GetDigest(a)
+
+	fmt.Printf("got digest %s\n", digest)
 }

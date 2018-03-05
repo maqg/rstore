@@ -54,7 +54,7 @@ type Image struct {
 	Format      string `json:"format"`
 	System      bool   `json:"isSystem"`
 	AccountID   string `json:"accountId"`
-	InstallPath string `json:"installPath"` // rstore://iamgeid/blobsum
+	InstallPath string `json:"installPath"` // rstore://imageid/blobsum
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 }
@@ -107,7 +107,6 @@ func UpdateImageCallback(imageID string, diskSize int64, virtualSize int64,
 	im.VirtualSize = virtualSize
 	im.Md5Sum = blobsum
 	im.InstallPath = fmt.Sprintf("rstore://%s/%s", im.ID, im.Md5Sum)
-	im.Status = status
 
 	WriteImages()
 
@@ -190,6 +189,7 @@ func appendImage(im *Image) {
 
 	case config.ImageTypeDataVolume:
 		GImagesDataTemplateMap[im.ID] = im
+		break
 
 	case config.ImageTypeIso:
 		GImagesIsoMap[im.ID] = im

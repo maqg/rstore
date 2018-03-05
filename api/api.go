@@ -62,8 +62,9 @@ type Proto struct {
 }
 
 // InitAPILog to init api log config
-func InitAPILog(level int) {
+func InitAPILog(level int) *octlog.LogConfig {
 	logger = octlog.InitLogConfig("api.log", level)
+	return logger
 }
 
 // Module of API

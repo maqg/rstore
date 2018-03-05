@@ -29,15 +29,20 @@ func initDebugConfig() {
 	octlog.InitDebugConfig(conf.DebugLevel)
 }
 
-func initLogConfig() {
+func initLogConfig() int {
 
-	utils.CreateDir(conf.RootDirectory + conf.LogDirectory)
+	utils.CreateDir(configuration.LogDirectory())
 
-	api.InitAPILog(conf.LogLevel)
+	if api.InitAPILog(conf.LogLevel) == nil {
+		fmt.Printf("init API log error\n")
+		return -1
+	}
 
 	blobs.InitLog(conf.LogLevel)
 
 	blobsmanifest.InitLog(conf.LogLevel)
+
+	manifest.InitLog(conf.LogLevel)
 
 	utils.InitLog(conf.LogLevel)
 
@@ -46,11 +51,14 @@ func initLogConfig() {
 	handlers.InitLog(conf.LogLevel)
 
 	task.InitLog(conf.LogLevel)
+
+	return 0
 }
 
-func initDebugAndLog() {
+func initDebugAndLog() int {
 	initDebugConfig()
-	initLogConfig()
+
+	return initLogConfig()
 }
 
 func init() {
@@ -106,7 +114,10 @@ func main() {
 	initRootDirectory()
 
 	// for debug and log config
-	initDebugAndLog()
+	if initDebugAndLog() != 0 {
+		fmt.Printf("Init Debug and Log config error\n")
+		return
+	}
 
 	// ReloadImages here
 	image.ReloadImages()

@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobsmanifest"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
+	"octlink/rstore/utils/configuration"
+	"octlink/rstore/utils/merrors"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -18,6 +21,13 @@ func init() {
 }
 
 func getBlob(name string, blobhash string) ([]byte, int, error) {
+
+	if blobhash == config.ZeroDataDigest8M {
+		// zero data no need fetch from remote
+		fmt.Printf("zero data no need fetch from remote\n")
+		return config.ZeroData8M, configuration.BlobSize, nil
+	}
+
 	url := fmt.Sprintf("http://%s/v1/%s/blobs/%s", address, name, blobhash)
 	data, len, err := blobs.HTTPGetBlob(url)
 	if err != nil {
@@ -28,19 +38,19 @@ func getBlob(name string, blobhash string) ([]byte, int, error) {
 	return data, len, nil
 }
 
-func pullImage() {
+func pullImage() int {
 
 	name, digest := manifest.ParseInstallPath(installpath)
 	if name == "" || digest == "" {
 		fmt.Printf("name and digest must be specified\n")
-		return
+		return merrors.ErrBadParas
 	}
 
 	url := fmt.Sprintf("http://%s/v1/%s/manifests/%s", address, name, digest)
 	manifest, err := manifest.HTTPGetManifest(url)
 	if err != nil {
 		fmt.Printf("get manifest from url %s error, manifest may not exist\n", url)
-		return
+		return merrors.ErrSegmentNotExist
 	}
 
 	fmt.Printf("got manifest %s\n", utils.JSON2String(manifest))
@@ -49,14 +59,14 @@ func pullImage() {
 	blobs, err := blobsmanifest.HTTPGetBlobsManifest(url)
 	if err != nil {
 		fmt.Printf("got blobsmanifest error from url %s\n", url)
-		return
+		return merrors.ErrUserNotExist
 	}
 	fmt.Printf("got blobsmanifest %s\n", utils.JSON2String(blobs))
 
 	fd, err := os.Create(outpath)
 	if err != nil {
 		fmt.Printf("create output file %s error\n", outpath)
-		return
+		return merrors.ErrCmdErr
 	}
 
 	defer fd.Close()
@@ -68,13 +78,15 @@ func pullImage() {
 		if err != nil {
 			fmt.Printf("got blob of %s error\n", blob)
 			fmt.Printf("Pull Image of %s error\n", installpath)
-			return
+			return merrors.ErrSyscallErr
 		}
 		fd.Write(data)
 		total += len
 	}
 
 	fmt.Printf("pull image of %s to %s length[%d] OK\n", installpath, outpath, total)
+
+	return merrors.ErrSuccess
 }
 
 var pullCmd = &cobra.Command{
@@ -87,10 +99,11 @@ var pullCmd = &cobra.Command{
 		fmt.Printf("running in pull service\n")
 
 		if installpath != "" {
-			pullImage()
-			return
+			os.Exit(pullImage())
 		}
 
 		cmd.Usage()
+
+		os.Exit(merrors.ErrBadParas)
 	},
 }

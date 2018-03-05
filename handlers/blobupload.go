@@ -33,6 +33,8 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if b.IsExist() {
+		b.IncRefCount()
+		b.WriteRefCount()
 		serviceresp.StatusOKResp(w)
 		logger.Warnf("blob of %s already exist", digest)
 		return

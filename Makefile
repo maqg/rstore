@@ -4,6 +4,7 @@ all::
 clean::
 	rm -rf bin/*
 	rm -rf rstore
+	rm -rf package
 
 fmt::
 	go fmt .

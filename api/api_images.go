@@ -120,9 +120,10 @@ func DeleteImageByAccount(paras *Paras) *Response {
 // DeleteImage to delete image
 func DeleteImage(paras *Paras) *Response {
 
+	logger.Errorf("start delete image %s\n", paras.Get("id"))
 	image := image.GetImage(paras.Get("id"))
 	if image == nil {
-		logger.Errorf("image of %s not exit\n", paras.Get("id"))
+		logger.Errorf("image of %s not exist\n", paras.Get("id"))
 		return &Response{
 			Error: merrors.ErrSegmentNotExist,
 		}

@@ -1,12 +1,8 @@
 package main
 
-import (
-	"octlink/rstore/api"
-	"octlink/rstore/cmd/cli/clis"
-	"octlink/rstore/modules/blobs"
-	"octlink/rstore/utils/octlog"
-)
+import "octlink/rstore/cmd/cli/clis"
 
+/*
 func initDebugConfig() {
 	octlog.InitDebugConfig(octlog.DebugLevel)
 }
@@ -20,6 +16,7 @@ func init() {
 	initDebugConfig()
 	initLogConfig()
 }
+*/
 
 func main() {
 	clis.RootCmd.Execute()

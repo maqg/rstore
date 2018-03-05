@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"octlink/rstore/modules/config"
 	"octlink/rstore/modules/manifest"
 	"octlink/rstore/utils"
 	"octlink/rstore/utils/configuration"
@@ -26,10 +27,6 @@ type Blob struct {
 // InitLog to init log config
 func InitLog(level int) {
 	logger = octlog.InitLogConfig("blob.log", level)
-}
-
-func init() {
-	InitLog(octlog.DebugLevel)
 }
 
 // DirPath to make blob path
@@ -210,7 +207,14 @@ func (b *Blob) Write() error {
 }
 
 func writeBlob(data []byte) string {
+
 	dgst := utils.GetDigest(data)
+	if dgst == config.ZeroDataDigest8M {
+		// ZeroData no need to store
+		logger.Infof("zero data of %s no need to write\n", dgst)
+		return dgst
+	}
+
 	if !configuration.HugeBlob() {
 		b := &Blob{
 			ID:   dgst,
@@ -280,6 +284,11 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 // HTTPWriteBlob To write blob from file by HTTP
 func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
 
+	if dgst == config.ZeroDataDigest8M {
+		logger.Infof("got zero data, no need to upload this blob %s\n", dgst)
+		return nil
+	}
+
 	url := urlPattern + "?digest=" + dgst
 	reader := bytes.NewReader(data)
 	reqeust, err := http.NewRequest("POST", url, reader)
@@ -326,6 +335,17 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 		n, err := f.Read(buffer)
 		if err == io.EOF {
 			logger.Warnf("reached end of file[%d]\n", n)
+			if n > 0 {
+				dgst := utils.GetDigest(buffer[:n])
+				err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
+				if err != nil {
+					logger.Errorf("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
+					return hashList, fileLength, err
+				}
+				hashList = append(hashList, dgst)
+				fileLength += int64(n)
+			}
+
 			break
 		}
 		fileLength += int64(n)

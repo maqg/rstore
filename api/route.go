@@ -16,7 +16,7 @@ func (api *API) Router() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 
 	if !utils.IsFileExist("frontend") {
-		baseDir = "../"
+		baseDir = "/OCT/OCTFrame/rstore/"
 	}
 
 	router.LoadHTMLGlob(baseDir + "frontend/apitest/templates/*.html")

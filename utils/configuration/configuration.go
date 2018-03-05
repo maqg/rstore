@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -50,12 +51,20 @@ func GetConfig() *Configuration {
 
 // LogDirectory for configuration
 func LogDirectory() string {
-	return Conf.RootDirectory + Conf.LogDirectory
+	if strings.HasSuffix(Conf.RootDirectory, "/") {
+		return Conf.RootDirectory + Conf.LogDirectory
+	}
+	return Conf.RootDirectory + "/" + Conf.LogDirectory
 }
 
 // RootDirectory for reposity directory fetching
 func RootDirectory() string {
-	return Conf.RootDirectory
+
+	if strings.HasSuffix(Conf.RootDirectory, "/") {
+		return Conf.RootDirectory
+	}
+
+	return Conf.RootDirectory + "/"
 }
 
 // HugeBlob for huge blob support or not
