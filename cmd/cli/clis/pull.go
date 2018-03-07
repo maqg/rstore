@@ -81,11 +81,11 @@ func pullImage() int {
 			return merrors.ErrSyscallErr
 		}
 		fd.Write(data)
-		total += len
+		total += int64(len)
 	}
 
 	if total != blobs.Size {
-		fmt.Printf("size fetched %lld not match size %lld\n", total, blobs.Size)
+		fmt.Printf("size fetched %d not match size %d\n", total, blobs.Size)
 		return merrors.ErrCommonErr
 	}
 

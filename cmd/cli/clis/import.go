@@ -54,8 +54,7 @@ func importImage() int {
 	}
 	conf = c
 
-	// to init log config
-	//initLogConfig()
+	fmt.Printf("with config of HugeBlob %v\n", conf.HugeBlob)
 
 	image.ReloadImages()
 
@@ -65,7 +64,14 @@ func importImage() int {
 		return merrors.ErrBadParas
 	}
 
-	hashes, size, err := blobs.ImportBlobs(filepath)
+	var hashes []string
+	var size int64
+
+	if conf.HugeBlob {
+		hashes, size, err = blobs.ImportHugeBlob(filepath)
+	} else {
+		hashes, size, err = blobs.ImportBlobs(filepath)
+	}
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ErrCommonErr
@@ -84,9 +90,12 @@ func importImage() int {
 
 	// for hugeblob supporting, copy file to blobs
 	if configuration.HugeBlob() {
-		dstFile := configuration.RootDirectory() + manifest.BlobDir + "/" + bm.BlobSum
-		fmt.Printf("for huge blob mode, copy %s to %s\n", filepath, dstFile)
-		utils.CopyFile(filepath, dstFile)
+		dstFileDir := configuration.RootDirectory() + manifest.ManifestDir + "/" + bm.BlobSum
+		utils.CreateDir(dstFileDir)
+
+		dstFilePath := dstFileDir + "/" + "image"
+		fmt.Printf("for huge blob mode, copy %s to %s\n", filepath, dstFilePath)
+		utils.CopyFile(filepath, dstFilePath)
 	}
 
 	// write manifest config

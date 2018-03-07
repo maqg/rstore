@@ -1,9 +1,9 @@
 version: 0.1
 debuglevel: 5
 loglevel: 5
-hugeblob: false
+hugeblob: true
 logdirectory: logs
 http:
     addr: :5000
     apiAddr: :4443
-rootdirectory: /rstore
+rootdirectory: ./rstorelocal

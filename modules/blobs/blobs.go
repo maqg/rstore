@@ -226,6 +226,41 @@ func writeBlob(data []byte) string {
 	return dgst
 }
 
+// ImportHugeBlob to write a huge file to repos.
+func ImportHugeBlob(filepath string) ([]string, int64, error) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		logger.Errorf("file of %s not exist\n", filepath)
+		return nil, 0, err
+	}
+	defer f.Close()
+	
+	var fileLength int64
+	hashList := make([]string, 0)
+	for {
+		buffer := make([]byte, configuration.BlobSize)
+		n, err := f.Read(buffer)
+		if err == io.EOF {
+			if n > 0 {
+				dgst := utils.GetDigest(buffer[:n])
+				hashList = append(hashList, dgst)
+				fileLength += int64(n)
+			}
+			break
+		} else if err != nil {
+			logger.Errorf("read file error %s, %s bytes already read\n", err, filepath)
+			return nil, fileLength, err
+		}
+
+		dgst := utils.GetDigest(buffer[:n])
+		fileLength += int64(n)
+		hashList = append(hashList, dgst)
+	}
+
+	return hashList, fileLength, nil
+	
+}
+
 // ImportBlobs to write blobs from file and return its hash values
 func ImportBlobs(filepath string) ([]string, int64, error) {
 
