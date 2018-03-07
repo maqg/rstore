@@ -103,7 +103,7 @@ func GetBlobPartial(name string, digest string) *Blob {
 }
 
 // GetBlob to get blob from web api
-func GetBlob(name string, digest string) *Blob {
+func GetBlob(blobSum string, digest string) *Blob {
 
 	b := new(Blob)
 	b.ID = digest

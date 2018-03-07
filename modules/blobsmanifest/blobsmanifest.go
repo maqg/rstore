@@ -138,8 +138,41 @@ func readBlob(filepath string) []byte {
 	return data
 }
 
+// GetBlobHuge to get blob from huge file image.
+func GetBlobHuge(blobSum string, digest string) *blobs.Blob {
+	blobManifest := GetBlobsManifest(blobSum)
+	if blobManifest == nil {
+		logger.Errorf("blob-manifest %s not exist", blobSum)
+		return nil
+	}
+
+	imageFilePath := configuration.RootDirectory() + "/" + manifest.ManifestDir + "/" + blobSum + "/" + "image"
+
+	logger.Debugf("image file path of huge file %s", imageFilePath)
+
+	b := new(blobs.Blob)
+	b.ID = digest
+	//b.Data = data
+	//b.Size = utils.GetFileSize(b.FilePath())
+	b.RefCount = 1
+
+	return b	
+}
+
+// ExportHuge to export hugeblog file
+func (bm *BlobsManifest)ExportHuge(outpath string, manifestDir string) error {
+	if utils.IsFileExist(outpath) {
+		os.Remove(outpath)
+	}
+
+	srcFilePath := manifestDir + "/" + bm.BlobSum + "/" + "image"
+	_, err := utils.CopyFile(srcFilePath, outpath)
+
+	return err
+}
+
 // Export file to outpath
-func (bm *BlobsManifest) Export(outpath string) error {
+func (bm *BlobsManifest)Export(outpath string) error {
 
 	if utils.IsFileExist(outpath) {
 		os.Remove(outpath)

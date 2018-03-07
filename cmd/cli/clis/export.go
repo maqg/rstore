@@ -45,9 +45,14 @@ func exportImage() int {
 
 	fmt.Println(utils.JSON2String(bm))
 
-	err = bm.Export(outpath)
+	if conf.HugeBlob {
+		err = bm.ExportHuge(outpath, conf.RootDirectory + "/" + manifest.ManifestDir)
+	} else {
+		err = bm.Export(outpath)
+	}
 	if err != nil {
-		fmt.Printf("export image to %s error\n", outpath)
+		fmt.Printf("export image %s to %s error\n", blobsum, outpath)
+		return -1;
 	}
 
 	fmt.Printf("Export image of %s to %s OK\n", blobsum, outpath)

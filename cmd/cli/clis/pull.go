@@ -20,7 +20,7 @@ func init() {
 	pullCmd.Flags().StringVarP(&address, "address", "a", "localhost:5000", "Rstore Server Address")
 }
 
-func getBlob(name string, blobhash string) ([]byte, int, error) {
+func getBlob(blobSum string, blobhash string) ([]byte, int, error) {
 
 	if blobhash == config.ZeroDataDigest8M {
 		// zero data no need fetch from remote
@@ -28,7 +28,7 @@ func getBlob(name string, blobhash string) ([]byte, int, error) {
 		return config.ZeroData8M, configuration.BlobSize, nil
 	}
 
-	url := fmt.Sprintf("http://%s/v1/%s/blobs/%s", address, name, blobhash)
+	url := fmt.Sprintf("http://%s/v1/%s/blobs/%s", address, blobSum, blobhash)
 	data, len, err := blobs.HTTPGetBlob(url)
 	if err != nil {
 		fmt.Printf("got blob from url %s error\n", url)
@@ -74,7 +74,7 @@ func pullImage() int {
 	// Start to downloan blobs
 	var total int64
 	for _, blob := range blobs.Chunks {
-		data, len, err := getBlob(name, blob)
+		data, len, err := getBlob(manifest.BlobSum, blob)
 		if err != nil {
 			fmt.Printf("got blob of %s error\n", blob)
 			fmt.Printf("Pull Image of %s error\n", installpath)

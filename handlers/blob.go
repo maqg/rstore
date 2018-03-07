@@ -30,7 +30,7 @@ func RenderMsg(w http.ResponseWriter, r *http.Request, data interface{}) {
 // GetBlob to get blob from web api
 func getBlob(w http.ResponseWriter, r *http.Request) {
 
-	name := mux.Vars(r)["name"]
+	name := mux.Vars(r)["name"] // now means blobsum
 	digest := mux.Vars(r)["digest"]
 
 	b := blobs.GetBlob(name, digest)
