@@ -72,7 +72,7 @@ func pullImage() int {
 	defer fd.Close()
 
 	// Start to downloan blobs
-	var total int
+	var total int64
 	for _, blob := range blobs.Chunks {
 		data, len, err := getBlob(name, blob)
 		if err != nil {
@@ -82,6 +82,11 @@ func pullImage() int {
 		}
 		fd.Write(data)
 		total += len
+	}
+
+	if total != blobs.Size {
+		fmt.Printf("size fetched %lld not match size %lld\n", total, blobs.Size)
+		return merrors.ErrCommonErr
 	}
 
 	fmt.Printf("pull image of %s to %s length[%d] OK\n", installpath, outpath, total)
