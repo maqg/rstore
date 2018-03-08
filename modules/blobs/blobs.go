@@ -1,6 +1,7 @@
 package blobs
 
 import (
+	"fmt"
 	"bytes"
 	"errors"
 	"io"
@@ -243,6 +244,7 @@ func ImportHugeBlob(filepath string) ([]string, int64, error) {
 		if err == io.EOF {
 			if n > 0 {
 				dgst := utils.GetDigest(buffer[:n])
+				dgst = fmt.Sprintf("%s_%d_%d", dgst, len(hashList), n)
 				hashList = append(hashList, dgst)
 				fileLength += int64(n)
 			}
@@ -254,6 +256,7 @@ func ImportHugeBlob(filepath string) ([]string, int64, error) {
 
 		dgst := utils.GetDigest(buffer[:n])
 		fileLength += int64(n)
+		dgst = fmt.Sprintf("%s_%d_%d", dgst, len(hashList), n)
 		hashList = append(hashList, dgst)
 	}
 

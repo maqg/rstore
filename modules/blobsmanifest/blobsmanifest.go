@@ -139,7 +139,7 @@ func readBlob(filepath string) []byte {
 }
 
 // GetBlobHuge to get blob from huge file image.
-func GetBlobHuge(blobSum string, digest string) *blobs.Blob {
+func GetBlobHuge(blobSum string, digest string, index int, length int) *blobs.Blob {
 	blobManifest := GetBlobsManifest(blobSum)
 	if blobManifest == nil {
 		logger.Errorf("blob-manifest %s not exist", blobSum)
@@ -150,10 +150,17 @@ func GetBlobHuge(blobSum string, digest string) *blobs.Blob {
 
 	logger.Debugf("image file path of huge file %s", imageFilePath)
 
+	data, err := utils.GetFileData(imageFilePath, index, length)
+	if err != nil {
+		logger.Errorf("get data from file %s error, index %d, length %d, %s",
+		imageFilePath, index, length, err)
+		return nil;
+	}
+
 	b := new(blobs.Blob)
 	b.ID = digest
-	//b.Data = data
-	//b.Size = utils.GetFileSize(b.FilePath())
+	b.Data = data
+	b.Size = int64(length)
 	b.RefCount = 1
 
 	return b	

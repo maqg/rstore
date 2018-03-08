@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"octlink/rstore/modules/blobsmanifest"
 	"fmt"
 	"net/http"
 	"octlink/rstore/modules/blobs"
@@ -30,10 +31,17 @@ func RenderMsg(w http.ResponseWriter, r *http.Request, data interface{}) {
 // GetBlob to get blob from web api
 func getBlob(w http.ResponseWriter, r *http.Request) {
 
+	var b *blobs.Blob
+
 	name := mux.Vars(r)["name"] // now means blobsum
 	digest := mux.Vars(r)["digest"]
 
-	b := blobs.GetBlob(name, digest)
+	dgst, index, length := utils.ParseBlobDigest(digest)
+	if length != 0 { // get blob digest like
+		b = blobsmanifest.GetBlobHuge(name, dgst, index, length)
+	} else {
+		b = blobs.GetBlob(name, digest)
+	}
 	if b == nil {
 		logger.Errorf("get blob by %s:%s error\n", name, digest)
 		RenderErrorMsg(w, r, "blob of "+digest+" not exist")

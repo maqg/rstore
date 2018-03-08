@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"octlink/rstore/utils/configuration"
+	"errors"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -154,6 +156,34 @@ func GetFileSize(path string) int64 {
 	return stat.Size()
 }
 
+// GetFileData to get file content by index and length
+func GetFileData(filepath string, index int, length int) ([]byte, error) {
+
+	if !IsFileExist(filepath) {
+		return nil, errors.New("file not exist")
+	}
+
+	fd, err := os.Open(filepath)
+	if err != nil {
+		return nil, errors.New("open file error")
+	}
+
+	defer fd.Close()
+
+	fd.Seek(int64(configuration.BlobSize * index), 0)
+	buffer := make([]byte, length)
+	n, err := fd.Read(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	if n != length {
+		return nil, errors.New("no enough bytes data to fetch")
+	}
+
+	return buffer, nil
+}
+
 const (
 	//QemuImgTool for virtual size fetching
 	QemuImgTool = "/usr/bin/qemu-img"
@@ -267,6 +297,35 @@ func SendUserSignal(pname string) {
 		cmd := fmt.Sprintf("pidof %s | xargs kill -USR1 > /dev/null 2>&1", pname)
 		OCTSystem(cmd)
 	}
+}
+
+// String2Int convert string to 32-bit int
+func String2Int(src string) int {
+	val, err := strconv.ParseInt(src, 10, 32)
+	if err != nil {
+		return -1
+	}
+	return int(val)
+}
+
+// String2Int64 convert string to int64
+func String2Int64(src string) int64 {
+	val, err := strconv.ParseInt(src, 10, 64)
+	if err != nil {
+		return -1
+	}
+	return val
+}
+
+// ParseBlobDigest for common digest, return dgst, 0, 0
+// for huge blob, return dgst, index, length
+func ParseBlobDigest(dgst string) (string, int, int) {
+	segs := strings.Split(dgst, "_")
+	if len(segs) == 1 {
+		return dgst, 0, 0
+	}
+
+	return segs[0], String2Int(segs[1]), String2Int(segs[2])
 }
 
 // CopyFile for srcfile to dst file, return size on success
