@@ -1,6 +1,7 @@
 package clis
 
 import (
+	"octlink/rstore/utils/uuid"
 	"fmt"
 	"octlink/rstore/api/v1"
 	"octlink/rstore/modules/blobs"
@@ -27,8 +28,11 @@ func pushImage() int {
 		return merrors.ErrBadParas
 	}
 
+	// for hugeblob mode, need a temp name
+	tempName := id + "_" + uuid.Generate().Simple()
+
 	urlPattern := fmt.Sprintf(v1.APIURLFormatBlobUpload, address, id)
-	hashes, size, err := blobs.HTTPWriteBlobs(filepath, urlPattern)
+	hashes, size, err := blobs.HTTPWriteBlobs(filepath, urlPattern, tempName)
 	if err != nil {
 		fmt.Printf("got file hashlist error\n")
 		return merrors.ErrCommonErr
@@ -54,7 +58,9 @@ func pushImage() int {
 	manifest.CreateTime = utils.CurrentTimeStr()
 	manifest.BlobSum = bm.BlobSum
 
-	err = manifest.HTTPWrite(fmt.Sprintf(v1.APIURLFormatManifests, address, id, bm.BlobSum))
+	url := fmt.Sprintf(v1.APIURLFormatManifests, address, id, bm.BlobSum)
+	url += "?tempName=" + tempName
+	err = manifest.HTTPWrite(url)
 	if err != nil {
 		fmt.Printf("Create manifest error[%s]\n", err)
 		// TDB,rollback

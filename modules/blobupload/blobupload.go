@@ -1,6 +1,7 @@
 package blobupload
 
 import (
+	"fmt"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -64,8 +65,7 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 		logger.Errorf("the ResponseWriter does not implement CloseNotifier (type: %T)", responseWriter)
 	}
 
-	// Read in the data, if any.
-	destWriter, err := os.Create(filepath)
+	destWriter, err := os.OpenFile(filepath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0)
 	if err != nil {
 		logger.Errorf("create file of %s error\n", filepath)
 		return err
@@ -80,6 +80,7 @@ func CopyFullPayload(responseWriter http.ResponseWriter, r *http.Request, filepa
 	len, err := destWriter.Write(data)
 	if err != nil {
 		logger.Errorf("Write data to dest writer error\n")
+		fmt.Printf("Write data to dest writer error\n")
 		return nil
 	}
 

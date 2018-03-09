@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"octlink/rstore/utils/configuration"
+	"octlink/rstore/modules/manifest"
 	"fmt"
 	"net/http"
 	"octlink/rstore/modules/blobs"
@@ -11,10 +13,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func blobHugeUpload(w http.ResponseWriter, r *http.Request, name string, digest string, tempName string) {
+	tempFile := configuration.RootDirectory() + manifest.TempDir + "/" + tempName
+	err := blobupload.CopyFullPayload(w, r, tempFile)
+	if err != nil {
+		logger.Errorf("copy full data for blob %s error\n", digest)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	serviceresp.StatusOKResp(w)
+}
+
 func blobUpload(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
 	digest := r.FormValue("digest")
+	tempName := r.FormValue("tempName")
 
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -27,6 +42,13 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
+
+	if tempName != "" {
+		fmt.Printf("running in blob huge uploading %s,digest %s\n", tempName, digest)
+		blobHugeUpload(w, r, name, digest, tempName)
+		return
+	}
+	fmt.Printf("running in blob uploading %s,digest %s\n", tempName, digest)
 
 	b := blobs.Blob{
 		ID: digest,

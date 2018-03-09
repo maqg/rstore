@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"octlink/rstore/utils/configuration"
+	"os"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -69,17 +71,25 @@ func deleteManifest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func removeTempFile(tempName string) {
+	if tempName != "" {
+		os.RemoveAll(configuration.RootDirectory() + manifest.TempDir + "/" + tempName)
+	}
+}
+
 func postManifest(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
 	digest := mux.Vars(r)["digest"]
+	tempName := r.FormValue("tempName")	
 
+	// bad args for manifest post
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	logger.Debugf("got manifest post request %s:%s\n", name, digest)
+	logger.Debugf("got manifest post request %s:%s:%s\n", name, digest, tempName)
 
 	m := manifest.GetManifest(name, digest)
 	if m != nil {
@@ -88,6 +98,10 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			logger.Warnf("update image info %s error, and manifest created OK\n", m.Name)
 		}
+
+		// remove tempfile for this manifest
+		removeTempFile(tempName)
+
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -96,19 +110,28 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		logger.Errorf("readall data from http body error %s\n", err)
+		// remove tempfile for this manifest
+		removeTempFile(tempName)
 		return
 	}
 
 	m = new(manifest.Manifest)
 	if err = json.Unmarshal(data, m); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		logger.Errorf("convert data to json error %s\n", err)
+		
+		// remove tempfile for this manifest
+		removeTempFile(tempName)
+
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err = m.Write(); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		logger.Errorf("error happend for manifest write %s\n", err)
+		// remove tempfile for this manifest
+		removeTempFile(tempName)
+
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -116,6 +139,15 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		m.BlobSum, config.ImageStatusReady)
 	if err != nil {
 		logger.Infof("update image info %s error, and manifest created OK\n", m.Name)
+	}
+
+	if tempName != "" {
+		imageFilePath := configuration.RootDirectory() + manifest.TempDir + "/" + tempName
+		destFilePath := configuration.RootDirectory() + manifest.ManifestDir + "/" + m.BlobSum
+		if utils.IsFileExist(imageFilePath) {
+			utils.CreateDir(destFilePath)
+			os.Rename(imageFilePath, destFilePath)
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

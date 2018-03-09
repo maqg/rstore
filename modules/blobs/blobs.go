@@ -320,14 +320,14 @@ func HTTPGetBlob(url string) ([]byte, int, error) {
 }
 
 // HTTPWriteBlob To write blob from file by HTTP
-func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
+func HTTPWriteBlob(urlPattern string, dgst string, data []byte, tempName string) error {
 
 	if dgst == config.ZeroDataDigest8M {
 		logger.Infof("got zero data, no need to upload this blob %s\n", dgst)
 		return nil
 	}
 
-	url := urlPattern + "?digest=" + dgst
+	url := urlPattern + "?digest=" + dgst + "&tempName=" + tempName
 	reader := bytes.NewReader(data)
 	reqeust, err := http.NewRequest("POST", url, reader)
 	if err != nil {
@@ -354,7 +354,7 @@ func HTTPWriteBlob(urlPattern string, dgst string, data []byte) error {
 }
 
 // HTTPWriteBlobs to write blobs from file by HTTP
-func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error) {
+func HTTPWriteBlobs(filepath string, urlPattern string, tempName string) ([]string, int64, error) {
 
 	logger.Debugf("file %s, url %s\n", filepath, urlPattern)
 
@@ -375,7 +375,8 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 			logger.Warnf("reached end of file[%d]\n", n)
 			if n > 0 {
 				dgst := utils.GetDigest(buffer[:n])
-				err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
+				dgst = fmt.Sprintf("%s_%d_%d", dgst, len(hashList), n)
+				err = HTTPWriteBlob(urlPattern, dgst, buffer[:n], tempName)
 				if err != nil {
 					logger.Errorf("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
 					return hashList, fileLength, err
@@ -394,8 +395,8 @@ func HTTPWriteBlobs(filepath string, urlPattern string) ([]string, int64, error)
 		}
 
 		dgst := utils.GetDigest(buffer[:n])
-
-		err = HTTPWriteBlob(urlPattern, dgst, buffer[:n])
+		dgst = fmt.Sprintf("%s_%d_%d", dgst, len(hashList), n)
+		err = HTTPWriteBlob(urlPattern, dgst, buffer[:n], tempName)
 		if err != nil {
 			logger.Errorf("http post blob error url:%s,blob:%s\n", urlPattern, dgst)
 			return hashList, fileLength, err
