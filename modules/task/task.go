@@ -88,10 +88,17 @@ func GetTask(id string) *Task {
 
 // UpdateFilePath update and write file path
 func (t *Task) UpdateFilePath() {
-	segs := strings.Split(t.URL, "/")
-	t.FileName = segs[len(segs)-1]
-	t.FilePath = configuration.GetConfig().RootDirectory + "/registry/temp/" +
-		uuid.Generate().Simple() + "EEEEE" + t.FileName
+
+	if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+		segs := strings.Split(t.URL, "/")
+		t.FileName = segs[len(segs)-1]
+		t.FilePath = configuration.GetConfig().RootDirectory + "/registry/temp/" +
+				uuid.Generate().Simple() + "EEEEE" + t.FileName		
+	} else { // for local file import
+		segs := strings.Split(t.URL, "/")
+		t.FileName = segs[len(segs)-1]
+		t.FilePath = t.URL
+	}
 
 	logger.Debugf("update file dst path %s\n", t.FilePath)
 }
@@ -159,8 +166,55 @@ func (t *Task) WriteManifest(blobsum string) (*manifest.Manifest, error) {
 	return m, nil
 }
 
+
+func importImage(t *Task) {
+	bm, err := t.ImportBlobs()
+	if err != nil {
+		logger.Errorf("import blobs error %s for %s\n", err, t.FileName)
+		t.Error()
+
+		// Remove temp file when failed to add image
+		if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+			utils.Remove(t.FilePath)
+		}
+		return
+	}
+
+	m, err := t.WriteManifest(bm.BlobSum)
+	if err != nil {
+		logger.Errorf("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
+		t.Error()
+		// Remove temp file when failed to add image
+		if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+			utils.Remove(t.FilePath)
+		}		
+		return
+	}
+
+	// update task status and image info
+	t.Finish(m.DiskSize, m.VirtualSize, m.BlobSum)
+
+	logger.Debugf("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
+}
+
 // Download Image from URL
 func (t *Task) Download() {
+
+	if t.URL[:4] != "http" && t.URL[:4] != "ftp" {
+			
+		t.UpdateFilePath()
+
+		// import image from local
+		if !utils.IsFileExist(t.URL) {
+			logger.Errorf("local url to import of %s not exist", t.URL)
+			t.Error()
+			return
+		}
+		t.FileLength = utils.GetFileSize(t.URL)
+
+		importImage(t)
+		return
+	}
 
 	r, err := http.Get(t.URL)
 	if err != nil {
@@ -168,7 +222,6 @@ func (t *Task) Download() {
 		t.Error()
 		return
 	}
-
 	defer r.Body.Close()
 
 	t.UpdateFilePath()
@@ -214,25 +267,7 @@ func (t *Task) Download() {
 		}
 	}
 
-	bm, err := t.ImportBlobs()
-	if err != nil {
-		logger.Errorf("import blobs error %s for %s\n", err, t.FileName)
-		t.Error()
-		// TBD remove template file
-		return
-	}
-
-	m, err := t.WriteManifest(bm.BlobSum)
-	if err != nil {
-		logger.Errorf("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
-		t.Error()
-		return
-	}
-
-	// update task status and image info
-	t.Finish(m.DiskSize, m.VirtualSize, m.BlobSum)
-
-	logger.Debugf("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
+	importImage(t)
 
 	return
 }
