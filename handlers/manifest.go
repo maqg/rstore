@@ -73,7 +73,7 @@ func deleteManifest(w http.ResponseWriter, r *http.Request) {
 
 func removeTempFile(tempName string) {
 	if tempName != "" {
-		os.RemoveAll(configuration.RootDirectory() + manifest.TempDir + "/" + tempName)
+		os.Remove(configuration.RootDirectory() + manifest.TempDir + "/" + tempName)
 	}
 }
 

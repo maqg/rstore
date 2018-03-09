@@ -56,12 +56,21 @@ func blobsManifestPath(dgst string) string {
 func (bm *BlobsManifest) Delete() error {
 
 	for _, chunk := range bm.Chunks {
+		// for Huge Blob mode, no need remove blobs
+		_, _, length := utils.ParseBlobDigest(chunk)
+		if length != 0 {
+			break
+		}
 
 		b := blobs.GetBlobPartial("", chunk)
 		if b != nil {
 			b.Delete()
 		}
 	}
+
+	// to remove Huge Blob Image
+	imageDir := configuration.RootDirectory() + manifest.ManifestDir + "/" + bm.BlobSum
+	utils.RemoveDir(imageDir)
 
 	utils.Remove(blobsManifestPath(bm.BlobSum))
 

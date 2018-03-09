@@ -106,7 +106,16 @@ func (t *Task) UpdateFilePath() {
 // ImportBlobs and then write blobs-manifest config
 func (t *Task) ImportBlobs() (*blobsmanifest.BlobsManifest, error) {
 
-	hashes, len, err := blobs.ImportBlobs(t.FilePath)
+	var hashes []string
+	var len int64
+	var err error
+
+	hugeBlob := configuration.GetConfig().HugeBlob
+	if hugeBlob {
+		hashes, len, err = blobs.ImportHugeBlob(t.FilePath)
+	} else {
+		hashes, len, err = blobs.ImportBlobs(t.FilePath)
+	}
 	if err != nil {
 		logger.Errorf("got file hashlist error\n")
 		return nil, err

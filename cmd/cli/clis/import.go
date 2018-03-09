@@ -77,6 +77,11 @@ func importImage() int {
 		return merrors.ErrCommonErr
 	}
 
+	if size != utils.GetFileSize(filepath) {
+		fmt.Printf("filelen not match %d\n", size)
+		return merrors.ErrCmdErr
+	}
+
 	// write blobs-manifest config
 	bm := new(blobsmanifest.BlobsManifest)
 	bm.Size = size
