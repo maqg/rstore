@@ -57,7 +57,7 @@ func (app *App) dispatcher(dispatch dispatchFunc) http.Handler {
 // request time.
 func (app *App) register(routeName string, dispatch dispatchFunc) {
 	if app.Router == nil {
-		fmt.Printf("app router is null\n")
+		logger.Errorf("app router is null\n")
 	}
 	app.Router.GetRoute(routeName).Handler(app.dispatcher(dispatch))
 }

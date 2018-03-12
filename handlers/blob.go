@@ -67,6 +67,7 @@ func deleteBlob(w http.ResponseWriter, r *http.Request) {
 	b := blobs.GetBlobPartial(name, digest)
 	if b == nil {
 		w.WriteHeader(http.StatusNotFound)
+		logger.Errorf("blob digest of %s not exist to delete\n", digest)
 		return
 	}
 

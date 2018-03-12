@@ -22,7 +22,9 @@ func init() {
 
 func getBlob(blobSum string, blobhash string) ([]byte, int, error) {
 
-	if blobhash == config.ZeroDataDigest8M {
+	// be comptable with HugeBlob mode
+	temphash, _, _ := utils.ParseBlobDigest(blobhash)
+	if temphash == config.ZeroDataDigest8M {
 		// zero data no need fetch from remote
 		fmt.Printf("zero data no need fetch from remote\n")
 		return config.ZeroData8M, configuration.BlobSize, nil

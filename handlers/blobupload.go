@@ -3,7 +3,6 @@ package handlers
 import (
 	"octlink/rstore/utils/configuration"
 	"octlink/rstore/modules/manifest"
-	"fmt"
 	"net/http"
 	"octlink/rstore/modules/blobs"
 	"octlink/rstore/modules/blobupload"
@@ -33,22 +32,22 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusNotAcceptable)
+		logger.Errorf("upload blob erorr, name or digest paras nill %s:%s\n", name, digest)
 		return
 	}
 
 	ct := r.Header.Get("Content-Type")
 	if ct != "" && ct != "application/octet-stream" {
-		fmt.Printf("Bad Content-Type\n")
+		logger.Errorf("Bad Content-Type for blob uploading\n")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if tempName != "" {
-		fmt.Printf("running in blob huge uploading %s,digest %s\n", tempName, digest)
+		logger.Infof("running in blob huge uploading %s,digest %s\n", tempName, digest)
 		blobHugeUpload(w, r, name, digest, tempName)
 		return
 	}
-	fmt.Printf("running in blob uploading %s,digest %s\n", tempName, digest)
 
 	b := blobs.Blob{
 		ID: digest,
@@ -58,11 +57,9 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 		b.IncRefCount()
 		b.WriteRefCount()
 		serviceresp.StatusOKResp(w)
-		logger.Warnf("blob of %s already exist", digest)
+		logger.Warnf("blob of %s already exist\n", digest)
 		return
 	}
-
-	logger.Debugf("start to upload blob %s\n", digest)
 
 	bu := blobupload.BlobUpload{
 		ID:         digest,

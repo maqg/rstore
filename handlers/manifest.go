@@ -24,6 +24,7 @@ func getManifest(w http.ResponseWriter, r *http.Request) {
 
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		logger.Errorf("got manifest error for bad paras, no name or digest specified\n")
 		return
 	}
 
@@ -48,6 +49,7 @@ func deleteManifest(w http.ResponseWriter, r *http.Request) {
 
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		logger.Errorf("delete manifest of %s error, no name or digest specified\n", digest)
 		return
 	}
 
@@ -61,8 +63,7 @@ func deleteManifest(w http.ResponseWriter, r *http.Request) {
 	err := manifest.Delete()
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		logger.Warnf("delete manifest of %s error %s\n",
-			digest, err)
+		logger.Warnf("delete manifest of %s error %s\n", digest, err)
 		return
 	}
 
@@ -86,10 +87,11 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	// bad args for manifest post
 	if name == "" || digest == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		logger.Errorf("post manifest error for bad paras, name or digest not specified\n")
 		return
 	}
 
-	logger.Debugf("got manifest post request %s:%s:%s\n", name, digest, tempName)
+	logger.Debugf("to post manifest %s:%s:%s\n", name, digest, tempName)
 
 	m := manifest.GetManifest(name, digest)
 	if m != nil {
@@ -103,6 +105,9 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		removeTempFile(tempName)
 
 		w.WriteHeader(http.StatusOK)
+
+		logger.Debugf("manifest of %s already exist, updated it\n", digest)
+
 		return
 	}
 
@@ -151,6 +156,8 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+
+	logger.Debugf("Post manifest of %s OK!\n", digest)
 }
 
 func manifestManager(r *http.Request) http.Handler {

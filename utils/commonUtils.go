@@ -328,6 +328,12 @@ func ParseBlobDigest(dgst string) (string, int, int) {
 	return segs[0], String2Int(segs[1]), String2Int(segs[2])
 }
 
+// IsHugeBlobDigest if hugeblobdigest like xxxxx_2_33333, return ture
+func IsHugeBlobDigest(dgst string) bool {
+	segs := strings.Split(dgst, "_")
+	return len(segs) == 1
+}
+
 // CopyFile for srcfile to dst file, return size on success
 func CopyFile(srcFile, dstFile string) (int64, error) {
 	sd, err := os.Open(srcFile)
