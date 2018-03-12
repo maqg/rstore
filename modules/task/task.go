@@ -78,7 +78,7 @@ func (t *Task) AddAndRun(callback ImageCallBack) {
 	GTasks[t.ID] = t
 	go t.Download()
 
-	logger.Warnf("task of %s start to run, URL:%s\n", t.ID, t.URL)
+	logger.Warnf("Task of %s start to run, URL:%s\n", t.ID, t.URL)
 }
 
 // GetTask by taskid
@@ -265,7 +265,7 @@ func (t *Task) Download() {
 		return
 	}
 
-	logger.Infof("Fetch image from Internet URL %s\n", t.URL)
+	logger.Infof("Fetch image from Internet URL %s, started to download......\n", t.URL)
 
 	r, err := http.Get(t.URL)
 	if err != nil {
@@ -318,6 +318,8 @@ func (t *Task) Download() {
 		}
 	}
 
+	logger.Infof("Fetch image from Internet URL %s, download finished!!!!\n", t.URL)
+
 	importImage(t)
 
 	return
@@ -325,23 +327,27 @@ func (t *Task) Download() {
 
 // Stop this task
 func (t *Task) Stop() int {
+	logger.Warnf("task of %s with URL %s stopped\n", t.ID, t.URL)
 	t.callback(t.ImageName, 0, 0, "", TaskStatusError)
 	return merrors.ErrSuccess
 }
 
 // Delete this task
 func (t *Task) Delete() int {
+	logger.Warnf("task of %s with URL %s Deleted\n", t.ID, t.URL)
 	return merrors.ErrSuccess
 }
 
 // Finish task here
 func (t *Task) Finish(diskSize int64, virtualSize int64, blobsum string) {
+	logger.Warnf("task of %s with URL %s Finished\n", t.ID, t.URL)
 	t.Status = TaskStatusFinished
 	t.FinishTime = utils.CurrentTimeStr()
 	t.callback(t.ImageName, diskSize, virtualSize, blobsum, TaskStatusFinished)
 }
 
 func (t *Task) Error() {
+	logger.Warnf("task of %s with URL %s Errored\n", t.ID, t.URL)
 	t.Status = TaskStatusError
 	t.FinishTime = utils.CurrentTimeStr()
 	t.callback(t.ImageName, 0, 0, "", TaskStatusError)
