@@ -78,7 +78,7 @@ func (t *Task) AddAndRun(callback ImageCallBack) {
 	GTasks[t.ID] = t
 	go t.Download()
 
-	logger.Warnf("task of %s start to run, %s\n", t.ID, t.URL)
+	logger.Warnf("task of %s start to run, URL:%s\n", t.ID, t.URL)
 }
 
 // GetTask by taskid
@@ -100,7 +100,7 @@ func (t *Task) UpdateFilePath() {
 		t.FilePath = t.URL
 	}
 
-	logger.Debugf("update file dst path %s\n", t.FilePath)
+	logger.Warnf("Updated image dst path to %s\n", t.FilePath)
 }
 
 // ImportBlobs and then write blobs-manifest config
@@ -144,6 +144,8 @@ func (t *Task) ImportBlobs() (*blobsmanifest.BlobsManifest, error) {
 		return nil, err
 	}
 
+	logger.Warnf("Import blobs for URL:%s blobsum %s OK\n", t.URL, bm.BlobSum)
+
 	return bm, nil
 }
 
@@ -166,17 +168,19 @@ func (t *Task) WriteManifest(blobsum string) (*manifest.Manifest, error) {
 
 	err := m.Write()
 	if err != nil {
-		logger.Errorf("Create manifest error[%s]\n", err)
+		logger.Errorf("Create and Write manifest error, name[%s], blobsum %s, err %s\n",
+			m.Name, m.BlobSum, err)
 		return nil, err
 	}
 
-	logger.Debugf("Write manifest of %s OK\n", blobsum)
+	logger.Warnf("Write manifest of %s/%s OK\n", blobsum, m.Name)
 
 	return m, nil
 }
 
 
 func importImage(t *Task) {
+
 	bm, err := t.ImportBlobs()
 	if err != nil {
 		logger.Errorf("import blobs error %s for %s\n", err, t.FileName)
@@ -236,7 +240,8 @@ func importImage(t *Task) {
 	// update task status and image info
 	t.Finish(m.DiskSize, m.VirtualSize, m.BlobSum)
 
-	logger.Debugf("got file length of %d, and wroted %s\n", t.FileLength, t.FilePath)
+	logger.Warnf("Import Image From Internet OK,length %d, and wroted to %s, with blobsum %s\n",
+		t.FileLength, t.FilePath, m.BlobSum)
 }
 
 // Download Image from URL
@@ -245,6 +250,8 @@ func (t *Task) Download() {
 	if utils.IsLocalFile(t.URL) {
 
 		t.UpdateFilePath()
+
+		logger.Infof("Fetch image from Local URL %s, no need downloading\n", t.URL)
 
 		// import image from local
 		if !utils.IsFileExist(t.URL) {
@@ -257,6 +264,8 @@ func (t *Task) Download() {
 		importImage(t)
 		return
 	}
+
+	logger.Infof("Fetch image from Internet URL %s\n", t.URL)
 
 	r, err := http.Get(t.URL)
 	if err != nil {
@@ -294,7 +303,7 @@ func (t *Task) Download() {
 		}
 
 		if err != nil {
-			logger.Errorf("read file error %s", err)
+			logger.Errorf("read file error %s. with Url %s", err, t.URL)
 			// TBD clear
 			t.Error()
 			return
