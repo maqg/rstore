@@ -196,8 +196,15 @@ func importImage(t *Task) {
 		// Remove temp file when failed to add image
 		if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
 			utils.Remove(t.FilePath)
-		}		
+		}
 		return
+	}
+
+	hugeBlob := configuration.GetConfig().HugeBlob
+	if hugeBlob {
+		if utils.IsFileExist(t.FilePath) {
+			//
+		}
 	}
 
 	// update task status and image info
@@ -210,7 +217,7 @@ func importImage(t *Task) {
 func (t *Task) Download() {
 
 	if t.URL[:4] != "http" && t.URL[:4] != "ftp" {
-			
+
 		t.UpdateFilePath()
 
 		// import image from local

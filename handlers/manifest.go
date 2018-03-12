@@ -82,7 +82,7 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 
 	name := mux.Vars(r)["name"]
 	digest := mux.Vars(r)["digest"]
-	tempName := r.FormValue("tempName")	
+	tempName := r.FormValue("tempName")
 
 	// bad args for manifest post
 	if name == "" || digest == "" {
@@ -123,7 +123,7 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	m = new(manifest.Manifest)
 	if err = json.Unmarshal(data, m); err != nil {
 		logger.Errorf("convert data to json error %s\n", err)
-		
+
 		// remove tempfile for this manifest
 		removeTempFile(tempName)
 
@@ -147,17 +147,26 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tempName != "" {
+
 		imageFilePath := configuration.RootDirectory() + manifest.TempDir + "/" + tempName
-		destFilePath := configuration.RootDirectory() + manifest.ManifestDir + "/" + m.BlobSum
+		destFileDir := configuration.RootDirectory() + manifest.ManifestDir + "/" + m.BlobSum
+		destFilePath := destFileDir + "/" + "image"
+
+		logger.Infof("tempName %s,tempFile %s\ndestFile %s\n", tempName, imageFilePath, destFilePath)
+
 		if utils.IsFileExist(imageFilePath) {
-			utils.CreateDir(destFilePath)
-			os.Rename(imageFilePath, destFilePath)
+			utils.CreateDir(destFileDir)
+			if !utils.IsFileExist(destFilePath) {
+				os.Rename(imageFilePath, destFilePath)
+			} else {
+				utils.Remove(imageFilePath)
+			}
 		}
 	}
 
 	w.WriteHeader(http.StatusOK)
 
-	logger.Debugf("Post manifest of %s OK!\n", digest)
+	logger.Infof("Post manifest of %s OK!\n", digest)
 }
 
 func manifestManager(r *http.Request) http.Handler {

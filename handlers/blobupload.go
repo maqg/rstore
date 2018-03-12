@@ -44,7 +44,7 @@ func blobUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if tempName != "" {
-		logger.Infof("running in blob huge uploading %s,digest %s\n", tempName, digest)
+		logger.Debugf("running in blob huge uploading %s,digest %s\n", tempName, digest)
 		blobHugeUpload(w, r, name, digest, tempName)
 		return
 	}

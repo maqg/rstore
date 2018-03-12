@@ -73,7 +73,7 @@ func postBlobsManifest(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 
-	logger.Debugf("write new blobs-manifest %s OK\n", bm.BlobSum)
+	logger.Infof("write new blobs-manifest %s OK\n", bm.BlobSum)
 }
 
 func blobsmanifestManager(r *http.Request) http.Handler {
