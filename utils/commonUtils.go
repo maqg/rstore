@@ -317,6 +317,14 @@ func String2Int64(src string) int64 {
 	return val
 }
 
+// IsLocalFile for url checking local or remote
+func IsLocalFile(url string) bool {
+	if url[:4] != "http" && url[:4] != "ftp" {
+		return true
+	}
+	return false
+}
+
 // ParseBlobDigest for common digest, return dgst, 0, 0
 // for huge blob, return dgst, index, length
 func ParseBlobDigest(dgst string) (string, int, int) {

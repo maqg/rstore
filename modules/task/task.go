@@ -89,7 +89,7 @@ func GetTask(id string) *Task {
 // UpdateFilePath update and write file path
 func (t *Task) UpdateFilePath() {
 
-	if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+	if !utils.IsLocalFile(t.URL) {
 		segs := strings.Split(t.URL, "/")
 		t.FileName = segs[len(segs)-1]
 		t.FilePath = configuration.GetConfig().RootDirectory + "/registry/temp/" +
@@ -183,7 +183,7 @@ func importImage(t *Task) {
 		t.Error()
 
 		// Remove temp file when failed to add image
-		if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+		if !utils.IsLocalFile(t.URL) {
 			utils.Remove(t.FilePath)
 		}
 		return
@@ -194,7 +194,7 @@ func importImage(t *Task) {
 		logger.Errorf("write manifest error, imageid:%s, blobsum:%s\n", t.ImageName, bm.BlobSum)
 		t.Error()
 		// Remove temp file when failed to add image
-		if t.URL[:4] == "http" || t.URL[:4] == "ftp" {
+		if !utils.IsLocalFile(t.URL) {
 			utils.Remove(t.FilePath)
 		}
 		return
@@ -202,9 +202,35 @@ func importImage(t *Task) {
 
 	hugeBlob := configuration.GetConfig().HugeBlob
 	if hugeBlob {
-		if utils.IsFileExist(t.FilePath) {
-			//
+
+		imageFilePath := t.FilePath
+        destFileDir := configuration.RootDirectory() + manifest.ManifestDir + "/" + m.BlobSum
+        destFilePath := destFileDir + "/" + "image"
+
+        logger.Infof("LocalFile %s,destFile %s\n", imageFilePath, destFilePath)
+
+        if utils.IsFileExist(imageFilePath) {
+            utils.CreateDir(destFileDir)
+            if !utils.IsFileExist(destFilePath) {
+				if !utils.IsLocalFile(t.URL) {
+					os.Rename(imageFilePath, destFilePath)
+				} else {
+					utils.CopyFile(imageFilePath, destFilePath)
+				}
+            } else {
+				logger.Infof("image file of %s already exist, no need copy\n", destFilePath)
+            }
+        } else {
+			logger.Errorf("local file of %s from url %s not exist, import manifest error\n",
+				t.FilePath, t.URL)
+			t.Error()
+			return
 		}
+	}
+
+	// remove temp file
+	if !utils.IsLocalFile(t.URL) {
+		utils.Remove(t.FilePath)
 	}
 
 	// update task status and image info
@@ -216,7 +242,7 @@ func importImage(t *Task) {
 // Download Image from URL
 func (t *Task) Download() {
 
-	if t.URL[:4] != "http" && t.URL[:4] != "ftp" {
+	if utils.IsLocalFile(t.URL) {
 
 		t.UpdateFilePath()
 
