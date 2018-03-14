@@ -146,7 +146,8 @@ func postManifest(w http.ResponseWriter, r *http.Request) {
 		logger.Infof("update image info %s error, and manifest created OK\n", m.Name)
 	}
 
-	if tempName != "" {
+	hugeBlob := configuration.GetConfig().HugeBlob	
+	if hugeBlob && tempName != "" {
 
 		imageFilePath := configuration.RootDirectory() + manifest.TempDir + "/" + tempName
 		destFileDir := configuration.RootDirectory() + manifest.ManifestDir + "/" + m.BlobSum
